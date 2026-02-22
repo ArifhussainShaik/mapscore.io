@@ -67,6 +67,33 @@ export default function AuditReport({ audit, isPro = false }) {
                         </p>
                     </div>
                 )}
+                {/* Quick Stats: Unreplied reviews + Post frequency */}
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {audit.unrepliedReviewCount != null && (
+                        <div className="p-3 rounded-lg bg-base-content/5 border border-base-content/10">
+                            <p className="text-xs text-base-content/50">Unreplied Reviews</p>
+                            <p className={`text-xl font-bold mt-1 ${audit.unrepliedReviewCount > 5 ? "text-red-400" : audit.unrepliedReviewCount > 0 ? "text-amber-400" : "text-emerald-400"}`}>
+                                {audit.unrepliedReviewCount}
+                                <span className="text-xs font-normal text-base-content/40 ml-1">/ {audit.reviewCount || 0}</span>
+                            </p>
+                        </div>
+                    )}
+                    <div className="p-3 rounded-lg bg-base-content/5 border border-base-content/10">
+                        <p className="text-xs text-base-content/50">Posts / Month</p>
+                        <p className={`text-xl font-bold mt-1 ${(audit.postsPerMonth || 0) >= 4 ? "text-emerald-400" : (audit.postsPerMonth || 0) >= 1 ? "text-amber-400" : "text-red-400"}`}>
+                            {audit.postsPerMonth ?? 0}
+                            <span className="text-xs font-normal text-base-content/40 ml-1">
+                                {(audit.postsPerMonth || 0) >= 4 ? "Great!" : (audit.postsPerMonth || 0) >= 1 ? "Could improve" : "Not posting"}
+                            </span>
+                        </p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-base-content/5 border border-base-content/10">
+                        <p className="text-xs text-base-content/50">Review Response Rate</p>
+                        <p className={`text-xl font-bold mt-1 ${(audit.responseRate || 0) >= 0.8 ? "text-emerald-400" : (audit.responseRate || 0) >= 0.5 ? "text-amber-400" : "text-red-400"}`}>
+                            {Math.round((audit.responseRate || 0) * 100)}%
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Section 1: Score Dashboard */}

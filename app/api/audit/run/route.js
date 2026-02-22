@@ -64,20 +64,43 @@ export async function POST(req) {
             ).toISOString(),
         };
 
-        // Collect suggested secondary categories from competitors
+        // ── Compute unreplied review count ──
+        const reviewCount = rawData.reviewCount || 0;
+        const responseRate = rawData.responseRate ?? 0;
+        audit.unrepliedReviewCount = Math.round(reviewCount * (1 - responseRate));
+
+        // ── Compute posts per month ──
+        if (rawData.postFrequency === "weekly") audit.postsPerMonth = 4;
+        else if (rawData.postFrequency === "monthly") audit.postsPerMonth = 1;
+        else if (rawData.postFrequency === "rarely") audit.postsPerMonth = 0;
+        else audit.postsPerMonth = 0;
+
+        // ── Add Google Maps links to competitors ──
         if (rawData.competitors?.length > 0) {
-            const existingCats = new Set([
-                rawData.primaryCategory?.toLowerCase(),
-                ...(rawData.secondaryCategories || []).map(c => c.toLowerCase()),
-            ].filter(Boolean));
-            const suggestions = new Set();
+            for (const comp of rawData.competitors) {
+                if (!comp.mapsUrl && comp.name) {
+                    comp.mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(comp.name + " " + (city || ""))}`;
+                }
+            }
+            audit.competitors = rawData.competitors;
+        }
+
+        // ── Collect suggested secondary categories ──
+        const existingCats = new Set([
+            rawData.primaryCategory?.toLowerCase(),
+            ...(rawData.secondaryCategories || []).map(c => c.toLowerCase()),
+        ].filter(Boolean));
+        const suggestions = new Set();
+
+        // From competitors
+        if (rawData.competitors?.length > 0) {
             for (const comp of rawData.competitors) {
                 if (comp.category && !existingCats.has(comp.category.toLowerCase())) {
                     suggestions.add(comp.category);
                 }
             }
-            audit.suggestedCategories = [...suggestions].slice(0, 5);
         }
+        audit.suggestedCategories = [...suggestions].slice(0, 5);
 
         // Remove internal metadata before saving
         delete audit._source;

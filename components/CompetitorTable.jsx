@@ -69,11 +69,21 @@ export default function CompetitorTable({ competitors, auditData }) {
                         <tr className="border-base-content/10">
                             <th className="text-base-content/50 text-xs uppercase">Metric</th>
                             <th className="text-emerald-400 text-xs uppercase font-bold">
-                                You
+                                {auditData?.googleMapsUrl ? (
+                                    <a href={auditData.googleMapsUrl} target="_blank" rel="noopener noreferrer"
+                                        className="hover:underline">You</a>
+                                ) : "You"}
                             </th>
                             {competitors.map((c, i) => (
                                 <th key={i} className="text-base-content/50 text-xs uppercase">
-                                    {c.name?.length > 20 ? c.name.slice(0, 20) + "…" : c.name}
+                                    {c.mapsUrl ? (
+                                        <a href={c.mapsUrl} target="_blank" rel="noopener noreferrer"
+                                            className="hover:text-emerald-400 hover:underline transition-colors">
+                                            {c.name?.length > 20 ? c.name.slice(0, 20) + "…" : c.name}
+                                        </a>
+                                    ) : (
+                                        c.name?.length > 20 ? c.name.slice(0, 20) + "…" : c.name
+                                    )}
                                 </th>
                             ))}
                         </tr>
