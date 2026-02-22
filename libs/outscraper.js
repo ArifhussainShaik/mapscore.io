@@ -190,9 +190,11 @@ function mapOutscraperToAuditData(place) {
         monthlyReviewVelocity: estimateReviewVelocity(reviewCount),
         responseRate: responseRate ?? 0.5,
 
-        // Activity / Posts
-        lastPostDate: place.last_post_date || null,
-        postFrequency: estimatePostFrequency(place.posts_count),
+        // Activity / Posts — Outscraper returns `posts` as an array or count
+        lastPostDate: parseLastPostDate(place.posts),
+        postFrequency: estimatePostFrequency(
+            Array.isArray(place.posts) ? place.posts.length : (place.posts_count || 0)
+        ),
 
         // Website (will be enriched by PageSpeed later)
         websiteHttps: (place.site || place.website || "").startsWith("https"),
@@ -281,3 +283,25 @@ function estimatePostFrequency(postsCount) {
     if (postsCount >= 4) return "monthly";
     return "rarely";
 }
+
+/**
+ * Extract the most recent post date from Outscraper's posts data.
+ */
+function parseLastPostDate(posts) {
+    if (!posts) return null;
+    if (Array.isArray(posts) && posts.length > 0) {
+        // Posts may have a date/time field
+        const dates = posts
+            .map(p => p.post_datetime || p.date || p.timestamp)
+            .filter(Boolean)
+            .sort()
+            .reverse();
+        if (dates.length > 0) {
+            try {
+                return new Date(dates[0]).toISOString();
+            } catch { return null; }
+        }
+    }
+    return null;
+}
+

@@ -30,8 +30,16 @@ export default function CompetitorTable({ competitors, auditData }) {
         },
         {
             label: "Activity",
-            getValue: (c) => c.postActivity ?? "—",
-            businessValue: auditData?.postFrequency ?? "—",
+            getValue: (c) => {
+                const val = c.postActivity;
+                if (!val || val === "unknown") return "N/A";
+                return val;
+            },
+            businessValue: (() => {
+                const freq = auditData?.postFrequency;
+                if (!freq || freq === "unknown") return "N/A";
+                return freq;
+            })(),
             compare: null,
         },
     ];

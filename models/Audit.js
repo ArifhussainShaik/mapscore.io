@@ -16,6 +16,7 @@ const auditSchema = mongoose.Schema(
         description: { type: String },
         phone: { type: String },
         websiteUrl: { type: String },
+        googleMapsUrl: { type: String },
         hours: { type: Object },
         attributes: { type: Object },
         services: [
@@ -39,7 +40,7 @@ const auditSchema = mongoose.Schema(
         lastPostDate: { type: Date },
         postFrequency: {
             type: String,
-            enum: ["weekly", "monthly", "rarely", "never"],
+            enum: ["weekly", "monthly", "rarely", "never", "unknown"],
         },
         // Website checks
         websiteHttps: { type: Boolean },
@@ -96,6 +97,8 @@ const auditSchema = mongoose.Schema(
         dataSource: { type: String },
         // Raw data for debugging
         rawData: { type: Object },
+        // Suggested categories for improvement
+        suggestedCategories: [String],
         // Cache
         cachedUntil: { type: Date },
     },

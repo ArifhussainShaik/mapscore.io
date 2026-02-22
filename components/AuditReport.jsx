@@ -30,6 +30,16 @@ export default function AuditReport({ audit, isPro = false }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                     </svg>
                     {audit.businessAddress}
+                    {audit.googleMapsUrl && (
+                        <a
+                            href={audit.googleMapsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-400 hover:text-emerald-300 transition-colors inline-flex items-center gap-1 text-xs font-medium"
+                        >
+                            View on Google Maps →
+                        </a>
+                    )}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
                     <span className="badge badge-outline badge-sm text-emerald-400 border-emerald-500/30">
@@ -41,6 +51,22 @@ export default function AuditReport({ audit, isPro = false }) {
                         </span>
                     ))}
                 </div>
+                {/* Suggested categories */}
+                {audit.suggestedCategories?.length > 0 && (
+                    <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <p className="text-xs font-semibold text-amber-400 mb-1.5">💡 Suggested Secondary Categories</p>
+                        <div className="flex flex-wrap gap-1.5">
+                            {audit.suggestedCategories.map((cat, i) => (
+                                <span key={i} className="badge badge-sm bg-amber-500/15 text-amber-300 border-amber-500/25">
+                                    + {cat}
+                                </span>
+                            ))}
+                        </div>
+                        <p className="text-xs text-base-content/40 mt-1.5">
+                            Adding relevant categories expands what searches your business appears in.
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Section 1: Score Dashboard */}

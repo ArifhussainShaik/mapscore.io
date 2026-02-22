@@ -64,10 +64,27 @@ export async function POST(req) {
             ).toISOString(),
         };
 
-        // Remove internal metadata
+        // Collect suggested secondary categories from competitors
+        if (rawData.competitors?.length > 0) {
+            const existingCats = new Set([
+                rawData.primaryCategory?.toLowerCase(),
+                ...(rawData.secondaryCategories || []).map(c => c.toLowerCase()),
+            ].filter(Boolean));
+            const suggestions = new Set();
+            for (const comp of rawData.competitors) {
+                if (comp.category && !existingCats.has(comp.category.toLowerCase())) {
+                    suggestions.add(comp.category);
+                }
+            }
+            audit.suggestedCategories = [...suggestions].slice(0, 5);
+        }
+
+        // Remove internal metadata before saving
         delete audit._source;
         delete audit._serperCid;
         delete audit._outscraper;
+        delete audit._servicesChecked;
+        delete audit._descriptionChecked;
 
         // Save to MongoDB if user is authenticated
         let savedAuditId = null;
@@ -83,8 +100,13 @@ export async function POST(req) {
                 console.log(`[Audit] Saved to DB for user ${userId}: ${savedAuditId}`);
             }
         } catch (dbError) {
-            // Don't fail the audit if DB save fails
+            // Don't fail the audit if DB save fails — but log the full error
             console.error("[Audit] DB save failed:", dbError.message);
+            if (dbError.errors) {
+                for (const [field, err] of Object.entries(dbError.errors)) {
+                    console.error(`[Audit] Validation error on '${field}':`, err.message);
+                }
+            }
         }
 
         // Add the DB id to the response
