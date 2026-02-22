@@ -82,6 +82,7 @@ export async function getFullBusinessData(query, placeId = null) {
         }
 
         console.log(`[Outscraper] Got data: ${place.name || "unknown"} (${place.reviews || 0} reviews)`);
+        console.log(`[Outscraper] Raw fields → description: ${(place.description || "").slice(0, 80)}... | services: ${JSON.stringify(place.services || place.menu || []).slice(0, 100)}... | working_hours: ${JSON.stringify(place.working_hours || {}).slice(0, 100)}...`);
         return mapOutscraperToAuditData(place);
     } catch (error) {
         console.error("[Outscraper] API error:", error.message);

@@ -34,6 +34,7 @@ export async function fetchAuditData(businessName, city, placeId) {
             auditData = await getPlaceDetails(placeId);
             source = "google-places";
             console.log(`[DataProvider] Google Places returned: ${auditData.businessName} (${auditData.reviewCount} reviews)`);
+            console.log(`[DataProvider] → Services: ${auditData.services?.length || 0}, Description: ${auditData.description?.length || 0} chars, Hours: ${Object.keys(auditData.hours || {}).length} days`);
         } catch (error) {
             console.error("[DataProvider] Google Places failed:", error.message);
             // Fall through to Serper
@@ -47,6 +48,7 @@ export async function fetchAuditData(businessName, city, placeId) {
             auditData = await getBusinessDetails(businessName, city, placeId);
             source = "serper";
             console.log(`[DataProvider] Serper returned: ${auditData.businessName} (${auditData.reviewCount} reviews)`);
+            console.log(`[DataProvider] → Services: ${auditData.services?.length || 0}, Description: ${auditData.description?.length || 0} chars, Hours: ${Object.keys(auditData.hours || {}).length} days`);
         } catch (error) {
             console.error("[DataProvider] Serper failed:", error.message);
         }
@@ -66,9 +68,12 @@ export async function fetchAuditData(businessName, city, placeId) {
             const deepData = await getFullBusinessData(query, confirmedPlaceId);
 
             if (deepData) {
+                console.log(`[DataProvider] Outscraper raw → Services: ${deepData.services?.length || 0}, Description: ${deepData.description?.length || 0} chars, Hours: ${Object.keys(deepData.hours || {}).length} days`);
                 auditData = mergeAuditData(auditData, deepData);
                 source += "+outscraper";
-                console.log(`[DataProvider] Outscraper enrichment applied`);
+                console.log(`[DataProvider] After merge → Services: ${auditData.services?.length || 0}, Description: ${auditData.description?.length || 0} chars, Hours: ${Object.keys(auditData.hours || {}).length} days`);
+            } else {
+                console.warn(`[DataProvider] Outscraper returned no data — services and description may be empty`);
             }
         } catch (error) {
             console.error("[DataProvider] Outscraper enrichment failed:", error.message);

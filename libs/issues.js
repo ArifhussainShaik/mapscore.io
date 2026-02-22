@@ -1,6 +1,80 @@
 import issuesLibrary from "@/issues-library.json";
 
 /**
+ * Interpolate template placeholders in issue text with actual audit data.
+ * Replaces {primary_category}, {services_count}, {review_count}, etc.
+ */
+function interpolate(text, data) {
+    if (!text) return text;
+
+    // Calculate derived values for templates
+    const competitorAvgReviews = data.competitors?.length > 0
+        ? Math.round(data.competitors.reduce((s, c) => s + (c.reviewCount || 0), 0) / data.competitors.length)
+        : 0;
+    const competitorAvgRating = data.competitors?.length > 0
+        ? (data.competitors.reduce((s, c) => s + (c.rating || 0), 0) / data.competitors.length).toFixed(1)
+        : "0";
+    const competitorAvgPhotos = data.competitors?.length > 0
+        ? Math.round(data.competitors.reduce((s, c) => s + (c.photoCount || 0), 0) / data.competitors.length)
+        : 0;
+
+    // Find most common competitor category
+    const competitorCategories = (data.competitors || []).map((c) => c.category).filter(Boolean);
+    const categoryCounts = {};
+    for (const cat of competitorCategories) {
+        categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    }
+    const competitorCommonCategory = Object.entries(categoryCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || "unknown";
+
+    // Days since last review/post
+    const daysSinceReview = data.recentReviewDate
+        ? Math.floor((Date.now() - new Date(data.recentReviewDate).getTime()) / (1000 * 60 * 60 * 24))
+        : 999;
+    const daysSincePost = data.lastPostDate
+        ? Math.floor((Date.now() - new Date(data.lastPostDate).getTime()) / (1000 * 60 * 60 * 24))
+        : 999;
+
+    // City from address
+    const cityName = data.businessAddress?.split(",")[1]?.trim() || "";
+
+    // Replacement map
+    const replacements = {
+        "{primary_category}": data.primaryCategory || "Not Set",
+        "{competitor_common_category}": competitorCommonCategory,
+        "{services_count}": data.services?.length || 0,
+        "{description_length}": data.description?.length || 0,
+        "{secondary_categories_count}": data.secondaryCategories?.length || 0,
+        "{review_count}": data.reviewCount ?? 0,
+        "{average_rating}": data.averageRating ?? 0,
+        "{competitor_average_reviews}": competitorAvgReviews,
+        "{competitor_average_rating}": competitorAvgRating,
+        "{competitor_average_photos}": competitorAvgPhotos,
+        "{review_gap}": Math.max(0, competitorAvgReviews - (data.reviewCount || 0)),
+        "{photo_count}": data.photoCount ?? 0,
+        "{photo_gap}": Math.max(0, competitorAvgPhotos - (data.photoCount || 0)),
+        "{days_since_last_review}": daysSinceReview,
+        "{days_since_last_post}": daysSincePost,
+        "{city_name}": cityName,
+        "{website_url}": data.websiteUrl || "",
+        "{response_rate}": Math.round((data.responseRate ?? 0) * 100),
+        "{competitor_post_frequency}": "weekly",
+        "{user_post_frequency}": data.postFrequency || "never",
+        "{competitors_open_count}": "2",
+        "{average_daily_hours}": data.hours ? Object.keys(data.hours).length : 0,
+        "{estimated_months_to_close}": competitorAvgReviews > 0
+            ? Math.ceil(Math.max(0, competitorAvgReviews - (data.reviewCount || 0)) / 4)
+            : "N/A",
+    };
+
+    let result = text;
+    for (const [key, value] of Object.entries(replacements)) {
+        result = result.replaceAll(key, String(value));
+    }
+    return result;
+}
+
+/**
  * Detect issues from audit data and return matched issues sorted by severity.
  * @param {Object} auditData - The raw audit data
  * @returns {Array} Array of matched issues with full details
@@ -15,8 +89,8 @@ export function detectIssues(auditData) {
                 category: issue.category,
                 name: issue.name,
                 severity: issue.severity,
-                description: issue.what_we_found,
-                whyItMatters: issue.why_it_matters,
+                description: interpolate(issue.what_we_found, auditData),
+                whyItMatters: interpolate(issue.why_it_matters, auditData),
                 howToFix: issue.how_to_fix,
                 timeToFix: issue.time_to_fix,
                 expectedImpact: issue.expected_impact,
