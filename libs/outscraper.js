@@ -23,7 +23,7 @@ export function isOutscraperConfigured() {
  * @param {string} query - "Business Name, City" text query
  * @returns {Promise<Object|null>} Mapped audit data or null on failure
  */
-export async function getFullBusinessData(query) {
+export async function getFullBusinessData(query, placeId = null) {
     const apiKey = process.env.OUTSCRAPER_API_KEY;
     if (!apiKey) {
         console.warn("[Outscraper] Not configured — skipping deep data pull");
@@ -31,11 +31,14 @@ export async function getFullBusinessData(query) {
     }
 
     try {
-        console.log(`[Outscraper] Fetching deep data for: "${query}"`);
+        // Outscraper supports Place ID directly as a query (prefixed or raw)
+        // This gives the most accurate match possible
+        const searchQuery = placeId || query;
+        console.log(`[Outscraper] Fetching deep data for: "${searchQuery}"${placeId ? " (via placeId)" : ""}`);
 
         // Use the Google Maps Search endpoint with async=false for synchronous response
         const params = new URLSearchParams({
-            query: query,
+            query: searchQuery,
             limit: "1",
             language: "en",
             async: "false",  // Wait for results instead of returning a job ID

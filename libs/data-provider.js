@@ -52,16 +52,18 @@ export async function fetchAuditData(businessName, city, placeId) {
         }
     }
 
-    // ── Step 3: Outscraper deep enrichment (if configured) ──
+    // ── Step 3: Outscraper deep enrichment (services, description, posts) ──
     if (auditData && isOutscraperConfigured()) {
         try {
-            // Use the confirmed business name + address for better matching
+            // Use the confirmed business name + address for the text query
             const name = auditData.businessName || businessName;
             const location = city || auditData.businessAddress || "";
             const query = location ? `${name}, ${location}` : name;
+            // Pass placeId for exact matching — Outscraper supports Place ID queries
+            const confirmedPlaceId = auditData.googlePlaceId || placeId || null;
 
             console.log(`[DataProvider] Step 3: Outscraper deep pull for "${query}"`);
-            const deepData = await getFullBusinessData(query);
+            const deepData = await getFullBusinessData(query, confirmedPlaceId);
 
             if (deepData) {
                 auditData = mergeAuditData(auditData, deepData);
