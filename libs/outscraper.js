@@ -204,6 +204,7 @@ function mapOutscraperToAuditData(place) {
         _source: "outscraper",
         _outscraper: true,
         _servicesChecked: servicesChecked,
+        _descriptionChecked: place.description != null, // only checked if API returned a value
     };
 }
 

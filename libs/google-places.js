@@ -155,6 +155,7 @@ function mapPlaceToAuditData(place, placeId) {
         // Services (not available from Places Details — will be enriched by Outscraper)
         services: [],
         _servicesChecked: false, // Google Places does NOT expose GBP services
+        _descriptionChecked: false, // editorialSummary is NOT the owner's description
 
         // Photos
         photoCount,

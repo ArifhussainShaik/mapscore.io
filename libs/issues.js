@@ -120,8 +120,9 @@ function shouldTrigger(issue, data) {
     // Services: only trigger if we actually checked (APIs may not expose GBP services)
     if (t.includes("services_count == 0") && data._servicesChecked && (!data.services || data.services.length === 0)) return true;
     if (t.includes("services_count > 0 AND services_count < 5") && data._servicesChecked && data.services?.length > 0 && data.services.length < 5) return true;
-    if (t.includes("description == null") && (!data.description || data.description === "")) return true;
-    if (t.includes("description_length > 0 AND description_length < 250") && data.description && data.description.length > 0 && data.description.length < 250) return true;
+    // Description: only trigger if we actually got a reliable check
+    if (t.includes("description == null") && data._descriptionChecked && (!data.description || data.description === "")) return true;
+    if (t.includes("description_length > 0 AND description_length < 250") && data._descriptionChecked && data.description && data.description.length > 0 && data.description.length < 250) return true;
     if (t.includes("description does not contain city_name") && data.description && data.businessAddress) {
         const city = data.businessAddress.split(",")[1]?.trim();
         if (city && !data.description.toLowerCase().includes(city.toLowerCase())) return true;

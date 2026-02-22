@@ -74,13 +74,18 @@ function evaluateCheck(check, data, sectionId) {
 
         case "description":
             const descLen = data.description?.length || 0;
-            const hasKeywords =
-                data.description &&
-                (data.description.toLowerCase().includes(data.primaryCategory?.toLowerCase() || "") ||
-                    data.description.toLowerCase().includes(data.businessAddress?.split(",")[1]?.trim()?.toLowerCase() || ""));
-            if (descLen >= 500 && hasKeywords) score = 4;
-            else if (descLen >= 250) score = 3;
-            else if (descLen > 0) score = 1;
+            if (!data._descriptionChecked && descLen === 0) {
+                // Can't verify description via API — give benefit of the doubt
+                score = 2;
+            } else {
+                const hasKeywords =
+                    data.description &&
+                    (data.description.toLowerCase().includes(data.primaryCategory?.toLowerCase() || "") ||
+                        data.description.toLowerCase().includes(data.businessAddress?.split(",")[1]?.trim()?.toLowerCase() || ""));
+                if (descLen >= 500 && hasKeywords) score = 4;
+                else if (descLen >= 250) score = 3;
+                else if (descLen > 0) score = 1;
+            }
             break;
 
         case "hours":

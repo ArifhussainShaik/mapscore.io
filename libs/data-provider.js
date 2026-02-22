@@ -181,6 +181,7 @@ function mergeAuditData(primaryData, outscraperData) {
             : primaryData.services,
         // Track whether services were actually checked by any API
         _servicesChecked: outscraperData._servicesChecked || primaryData._servicesChecked || false,
+        _descriptionChecked: outscraperData._descriptionChecked || primaryData._descriptionChecked || false,
 
         // Photos: Use the richer source
         photoCount: Math.max(outscraperData.photoCount || 0, primaryData.photoCount || 0),
