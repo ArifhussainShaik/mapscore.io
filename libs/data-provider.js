@@ -1,22 +1,22 @@
 /**
- * Data Provider — Abstraction layer wrapping Serper + Outscraper + PageSpeed.
+ * Data Provider — Abstraction layer wrapping Google Places + Serper + Outscraper + PageSpeed.
  *
  * This is the single entry point for fetching audit data.
- * It orchestrates multiple data sources with automatic fallback:
- *   1. Serper  → fast business search (always used)
- *   2. Outscraper → deep GBP data enrichment (if configured)
- *   3. PageSpeed → website performance checks (if website URL found)
- *
- * If Outscraper is not configured or fails, Serper data is used alone.
- * If PageSpeed fails, basic URL checks are used as fallback.
+ * It orchestrates multiple data sources:
+ *   1. Google Places Details → accurate business data via Place ID (primary)
+ *   2. Serper  → fallback search + competitor data
+ *   3. Outscraper → deep GBP data enrichment (if configured)
+ *   4. PageSpeed → website performance checks (if website URL found)
  */
 
+import { getPlaceDetails, isGooglePlacesConfigured } from "@/libs/google-places";
 import { getBusinessDetails, getCompetitors, isSerperConfigured } from "@/libs/serper";
 import { getFullBusinessData, isOutscraperConfigured } from "@/libs/outscraper";
 import { checkWebsite } from "@/libs/pagespeed";
+
 /**
  * Fetch complete audit data for a business.
- * Orchestrates Serper → Outscraper → PageSpeed pipeline.
+ * Priority: Google Places (by placeId) → Serper (text search fallback) → error.
  *
  * @param {string} businessName
  * @param {string} [city]
@@ -25,12 +25,25 @@ import { checkWebsite } from "@/libs/pagespeed";
  */
 export async function fetchAuditData(businessName, city, placeId) {
     let auditData = null;
-    let source = "serper";
+    let source = "";
 
-    // ── Step 1: Serper (fast search — always try first) ──
-    if (isSerperConfigured()) {
+    // ── Step 1: Google Places Details (accurate, uses Place ID) ──
+    if (placeId && isGooglePlacesConfigured()) {
         try {
-            console.log(`[DataProvider] Step 1: Serper search for "${businessName}"`);
+            console.log(`[DataProvider] Step 1: Google Places Details for placeId: ${placeId}`);
+            auditData = await getPlaceDetails(placeId);
+            source = "google-places";
+            console.log(`[DataProvider] Google Places returned: ${auditData.businessName} (${auditData.reviewCount} reviews)`);
+        } catch (error) {
+            console.error("[DataProvider] Google Places failed:", error.message);
+            // Fall through to Serper
+        }
+    }
+
+    // ── Step 2: Serper fallback (if no placeId or Google Places failed) ──
+    if (!auditData && isSerperConfigured()) {
+        try {
+            console.log(`[DataProvider] Step 2: Serper search for "${businessName}"`);
             auditData = await getBusinessDetails(businessName, city, placeId);
             source = "serper";
             console.log(`[DataProvider] Serper returned: ${auditData.businessName} (${auditData.reviewCount} reviews)`);
@@ -39,42 +52,38 @@ export async function fetchAuditData(businessName, city, placeId) {
         }
     }
 
-    // ── Step 2: Outscraper deep enrichment (if configured) ──
-    if (isOutscraperConfigured()) {
+    // ── Step 3: Outscraper deep enrichment (if configured) ──
+    if (auditData && isOutscraperConfigured()) {
         try {
-            // Outscraper works best with text queries like "Business Name, City"
-            // Prefer name+location over Place ID for better match rates
-            const name = auditData?.businessName || businessName;
-            const location = city || auditData?.businessAddress || "";
+            // Use the confirmed business name + address for better matching
+            const name = auditData.businessName || businessName;
+            const location = city || auditData.businessAddress || "";
             const query = location ? `${name}, ${location}` : name;
 
-            console.log(`[DataProvider] Step 2: Outscraper deep pull for "${query}"`);
+            console.log(`[DataProvider] Step 3: Outscraper deep pull for "${query}"`);
             const deepData = await getFullBusinessData(query);
 
             if (deepData) {
-                // Merge: Outscraper deep data overwrites Serper basics,
-                // but keep Serper data for any fields Outscraper doesn't have
                 auditData = mergeAuditData(auditData, deepData);
-                source = "serper+outscraper";
+                source += "+outscraper";
                 console.log(`[DataProvider] Outscraper enrichment applied`);
             }
         } catch (error) {
             console.error("[DataProvider] Outscraper enrichment failed:", error.message);
-            // Continue with Serper data only
         }
     }
 
-    // ── Step 3: Fail if no data was fetched ──
+    // ── Step 4: Fail if no data was fetched ──
     if (!auditData) {
         throw new Error(
-            "Could not fetch audit data. Please check that SERPER_API_KEY is configured and valid."
+            "Could not fetch audit data. Please check that GOOGLE_PLACES_API_KEY or SERPER_API_KEY is configured."
         );
     }
 
-    // ── Step 4: PageSpeed website check ──
+    // ── Step 5: PageSpeed website check ──
     if (auditData.websiteUrl) {
         try {
-            console.log(`[DataProvider] Step 3: PageSpeed check for "${auditData.websiteUrl}"`);
+            console.log(`[DataProvider] Step 4: PageSpeed check for "${auditData.websiteUrl}"`);
             const websiteCheck = await checkWebsite(auditData.websiteUrl);
 
             auditData.websiteHttps = websiteCheck.httpsValid;
@@ -84,13 +93,10 @@ export async function fetchAuditData(businessName, city, placeId) {
             auditData.websiteDesktopScore = websiteCheck.desktopScore;
             auditData.websiteLoadSpeed = websiteCheck.loadSpeed;
 
-            if (source !== "mock") {
-                source += "+pagespeed";
-            }
+            source += "+pagespeed";
             console.log(`[DataProvider] PageSpeed results applied`);
         } catch (error) {
             console.error("[DataProvider] PageSpeed check failed:", error.message);
-            // Keep existing website checks from Serper/Outscraper
         }
     }
 
@@ -125,70 +131,74 @@ export async function fetchCompetitors(category, city, excludeName = "") {
 // ─────────────────────────────────────────────
 
 /**
- * Merge Serper base data with Outscraper deep data.
- * Outscraper data takes priority for fields it provides,
- * but Serper fills gaps for anything Outscraper missed.
+ * Merge base data with Outscraper deep data.
+ * Outscraper data takes priority for fields it provides (richer data),
+ * but the primary source fills gaps for anything Outscraper missed.
+ * IMPORTANT: businessName, businessAddress, and googlePlaceId always
+ * come from the primary source (more trustworthy).
  */
-function mergeAuditData(serperData, outscraperData) {
-    if (!serperData) return outscraperData;
-    if (!outscraperData) return serperData;
+function mergeAuditData(primaryData, outscraperData) {
+    if (!primaryData) return outscraperData;
+    if (!outscraperData) return primaryData;
 
     return {
-        // Use Outscraper for basic info (generally richer)
-        businessName: outscraperData.businessName || serperData.businessName,
-        businessAddress: outscraperData.businessAddress || serperData.businessAddress,
-        googlePlaceId: outscraperData.googlePlaceId || serperData.googlePlaceId,
-        primaryCategory: outscraperData.primaryCategory || serperData.primaryCategory,
+        // Keep primary source for identity fields (most trustworthy)
+        businessName: primaryData.businessName || outscraperData.businessName,
+        businessAddress: primaryData.businessAddress || outscraperData.businessAddress,
+        googlePlaceId: primaryData.googlePlaceId || outscraperData.googlePlaceId,
+
+        // Use Outscraper for enrichable fields (generally richer)
+        primaryCategory: outscraperData.primaryCategory || primaryData.primaryCategory,
         secondaryCategories: outscraperData.secondaryCategories?.length > 0
             ? outscraperData.secondaryCategories
-            : serperData.secondaryCategories,
-        description: outscraperData.description || serperData.description,
-        phone: outscraperData.phone || serperData.phone,
-        websiteUrl: outscraperData.websiteUrl || serperData.websiteUrl,
+            : primaryData.secondaryCategories,
+        description: outscraperData.description || primaryData.description,
+        phone: outscraperData.phone || primaryData.phone,
+        websiteUrl: outscraperData.websiteUrl || primaryData.websiteUrl,
 
-        // Hours: Outscraper is better
+        // Hours: Outscraper is generally better
         hours: Object.keys(outscraperData.hours || {}).length > 0
             ? outscraperData.hours
-            : serperData.hours,
+            : primaryData.hours,
 
         // Attributes: merge both
         attributes: {
-            ...(serperData.attributes || {}),
+            ...(primaryData.attributes || {}),
             ...(outscraperData.attributes || {}),
         },
 
-        // Services: Outscraper usually has them, Serper doesn't
+        // Services: Outscraper usually has them
         services: outscraperData.services?.length > 0
             ? outscraperData.services
-            : serperData.services,
+            : primaryData.services,
 
-        // Photos: Use Outscraper's real counts
-        photoCount: outscraperData.photoCount || serperData.photoCount,
-        ownerPhotoCount: outscraperData.ownerPhotoCount || serperData.ownerPhotoCount,
-        hasLogo: outscraperData.hasLogo || serperData.hasLogo,
-        hasCoverPhoto: outscraperData.hasCoverPhoto || serperData.hasCoverPhoto,
+        // Photos: Use the richer source
+        photoCount: Math.max(outscraperData.photoCount || 0, primaryData.photoCount || 0),
+        ownerPhotoCount: outscraperData.ownerPhotoCount || primaryData.ownerPhotoCount,
+        hasLogo: outscraperData.hasLogo || primaryData.hasLogo,
+        hasCoverPhoto: outscraperData.hasCoverPhoto || primaryData.hasCoverPhoto,
 
-        // Reviews: Use Outscraper's data (more accurate)
-        reviewCount: outscraperData.reviewCount || serperData.reviewCount,
-        averageRating: outscraperData.averageRating || serperData.averageRating,
-        recentReviewDate: outscraperData.recentReviewDate || serperData.recentReviewDate,
-        monthlyReviewVelocity: outscraperData.monthlyReviewVelocity || serperData.monthlyReviewVelocity,
-        responseRate: outscraperData.responseRate ?? serperData.responseRate,
+        // Reviews: Use the more accurate source
+        reviewCount: outscraperData.reviewCount || primaryData.reviewCount,
+        averageRating: outscraperData.averageRating || primaryData.averageRating,
+        recentReviewDate: outscraperData.recentReviewDate || primaryData.recentReviewDate,
+        monthlyReviewVelocity: outscraperData.monthlyReviewVelocity || primaryData.monthlyReviewVelocity,
+        responseRate: outscraperData.responseRate ?? primaryData.responseRate,
 
         // Activity: Outscraper may have post data
-        lastPostDate: outscraperData.lastPostDate || serperData.lastPostDate,
+        lastPostDate: outscraperData.lastPostDate || primaryData.lastPostDate,
         postFrequency: outscraperData.postFrequency !== "unknown"
             ? outscraperData.postFrequency
-            : serperData.postFrequency,
+            : primaryData.postFrequency,
 
         // Website
-        websiteHttps: outscraperData.websiteHttps || serperData.websiteHttps,
-        websiteLoads: outscraperData.websiteLoads || serperData.websiteLoads,
-        websiteMobile: outscraperData.websiteMobile ?? serperData.websiteMobile,
-        websiteHasNap: outscraperData.websiteHasNap || serperData.websiteHasNap,
+        websiteHttps: outscraperData.websiteHttps || primaryData.websiteHttps,
+        websiteLoads: outscraperData.websiteLoads || primaryData.websiteLoads,
+        websiteMobile: outscraperData.websiteMobile ?? primaryData.websiteMobile,
+        websiteHasNap: outscraperData.websiteHasNap || primaryData.websiteHasNap,
 
-        // Competitors: keep from Serper (populated separately)
-        competitors: serperData.competitors || [],
+        // Competitors: keep from primary (populated separately)
+        competitors: primaryData.competitors || [],
 
         // Source
         _source: "merged",
