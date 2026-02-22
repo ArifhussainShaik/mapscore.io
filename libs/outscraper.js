@@ -135,8 +135,11 @@ function mapOutscraperToAuditData(place) {
     // Parse attributes
     const attributes = parseAttributes(place.about || place.range);
 
-    // Parse services
+    // Parse services — note: Outscraper's search-v3 does NOT return GBP services
+    // The 'services' field doesn't exist. We use subtypes as the closest proxy.
     const services = parseServices(place.services || place.menu);
+    // Flag: services NOT available via Outscraper API (field doesn't exist)
+    const servicesChecked = !!(place.services || place.menu);
 
     // Photo counts
     const photoCount = place.photos_count || place.photos || 0;
@@ -163,7 +166,7 @@ function mapOutscraperToAuditData(place) {
         googlePlaceId: place.place_id || "",
         primaryCategory: place.category || place.type || "",
         secondaryCategories: parseCategoriesArray(place.subtypes || place.categories),
-        description: place.description || place.about?.summary || "",
+        description: place.description || (typeof place.about === "object" ? place.about?.summary : "") || "",
         phone: place.phone || place.international_phone || "",
         websiteUrl: place.site || place.website || "",
 
@@ -200,6 +203,7 @@ function mapOutscraperToAuditData(place) {
         // Source metadata
         _source: "outscraper",
         _outscraper: true,
+        _servicesChecked: servicesChecked,
     };
 }
 

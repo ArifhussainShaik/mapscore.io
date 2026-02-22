@@ -154,7 +154,8 @@ function mergeAuditData(primaryData, outscraperData) {
         businessAddress: primaryData.businessAddress || outscraperData.businessAddress,
         googlePlaceId: primaryData.googlePlaceId || outscraperData.googlePlaceId,
 
-        // Use Outscraper for enrichable fields (generally richer)
+        // Category: ALWAYS prefer Outscraper (Google returns generic types like 'Services')
+        // Outscraper returns actual GBP category like 'Scaffolding rental service'
         primaryCategory: outscraperData.primaryCategory || primaryData.primaryCategory,
         secondaryCategories: outscraperData.secondaryCategories?.length > 0
             ? outscraperData.secondaryCategories
@@ -174,10 +175,12 @@ function mergeAuditData(primaryData, outscraperData) {
             ...(outscraperData.attributes || {}),
         },
 
-        // Services: Outscraper usually has them
+        // Services: Use whichever source has them
         services: outscraperData.services?.length > 0
             ? outscraperData.services
             : primaryData.services,
+        // Track whether services were actually checked by any API
+        _servicesChecked: outscraperData._servicesChecked || primaryData._servicesChecked || false,
 
         // Photos: Use the richer source
         photoCount: Math.max(outscraperData.photoCount || 0, primaryData.photoCount || 0),

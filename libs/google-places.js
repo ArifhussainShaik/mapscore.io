@@ -85,7 +85,7 @@ export async function getPlaceDetails(placeId) {
  * Map Google Places API response to our audit data schema.
  */
 function mapPlaceToAuditData(place, placeId) {
-    // Parse hours
+    // Parse hours — prefer weekdayDescriptions (more reliable), fall back to periods
     const hours = parseOpeningHours(place.regularOpeningHours);
 
     // Parse types into categories
@@ -154,6 +154,7 @@ function mapPlaceToAuditData(place, placeId) {
 
         // Services (not available from Places Details — will be enriched by Outscraper)
         services: [],
+        _servicesChecked: false, // Google Places does NOT expose GBP services
 
         // Photos
         photoCount,
@@ -191,12 +192,32 @@ function mapPlaceToAuditData(place, placeId) {
 
 /**
  * Parse Google Places regularOpeningHours into our expected format.
+ * Uses weekdayDescriptions first (more reliable), falls back to periods.
  */
 function parseOpeningHours(openingHours) {
-    if (!openingHours || !openingHours.periods) return {};
+    if (!openingHours) return {};
+
+    const hours = {};
+
+    // Method 1: Use weekdayDescriptions (human-readable, most reliable)
+    if (openingHours.weekdayDescriptions && openingHours.weekdayDescriptions.length > 0) {
+        for (const desc of openingHours.weekdayDescriptions) {
+            // Format: "Monday: 6:00 AM – 7:00 PM" or "Sunday: Closed"
+            const colonIndex = desc.indexOf(":");
+            if (colonIndex === -1) continue;
+            const day = desc.slice(0, colonIndex).trim().toLowerCase();
+            const time = desc.slice(colonIndex + 1).trim();
+            if (day && time) {
+                hours[day] = time;
+            }
+        }
+        if (Object.keys(hours).length > 0) return hours;
+    }
+
+    // Method 2: Fall back to periods
+    if (!openingHours.periods) return hours;
 
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    const hours = {};
 
     for (const period of openingHours.periods) {
         const dayIndex = period.open?.day;

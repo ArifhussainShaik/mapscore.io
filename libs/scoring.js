@@ -64,7 +64,10 @@ function evaluateCheck(check, data, sectionId) {
 
         case "services":
             const svcCount = data.services?.length || 0;
-            if (svcCount >= 10) score = 6;
+            if (!data._servicesChecked) {
+                // Can't verify services via API — give benefit of the doubt (partial credit)
+                score = 3;
+            } else if (svcCount >= 10) score = 6;
             else if (svcCount >= 5) score = 4;
             else if (svcCount >= 1) score = 2;
             break;
