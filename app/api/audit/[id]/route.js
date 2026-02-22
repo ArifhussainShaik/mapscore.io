@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getMockScoredAudit } from "@/libs/mockData";
+import connectMongo from "@/libs/mongoose";
+import Audit from "@/models/Audit";
 
 export async function GET(req, { params }) {
     try {
@@ -12,11 +13,20 @@ export async function GET(req, { params }) {
             );
         }
 
-        // TODO: Replace with MongoDB lookup
-        // const audit = await Audit.findById(id);
-        // For MVP, return mock data
-        const audit = getMockScoredAudit();
-        audit.id = id;
+        // Fetch from MongoDB
+        await connectMongo();
+        const audit = await Audit.findById(id).lean();
+
+        if (!audit) {
+            return NextResponse.json(
+                { error: "Audit not found" },
+                { status: 404 }
+            );
+        }
+
+        // Normalize _id → id
+        audit.id = audit._id.toString();
+        delete audit._id;
 
         return NextResponse.json({ audit });
     } catch (error) {

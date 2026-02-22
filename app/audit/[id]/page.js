@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuditReport from "@/components/AuditReport";
@@ -8,46 +8,61 @@ import ScanningProgress from "@/components/ScanningProgress";
 
 export default function AuditPage() {
     const searchParams = useSearchParams();
-    const businessName = searchParams.get("business") || "Austin Premier Plumbing";
-    const city = searchParams.get("city") || "Austin, TX";
+    const businessName = searchParams.get("business") || "";
+    const city = searchParams.get("city") || "";
     const placeId = searchParams.get("placeId") || "";
 
     const [scanning, setScanning] = useState(true);
     const [auditData, setAuditData] = useState(null);
+    const [isDataReady, setIsDataReady] = useState(false);
     const [error, setError] = useState(null);
+    const fetchStartedRef = useRef(false);
 
-    const handleScanComplete = useCallback(async () => {
-        try {
-            // Call the audit run API which uses Serper for real data
-            const response = await fetch("/api/audit/run", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    businessName,
-                    city,
-                    placeId: placeId || undefined,
-                }),
-            });
+    // Start API call immediately when the page loads (in parallel with animation)
+    useEffect(() => {
+        if (fetchStartedRef.current) return;
+        fetchStartedRef.current = true;
 
-            if (!response.ok) {
-                throw new Error(`Audit failed: ${response.status}`);
+        async function fetchAuditData() {
+            try {
+                const response = await fetch("/api/audit/run", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        businessName,
+                        city,
+                        placeId: placeId || undefined,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Audit failed: ${response.status}`);
+                }
+
+                const { audit } = await response.json();
+                setAuditData(audit);
+                setIsDataReady(true);
+            } catch (err) {
+                console.error("Audit error:", err);
+                setError(err.message);
+                setIsDataReady(true); // Signal animation to finish even on error
             }
-
-            const { audit } = await response.json();
-            setAuditData(audit);
-        } catch (err) {
-            console.error("Audit error:", err);
-            setError(err.message);
-        } finally {
-            setScanning(false);
         }
+
+        fetchAuditData();
     }, [businessName, city, placeId]);
+
+    // Called when the scanning animation is done AND data is ready
+    const handleScanComplete = useCallback(() => {
+        setScanning(false);
+    }, []);
 
     if (scanning) {
         return (
             <ScanningProgress
                 businessName={businessName}
                 city={city}
+                isDataReady={isDataReady}
                 onComplete={handleScanComplete}
             />
         );
@@ -77,7 +92,7 @@ export default function AuditPage() {
                     <span className="text-sm font-medium">New Audit</span>
                 </Link>
                 <div className="flex items-center gap-3">
-                    {auditData?.dataSource === "serper" && (
+                    {auditData?.dataSource && !auditData.dataSource.includes("mock") && (
                         <span className="badge badge-sm bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                             ✓ Live Data
                         </span>
@@ -91,7 +106,8 @@ export default function AuditPage() {
                 </div>
             </div>
 
-            <AuditReport audit={auditData} isPro={false} />
+            {/* TODO: Revert isPro to false (or wire to subscription status) when re-enabling payments */}
+            <AuditReport audit={auditData} isPro={true} />
         </main>
     );
 }

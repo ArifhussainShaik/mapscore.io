@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { searchBusiness, isSerperConfigured } from "@/libs/serper";
-import { getMockSearchResults } from "@/libs/mockData";
 
 export async function POST(req) {
     try {
@@ -13,36 +12,24 @@ export async function POST(req) {
             );
         }
 
-        // Use Serper for real data, fall back to mock
-        if (isSerperConfigured()) {
-            try {
-                const results = await searchBusiness(businessName, city);
-
-                if (results.length > 0) {
-                    return NextResponse.json({
-                        results,
-                        query: { businessName, city },
-                        source: "serper",
-                    });
-                }
-            } catch (error) {
-                console.error("Serper search error, falling back to mock:", error.message);
-            }
+        if (!isSerperConfigured()) {
+            return NextResponse.json(
+                {
+                    results: [],
+                    query: { businessName, city },
+                    source: "none",
+                    message: "Search API is not configured. Please set SERPER_API_KEY.",
+                },
+                { status: 200 }
+            );
         }
 
-        // Fallback: mock data
-        const results = getMockSearchResults();
-
-        const filtered = results.filter(
-            (r) =>
-                r.name.toLowerCase().includes(businessName.toLowerCase()) ||
-                businessName.toLowerCase().includes(r.name.split(" ")[0].toLowerCase())
-        );
+        const results = await searchBusiness(businessName, city);
 
         return NextResponse.json({
-            results: filtered.length > 0 ? filtered : results,
+            results,
             query: { businessName, city },
-            source: "mock",
+            source: "serper",
         });
     } catch (error) {
         console.error("Search error:", error);

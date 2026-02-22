@@ -14,8 +14,6 @@
 import { getBusinessDetails, getCompetitors, isSerperConfigured } from "@/libs/serper";
 import { getFullBusinessData, isOutscraperConfigured } from "@/libs/outscraper";
 import { checkWebsite } from "@/libs/pagespeed";
-import { getMockAuditData } from "@/libs/mockData";
-
 /**
  * Fetch complete audit data for a business.
  * Orchestrates Serper → Outscraper → PageSpeed pipeline.
@@ -27,7 +25,7 @@ import { getMockAuditData } from "@/libs/mockData";
  */
 export async function fetchAuditData(businessName, city, placeId) {
     let auditData = null;
-    let source = "mock";
+    let source = "serper";
 
     // ── Step 1: Serper (fast search — always try first) ──
     if (isSerperConfigured()) {
@@ -66,13 +64,11 @@ export async function fetchAuditData(businessName, city, placeId) {
         }
     }
 
-    // ── Step 3: Fallback to mock if nothing worked ──
+    // ── Step 3: Fail if no data was fetched ──
     if (!auditData) {
-        console.log("[DataProvider] All APIs failed — using mock data");
-        auditData = getMockAuditData();
-        if (businessName) auditData.businessName = businessName;
-        if (city) auditData.businessAddress = city;
-        source = "mock";
+        throw new Error(
+            "Could not fetch audit data. Please check that SERPER_API_KEY is configured and valid."
+        );
     }
 
     // ── Step 4: PageSpeed website check ──

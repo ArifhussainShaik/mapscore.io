@@ -1,6 +1,7 @@
 "use client";
 
-import { getMockScoredAudit } from "@/libs/mockData";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
 const SCORE_COLORS = {
@@ -27,7 +28,48 @@ const SEVERITY_ICONS = {
 };
 
 export default function AuditPDFView() {
-    const audit = getMockScoredAudit();
+    const params = useParams();
+    const [audit, setAudit] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function fetchAudit() {
+            try {
+                const res = await fetch(`/api/audit/${params.id}`);
+                if (!res.ok) throw new Error("Failed to load audit");
+                const data = await res.json();
+                setAudit(data.audit);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchAudit();
+    }, [params.id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[var(--color-brand-dark)] flex items-center justify-center">
+                <span className="loading loading-spinner loading-lg text-emerald-400"></span>
+            </div>
+        );
+    }
+
+    if (error || !audit) {
+        return (
+            <main className="min-h-screen bg-[var(--color-brand-dark)] flex items-center justify-center px-4">
+                <div className="glass-card p-8 max-w-md w-full text-center">
+                    <span className="text-5xl mb-4 block">⚠️</span>
+                    <h1 className="text-xl font-bold text-white mb-2">Could not load audit</h1>
+                    <p className="text-base-content/50 text-sm mb-6">{error || "Audit not found"}</p>
+                    <Link href="/" className="btn btn-brand btn-sm">← Go Home</Link>
+                </div>
+            </main>
+        );
+    }
+
     const color = SCORE_COLORS[audit.grade] || "#f59e0b";
 
     const sections = [
@@ -53,7 +95,7 @@ export default function AuditPDFView() {
                 >
                     📥 Save as PDF
                 </button>
-                <Link href="/audit/demo?business=Austin+Premier+Plumbing&city=Austin,+TX" className="btn btn-outline border-base-content/20 text-base-content/70">
+                <Link href={`/audit/${audit.id}?business=${encodeURIComponent(audit.businessName)}&city=${encodeURIComponent(audit.businessAddress || "")}`} className="btn btn-outline border-base-content/20 text-base-content/70">
                     ← Back to Report
                 </Link>
             </div>

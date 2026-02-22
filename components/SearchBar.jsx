@@ -154,7 +154,7 @@ export default function SearchBar({ variant = "hero" }) {
 
                     <input
                         type="text"
-                        placeholder="Business name..."
+                        placeholder="Search your business name..."
                         value={businessName}
                         onChange={handleBusinessNameChange}
                         onKeyDown={handleKeyDown}
@@ -173,6 +173,7 @@ export default function SearchBar({ variant = "hero" }) {
                             onClick={() => {
                                 setBusinessName("");
                                 setPlaceId(null);
+                                setCity("");
                                 setSuggestions([]);
                                 setShowSuggestions(false);
                             }}
@@ -229,35 +230,6 @@ export default function SearchBar({ variant = "hero" }) {
                     )}
                 </div>
 
-                {/* City Input */}
-                <div className="flex-1 relative">
-                    <svg
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-400 opacity-70"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                        />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="City, State"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="input input-bordered w-full pl-10 bg-transparent border-base-content/10 focus:border-emerald-500 focus:outline-none"
-                    />
-                </div>
-
                 <button
                     type="submit"
                     disabled={isLoading || !placeId}
@@ -267,7 +239,7 @@ export default function SearchBar({ variant = "hero" }) {
                         <span className="loading loading-spinner loading-sm"></span>
                     ) : (
                         <>
-                            Get Free Audit
+                            Start Audit
                             <svg
                                 className="w-5 h-5 ml-1"
                                 fill="none"
