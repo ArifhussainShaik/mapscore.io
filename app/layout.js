@@ -2,6 +2,7 @@ import { Outfit } from "next/font/google";
 import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
 import config from "@/config";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const font = Outfit({ subsets: ["latin"] });
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
 			>
 				<body>
 					<ClientLayout>{children}</ClientLayout>
+					<Analytics />
 				</body>
 			</html>
 		</ClerkProvider>
