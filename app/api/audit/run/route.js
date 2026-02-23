@@ -109,6 +109,13 @@ export async function POST(req) {
         delete audit._servicesChecked;
         delete audit._descriptionChecked;
 
+        // Normalize postFrequency to match schema enum
+        const validFrequencies = ["weekly", "monthly", "rarely", "never", "unknown"];
+        if (!validFrequencies.includes(audit.postFrequency)) {
+            console.log(`[Audit] Normalizing postFrequency "${audit.postFrequency}" → "unknown"`);
+            audit.postFrequency = "unknown";
+        }
+
         // Save to MongoDB if user is authenticated
         let savedAuditId = null;
         try {

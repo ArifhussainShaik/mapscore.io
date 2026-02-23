@@ -1,30 +1,81 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import Link from "next/link";
 import AuditReport from "@/components/AuditReport";
 import ScanningProgress from "@/components/ScanningProgress";
 
+// Check if a string looks like a MongoDB ObjectId
+function isMongoId(str) {
+    return /^[a-f0-9]{24}$/.test(str);
+}
+
+// Build a sessionStorage key for this audit
+function getSessionKey(id, placeId, businessName) {
+    if (isMongoId(id)) return `audit_db_${id}`;
+    if (placeId) return `audit_${placeId}`;
+    return `audit_${businessName}`;
+}
+
 export default function AuditPage() {
+    const params = useParams();
+    const id = params?.id || "";
     const searchParams = useSearchParams();
     const businessName = searchParams.get("business") || "";
     const city = searchParams.get("city") || "";
     const placeId = searchParams.get("placeId") || "";
 
-    const [scanning, setScanning] = useState(true);
+    // If loading from DB (dashboard link), skip scanning animation
+    const isDbLoad = isMongoId(id) && !businessName;
+    const [scanning, setScanning] = useState(!isDbLoad);
     const [auditData, setAuditData] = useState(null);
     const [isDataReady, setIsDataReady] = useState(false);
     const [error, setError] = useState(null);
     const fetchStartedRef = useRef(false);
 
-    // Start API call immediately when the page loads (in parallel with animation)
     useEffect(() => {
         if (fetchStartedRef.current) return;
         fetchStartedRef.current = true;
 
-        async function fetchAuditData() {
+        const sessionKey = getSessionKey(id, placeId, businessName);
+
+        async function loadAudit() {
             try {
+                // ── Priority 1: Check sessionStorage (back-button case) ──
+                try {
+                    const cached = sessionStorage.getItem(sessionKey);
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        if (parsed && parsed.businessName) {
+                            console.log("[Audit] Loaded from sessionStorage");
+                            setAuditData(parsed);
+                            setIsDataReady(true);
+                            if (isDbLoad) setScanning(false);
+                            return;
+                        }
+                    }
+                } catch (_) {
+                    /* sessionStorage might be unavailable */
+                    void 0;
+                }
+
+                // ── Priority 2: Load from DB if this is a MongoDB ObjectId ──
+                if (isMongoId(id)) {
+                    console.log(`[Audit] Loading from DB: ${id}`);
+                    const res = await fetch(`/api/audit/${id}`);
+                    if (!res.ok) throw new Error(`Failed to load audit: ${res.status}`);
+                    const { audit } = await res.json();
+                    setAuditData(audit);
+                    setIsDataReady(true);
+                    // Cache in sessionStorage for back-button
+                    try { sessionStorage.setItem(sessionKey, JSON.stringify(audit)); } catch (_) { void 0; }
+                    if (isDbLoad) setScanning(false);
+                    return;
+                }
+
+                // ── Priority 3: Run fresh audit ──
+                console.log(`[Audit] Running fresh audit for: ${businessName}`);
                 const response = await fetch("/api/audit/run", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -42,15 +93,26 @@ export default function AuditPage() {
                 const { audit } = await response.json();
                 setAuditData(audit);
                 setIsDataReady(true);
+
+                // Cache in sessionStorage for back-button
+                try {
+                    const cacheKey = audit.id ? `audit_db_${audit.id}` : sessionKey;
+                    sessionStorage.setItem(cacheKey, JSON.stringify(audit));
+                    // Also cache by placeId so back-button works
+                    if (sessionKey !== cacheKey) {
+                        sessionStorage.setItem(sessionKey, JSON.stringify(audit));
+                    }
+                } catch (_) { void 0; }
             } catch (err) {
                 console.error("Audit error:", err);
                 setError(err.message);
-                setIsDataReady(true); // Signal animation to finish even on error
+                setIsDataReady(true);
+                if (isDbLoad) setScanning(false);
             }
         }
 
-        fetchAuditData();
-    }, [businessName, city, placeId]);
+        loadAudit();
+    }, [id, businessName, city, placeId, isDbLoad]);
 
     // Called when the scanning animation is done AND data is ready
     const handleScanComplete = useCallback(() => {

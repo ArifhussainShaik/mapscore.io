@@ -5,6 +5,11 @@ import IssueCard from "./IssueCard";
 import CompetitorTable from "./CompetitorTable";
 import ActionPlan from "./ActionPlan";
 import PaywallGate from "./PaywallGate";
+import ProfileChecklist from "./ProfileChecklist";
+import RevenueImpact from "./RevenueImpact";
+import ReviewSentiment from "./ReviewSentiment";
+import LocalSeoReadiness from "./LocalSeoReadiness";
+import IndustryBenchmarks from "./IndustryBenchmarks";
 import Link from "next/link";
 
 export default function AuditReport({ audit, isPro = false }) {
@@ -96,7 +101,12 @@ export default function AuditReport({ audit, isPro = false }) {
                 </div>
             </div>
 
-            {/* Section 1: Score Dashboard */}
+            {/* Section 1: Profile Completeness (FREE — the hook) */}
+            <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
+                <ProfileChecklist audit={audit} />
+            </div>
+
+            {/* Section 2: Score Dashboard */}
             <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
                 <ScoreDashboard
                     totalScore={audit.totalScore}
@@ -105,7 +115,12 @@ export default function AuditReport({ audit, isPro = false }) {
                 />
             </div>
 
-            {/* Section 2: Critical Issues */}
+            {/* Section 3: Revenue Impact (FREE — drives urgency) */}
+            <div className="animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+                <RevenueImpact audit={audit} />
+            </div>
+
+            {/* Section 4: Critical Issues */}
             {criticalIssues.length > 0 && (
                 <div className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
                     <div className="flex items-center gap-2 mb-4">
@@ -122,7 +137,7 @@ export default function AuditReport({ audit, isPro = false }) {
                 </div>
             )}
 
-            {/* Section 3: Quick Wins */}
+            {/* Section 5: Quick Wins */}
             {quickWins.length > 0 && (
                 <div className="animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
                     <div className="flex items-center gap-2 mb-4">
@@ -149,8 +164,30 @@ export default function AuditReport({ audit, isPro = false }) {
                 </div>
             )}
 
-            {/* Section 4: Competitor Comparison */}
+            {/* Section 6: Review Sentiment (Paywalled) */}
+            <div className="animate-fade-in-up" style={{ animationDelay: "0.35s" }}>
+                {isPro ? (
+                    <ReviewSentiment audit={audit} />
+                ) : (
+                    <PaywallGate title="Unlock Review Analysis">
+                        <ReviewSentiment audit={audit} />
+                    </PaywallGate>
+                )}
+            </div>
+
+            {/* Section 7: Local SEO Readiness (Paywalled) */}
             <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+                {isPro ? (
+                    <LocalSeoReadiness audit={audit} />
+                ) : (
+                    <PaywallGate title="Unlock SEO Analysis">
+                        <LocalSeoReadiness audit={audit} />
+                    </PaywallGate>
+                )}
+            </div>
+
+            {/* Section 8: Competitor Comparison (Paywalled) */}
+            <div className="animate-fade-in-up" style={{ animationDelay: "0.45s" }}>
                 {isPro ? (
                     <CompetitorTable
                         businessName={audit.businessName}
@@ -168,8 +205,19 @@ export default function AuditReport({ audit, isPro = false }) {
                 )}
             </div>
 
-            {/* Section 5: Action Plan */}
+            {/* Section 9: Industry Benchmarks (Paywalled) */}
             <div className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+                {isPro ? (
+                    <IndustryBenchmarks audit={audit} />
+                ) : (
+                    <PaywallGate title="Unlock Industry Benchmarks">
+                        <IndustryBenchmarks audit={audit} />
+                    </PaywallGate>
+                )}
+            </div>
+
+            {/* Section 10: Action Plan (Paywalled) */}
+            <div className="animate-fade-in-up" style={{ animationDelay: "0.55s" }}>
                 {isPro ? (
                     <ActionPlan actionPlan={audit.actionPlan} />
                 ) : (
@@ -197,3 +245,4 @@ export default function AuditReport({ audit, isPro = false }) {
         </div>
     );
 }
+
