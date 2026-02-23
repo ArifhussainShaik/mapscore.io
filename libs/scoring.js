@@ -202,8 +202,10 @@ function evaluateCheck(check, data, sectionId) {
             else if (data.postFrequency === "rarely") score = 1;
             break;
 
-        case "qa_readiness":
-            score = 2; // Default: assume ready (improve later with real data)
+        case "ask_maps_readiness":
+            // If business has a website, assume some content for Ask Maps
+            if (data.websiteUrl && data.description) score = 2;
+            else if (data.websiteUrl) score = 1;
             break;
 
         // WEBSITE SIGNALS
@@ -233,35 +235,35 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         // COMPETITIVE POSITION
-        case "review_count_vs_top3":
+        case "review_count_gap":
             if (data.competitors?.length > 0) {
                 const maxReviews = Math.max(
                     ...data.competitors.map((c) => c.reviewCount || 0)
                 );
                 if (data.reviewCount >= maxReviews) score = 3;
                 else if (data.reviewCount >= maxReviews * 0.5) score = 2;
-                else score = 1;
+                else if (data.reviewCount >= 10) score = 1;
             }
             break;
 
-        case "rating_vs_top3":
+        case "rating_gap":
             if (data.competitors?.length > 0) {
                 const avgRating =
                     data.competitors.reduce((s, c) => s + (c.rating || 0), 0) /
                     data.competitors.length;
-                if (data.averageRating >= avgRating) score = 2;
-                else score = 1;
+                if (data.averageRating > avgRating) score = 2;
+                else if (data.averageRating >= avgRating - 0.1) score = 1;
             }
             break;
 
-        case "photo_count_vs_top3":
+        case "photo_gap":
             if (data.competitors?.length > 0) {
-                const avgPhotos =
-                    data.competitors.reduce((s, c) => s + (c.photoCount || 0), 0) /
-                    data.competitors.length;
-                if (data.photoCount >= avgPhotos) score = 3;
-                else if (data.photoCount >= avgPhotos * 0.5) score = 2;
-                else score = 1;
+                const maxPhotos = Math.max(
+                    ...data.competitors.map((c) => c.photoCount || 0)
+                );
+                if (data.photoCount >= maxPhotos) score = 3;
+                else if (data.photoCount >= maxPhotos * 0.5) score = 2;
+                else if (data.photoCount > 0) score = 1;
             }
             break;
 

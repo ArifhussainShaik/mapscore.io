@@ -91,7 +91,11 @@ export async function fetchAuditData(businessName, city, placeId) {
     if (auditData.websiteUrl) {
         try {
             console.log(`[DataProvider] Step 4: PageSpeed check for "${auditData.websiteUrl}"`);
-            const websiteCheck = await checkWebsite(auditData.websiteUrl);
+            const websiteCheck = await checkWebsite(auditData.websiteUrl, {
+                businessName: auditData.businessName,
+                phone: auditData.phone,
+                address: auditData.businessAddress,
+            });
 
             auditData.websiteHttps = websiteCheck.httpsValid;
             auditData.websiteLoads = websiteCheck.websiteLoads;
@@ -99,9 +103,10 @@ export async function fetchAuditData(businessName, city, placeId) {
             auditData.websiteMobileScore = websiteCheck.mobileScore;
             auditData.websiteDesktopScore = websiteCheck.desktopScore;
             auditData.websiteLoadSpeed = websiteCheck.loadSpeed;
+            auditData.websiteHasNap = websiteCheck.hasNap || false;
 
             source += "+pagespeed";
-            console.log(`[DataProvider] PageSpeed results applied`);
+            console.log(`[DataProvider] PageSpeed results applied (NAP=${auditData.websiteHasNap})`);
         } catch (error) {
             console.error("[DataProvider] PageSpeed check failed:", error.message);
         }
@@ -153,6 +158,7 @@ function mergeAuditData(primaryData, outscraperData) {
         businessName: primaryData.businessName || outscraperData.businessName,
         businessAddress: primaryData.businessAddress || outscraperData.businessAddress,
         googlePlaceId: primaryData.googlePlaceId || outscraperData.googlePlaceId,
+        googleMapsUrl: primaryData.googleMapsUrl || outscraperData.googleMapsUrl || "",
 
         // Category: ALWAYS prefer Outscraper (Google returns generic types like 'Services')
         // Outscraper returns actual GBP category like 'Scaffolding rental service'

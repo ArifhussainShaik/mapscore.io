@@ -164,6 +164,7 @@ function mapOutscraperToAuditData(place) {
         businessName: place.name || "",
         businessAddress: place.full_address || place.address || "",
         googlePlaceId: place.place_id || "",
+        googleMapsUrl: place.google_maps_url || place.place_url || "",
         primaryCategory: place.category || place.type || "",
         secondaryCategories: parseCategoriesArray(place.subtypes || place.categories),
         description: place.description || (typeof place.about === "object" ? place.about?.summary : "") || "",
