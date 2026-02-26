@@ -20,10 +20,26 @@
           "max_points": 8,
           "data_citation": "Whitespark 2026: #1 controllable ranking factor. Joy Hawkins documented drop from #1 to #31 from category switch.",
           "rules": [
-            { "condition": "matches_top_competitors", "points": 8, "label": "Optimal category matching top competitors" },
-            { "condition": "valid_but_different", "points": 5, "label": "Valid category but differs from competitors" },
-            { "condition": "mismatched", "points": 2, "label": "Category seems mismatched to services" },
-            { "condition": "missing", "points": 0, "label": "No category detected" }
+            {
+              "condition": "matches_top_competitors",
+              "points": 8,
+              "label": "Optimal category matching top competitors"
+            },
+            {
+              "condition": "valid_but_different",
+              "points": 5,
+              "label": "Valid category but differs from competitors"
+            },
+            {
+              "condition": "mismatched",
+              "points": 2,
+              "label": "Category seems mismatched to services"
+            },
+            {
+              "condition": "missing",
+              "points": 0,
+              "label": "No category detected"
+            }
           ]
         },
         {
@@ -32,9 +48,21 @@
           "max_points": 4,
           "data_citation": "Joy Hawkins: More relevant categories help, not dilute. Up to 9 secondary categories available.",
           "rules": [
-            { "condition": "count_gte_3", "points": 4, "label": "3-5 relevant secondary categories" },
-            { "condition": "count_1_2", "points": 2, "label": "1-2 secondary categories" },
-            { "condition": "count_0", "points": 0, "label": "No secondary categories" }
+            {
+              "condition": "count_gte_3",
+              "points": 4,
+              "label": "3-5 relevant secondary categories"
+            },
+            {
+              "condition": "count_1_2",
+              "points": 2,
+              "label": "1-2 secondary categories"
+            },
+            {
+              "condition": "count_0",
+              "points": 0,
+              "label": "No secondary categories"
+            }
           ]
         },
         {
@@ -43,10 +71,26 @@
           "max_points": 6,
           "data_citation": "Sterling Sky 2022 retest: services have direct ranking impact. Effects within 24-72 hours. Pre-defined services stronger than custom.",
           "rules": [
-            { "condition": "count_gte_10", "points": 6, "label": "10+ services with descriptions" },
-            { "condition": "count_5_9", "points": 4, "label": "5-9 services listed" },
-            { "condition": "count_1_4", "points": 2, "label": "1-4 services listed" },
-            { "condition": "count_0", "points": 0, "label": "No services" }
+            {
+              "condition": "count_gte_10",
+              "points": 6,
+              "label": "10+ services with descriptions"
+            },
+            {
+              "condition": "count_5_9",
+              "points": 4,
+              "label": "5-9 services listed"
+            },
+            {
+              "condition": "count_1_4",
+              "points": 2,
+              "label": "1-4 services listed"
+            },
+            {
+              "condition": "count_0",
+              "points": 0,
+              "label": "No services"
+            }
           ]
         },
         {
@@ -55,10 +99,26 @@
           "max_points": 4,
           "data_citation": "No direct ranking impact per Sterling Sky, but affects engagement and conversions. 750 character max.",
           "rules": [
-            { "condition": "length_500_750_with_keywords", "points": 4, "label": "500-750 chars with service keywords and city" },
-            { "condition": "length_250_499", "points": 3, "label": "250-499 chars with some keywords" },
-            { "condition": "length_under_250", "points": 1, "label": "Under 250 chars or no keywords" },
-            { "condition": "missing", "points": 0, "label": "No description" }
+            {
+              "condition": "length_500_750_with_keywords",
+              "points": 4,
+              "label": "500-750 chars with service keywords and city"
+            },
+            {
+              "condition": "length_250_499",
+              "points": 3,
+              "label": "250-499 chars with some keywords"
+            },
+            {
+              "condition": "length_under_250",
+              "points": 1,
+              "label": "Under 250 chars or no keywords"
+            },
+            {
+              "condition": "missing",
+              "points": 0,
+              "label": "No description"
+            }
           ]
         },
         {
@@ -67,10 +127,26 @@
           "max_points": 4,
           "data_citation": "Joy Hawkins (Nov 2023): Business hours is top-5 ranking factor. Businesses vanish from local pack when closed. Rankings degrade in final hour.",
           "rules": [
-            { "condition": "extended_hours_weekends", "points": 4, "label": "12+ hours/day, open weekends" },
-            { "condition": "standard_hours", "points": 3, "label": "Standard business hours set" },
-            { "condition": "limited_hours", "points": 2, "label": "Hours set but limited" },
-            { "condition": "missing_or_closed", "points": 0, "label": "No hours or temporarily closed" }
+            {
+              "condition": "extended_hours_weekends",
+              "points": 4,
+              "label": "12+ hours/day, open weekends"
+            },
+            {
+              "condition": "standard_hours",
+              "points": 3,
+              "label": "Standard business hours set"
+            },
+            {
+              "condition": "limited_hours",
+              "points": 2,
+              "label": "Hours set but limited"
+            },
+            {
+              "condition": "missing_or_closed",
+              "points": 0,
+              "label": "No hours or temporarily closed"
+            }
           ]
         },
         {
@@ -79,9 +155,21 @@
           "max_points": 3,
           "data_citation": "Whitespark 2026: Low-moderate impact. Trust building signal.",
           "rules": [
-            { "condition": "most_completed", "points": 3, "label": "Most applicable attributes set" },
-            { "condition": "some_completed", "points": 2, "label": "Some attributes set" },
-            { "condition": "few_or_none", "points": 0, "label": "Few or no attributes" }
+            {
+              "condition": "most_completed",
+              "points": 3,
+              "label": "Most applicable attributes set"
+            },
+            {
+              "condition": "some_completed",
+              "points": 2,
+              "label": "Some attributes set"
+            },
+            {
+              "condition": "few_or_none",
+              "points": 0,
+              "label": "Few or no attributes"
+            }
           ]
         },
         {
@@ -90,11 +178,93 @@
           "max_points": 3,
           "data_citation": "Engagement and conversion signal. Applicable for retail, food, and product-based categories.",
           "rules": [
-            { "condition": "products_listed_with_details", "points": 3, "label": "Products listed with prices and descriptions" },
-            { "condition": "some_products", "points": 2, "label": "Some products listed" },
-            { "condition": "no_products_applicable", "points": 1, "label": "No products (but category suggests they should)" },
-            { "condition": "not_applicable", "points": 3, "label": "Products not applicable for this category (full points)" }
+            {
+              "condition": "products_listed_with_details",
+              "points": 3,
+              "label": "Products listed with prices and descriptions"
+            },
+            {
+              "condition": "some_products",
+              "points": 2,
+              "label": "Some products listed"
+            },
+            {
+              "condition": "no_products_applicable",
+              "points": 1,
+              "label": "No products (but category suggests they should)"
+            },
+            {
+              "condition": "not_applicable",
+              "points": 3,
+              "label": "Products not applicable for this category (full points)"
+            }
           ]
+        },
+        {
+          "id": "flag_business_verified",
+          "name": "Business verified",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_phone_present",
+          "name": "Phone number present",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_website_present",
+          "name": "Website URL present",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_address_present",
+          "name": "Address present (storefront) or service area (SAB)",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_special_hours",
+          "name": "Special hours configured",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_booking_url",
+          "name": "Booking/appointment URL",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_name_stuffed",
+          "name": "Name not keyword-stuffed",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_desc_city",
+          "name": "Description has city name",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_desc_keywords",
+          "name": "Description has service keywords",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_opening_date",
+          "name": "Opening date set",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_short_name",
+          "name": "Short name / vanity URL claimed",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     },
@@ -110,11 +280,31 @@
           "max_points": 8,
           "data_citation": "Search Atlas ML Study: Review count = 19.2% of ranking variance (all positions), 26% for top 10.",
           "rules": [
-            { "condition": "above_competitor_average", "points": 8, "label": "More reviews than competitor average" },
-            { "condition": "within_25pct", "points": 5, "label": "Within 25% of competitor average" },
-            { "condition": "50_to_75pct", "points": 3, "label": "50-75% of competitor average" },
-            { "condition": "under_50pct", "points": 1, "label": "Under 50% of competitor average" },
-            { "condition": "under_10_total", "points": 0, "label": "Under 10 reviews total" }
+            {
+              "condition": "above_competitor_average",
+              "points": 8,
+              "label": "More reviews than competitor average"
+            },
+            {
+              "condition": "within_25pct",
+              "points": 5,
+              "label": "Within 25% of competitor average"
+            },
+            {
+              "condition": "50_to_75pct",
+              "points": 3,
+              "label": "50-75% of competitor average"
+            },
+            {
+              "condition": "under_50pct",
+              "points": 1,
+              "label": "Under 50% of competitor average"
+            },
+            {
+              "condition": "under_10_total",
+              "points": 0,
+              "label": "Under 10 reviews total"
+            }
           ]
         },
         {
@@ -123,10 +313,26 @@
           "max_points": 4,
           "data_citation": "Search Atlas ML: Ratings = 3.8% of variance. Important but secondary to count and recency.",
           "rules": [
-            { "condition": "rating_gte_4.5", "points": 4, "label": "4.5+ star rating" },
-            { "condition": "rating_4.0_4.4", "points": 3, "label": "4.0-4.4 star rating" },
-            { "condition": "rating_3.5_3.9", "points": 2, "label": "3.5-3.9 star rating" },
-            { "condition": "rating_under_3.5", "points": 0, "label": "Under 3.5 star rating" }
+            {
+              "condition": "rating_gte_4.5",
+              "points": 4,
+              "label": "4.5+ star rating"
+            },
+            {
+              "condition": "rating_4.0_4.4",
+              "points": 3,
+              "label": "4.0-4.4 star rating"
+            },
+            {
+              "condition": "rating_3.5_3.9",
+              "points": 2,
+              "label": "3.5-3.9 star rating"
+            },
+            {
+              "condition": "rating_under_3.5",
+              "points": 0,
+              "label": "Under 3.5 star rating"
+            }
           ]
         },
         {
@@ -135,10 +341,26 @@
           "max_points": 6,
           "data_citation": "Darren Shaw (Whitespark 2026): Review recency moved from #20 to top-5 factor. 'The moment you stop getting new reviews, rankings slip.'",
           "rules": [
-            { "condition": "within_7_days", "points": 6, "label": "Review in last 7 days" },
-            { "condition": "within_14_days", "points": 4, "label": "Review in last 14 days" },
-            { "condition": "within_30_days", "points": 2, "label": "Review in last 30 days" },
-            { "condition": "over_30_days", "points": 0, "label": "No review in 30+ days" }
+            {
+              "condition": "within_7_days",
+              "points": 6,
+              "label": "Review in last 7 days"
+            },
+            {
+              "condition": "within_14_days",
+              "points": 4,
+              "label": "Review in last 14 days"
+            },
+            {
+              "condition": "within_30_days",
+              "points": 2,
+              "label": "Review in last 30 days"
+            },
+            {
+              "condition": "over_30_days",
+              "points": 0,
+              "label": "No review in 30+ days"
+            }
           ]
         },
         {
@@ -147,10 +369,26 @@
           "max_points": 4,
           "data_citation": "Whitespark 2026: Consistent flow beats sporadic bursts. Target 1-3 new reviews per week.",
           "rules": [
-            { "condition": "4_plus_per_month", "points": 4, "label": "4+ reviews per month" },
-            { "condition": "2_3_per_month", "points": 3, "label": "2-3 reviews per month" },
-            { "condition": "1_per_month", "points": 2, "label": "~1 review per month" },
-            { "condition": "under_1_per_month", "points": 0, "label": "Less than 1 per month" }
+            {
+              "condition": "4_plus_per_month",
+              "points": 4,
+              "label": "4+ reviews per month"
+            },
+            {
+              "condition": "2_3_per_month",
+              "points": 3,
+              "label": "2-3 reviews per month"
+            },
+            {
+              "condition": "1_per_month",
+              "points": 2,
+              "label": "~1 review per month"
+            },
+            {
+              "condition": "under_1_per_month",
+              "points": 0,
+              "label": "Less than 1 per month"
+            }
           ]
         },
         {
@@ -159,11 +397,69 @@
           "max_points": 3,
           "data_citation": "Harvard Business Review: Businesses that reply to reviews receive 12% more reviews. Low-moderate ranking impact but high conversion impact.",
           "rules": [
-            { "condition": "rate_gte_80pct", "points": 3, "label": "80%+ reviews responded to" },
-            { "condition": "rate_50_79pct", "points": 2, "label": "50-79% responded" },
-            { "condition": "rate_under_50pct", "points": 1, "label": "Under 50% responded" },
-            { "condition": "rate_0", "points": 0, "label": "No responses" }
+            {
+              "condition": "rate_gte_80pct",
+              "points": 3,
+              "label": "80%+ reviews responded to"
+            },
+            {
+              "condition": "rate_50_79pct",
+              "points": 2,
+              "label": "50-79% responded"
+            },
+            {
+              "condition": "rate_under_50pct",
+              "points": 1,
+              "label": "Under 50% responded"
+            },
+            {
+              "condition": "rate_0",
+              "points": 0,
+              "label": "No responses"
+            }
           ]
+        },
+        {
+          "id": "flag_review_count_industry",
+          "name": "Review count vs. industry median",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_rating_sweet_spot",
+          "name": "Rating in sweet spot (4.2 to 4.5)",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_negative_response_rate",
+          "name": "Negative review response rate",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_one_star_pct",
+          "name": "1-star review percentage",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_velocity_trend",
+          "name": "Review velocity trend",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_reviews_with_text",
+          "name": "Reviews with text ratio",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_velocity_industry",
+          "name": "Review velocity vs. industry",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     },
@@ -179,10 +475,26 @@
           "max_points": 5,
           "data_citation": "Whitespark 2026: Photo quantity and quality = moderate ranking impact. Engagement signal.",
           "rules": [
-            { "condition": "count_gte_50", "points": 5, "label": "50+ photos" },
-            { "condition": "count_20_49", "points": 3, "label": "20-49 photos" },
-            { "condition": "count_5_19", "points": 1, "label": "5-19 photos" },
-            { "condition": "count_under_5", "points": 0, "label": "Under 5 photos" }
+            {
+              "condition": "count_gte_50",
+              "points": 5,
+              "label": "50+ photos"
+            },
+            {
+              "condition": "count_20_49",
+              "points": 3,
+              "label": "20-49 photos"
+            },
+            {
+              "condition": "count_5_19",
+              "points": 1,
+              "label": "5-19 photos"
+            },
+            {
+              "condition": "count_under_5",
+              "points": 0,
+              "label": "Under 5 photos"
+            }
           ]
         },
         {
@@ -191,9 +503,21 @@
           "max_points": 3,
           "data_citation": "Best practice: Interior, exterior, team, product/service, and action photos recommended.",
           "rules": [
-            { "condition": "multiple_categories", "points": 3, "label": "Photos across multiple categories" },
-            { "condition": "some_variety", "points": 2, "label": "Some variety in photos" },
-            { "condition": "limited_variety", "points": 0, "label": "Limited or no variety" }
+            {
+              "condition": "multiple_categories",
+              "points": 3,
+              "label": "Photos across multiple categories"
+            },
+            {
+              "condition": "some_variety",
+              "points": 2,
+              "label": "Some variety in photos"
+            },
+            {
+              "condition": "limited_variety",
+              "points": 0,
+              "label": "Limited or no variety"
+            }
           ]
         },
         {
@@ -201,8 +525,16 @@
           "name": "Logo Uploaded",
           "max_points": 2,
           "rules": [
-            { "condition": "has_logo", "points": 2, "label": "Logo uploaded" },
-            { "condition": "no_logo", "points": 0, "label": "No logo" }
+            {
+              "condition": "has_logo",
+              "points": 2,
+              "label": "Logo uploaded"
+            },
+            {
+              "condition": "no_logo",
+              "points": 0,
+              "label": "No logo"
+            }
           ]
         },
         {
@@ -210,8 +542,16 @@
           "name": "Cover Photo Set",
           "max_points": 2,
           "rules": [
-            { "condition": "has_cover", "points": 2, "label": "Cover photo set" },
-            { "condition": "no_cover", "points": 0, "label": "No cover photo" }
+            {
+              "condition": "has_cover",
+              "points": 2,
+              "label": "Cover photo set"
+            },
+            {
+              "condition": "no_cover",
+              "points": 0,
+              "label": "No cover photo"
+            }
           ]
         },
         {
@@ -219,9 +559,47 @@
           "name": "Recent Photos",
           "max_points": 1,
           "rules": [
-            { "condition": "within_30_days", "points": 1, "label": "Photos uploaded in last 30 days" },
-            { "condition": "over_30_days", "points": 0, "label": "No recent photos" }
+            {
+              "condition": "within_30_days",
+              "points": 1,
+              "label": "Photos uploaded in last 30 days"
+            },
+            {
+              "condition": "over_30_days",
+              "points": 0,
+              "label": "No recent photos"
+            }
           ]
+        },
+        {
+          "id": "flag_photo_count_industry",
+          "name": "Photo count vs. industry median",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_owner_customer_ratio",
+          "name": "Owner vs. customer photo ratio",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_video_present",
+          "name": "Video content present",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_interior_photos",
+          "name": "Interior photos present",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_team_photos",
+          "name": "Team/staff photos present",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     },
@@ -237,10 +615,26 @@
           "max_points": 5,
           "data_citation": "Sterling Sky testing: Posts don't directly boost rankings. But Google displays them prominently. Engagement and freshness signal.",
           "rules": [
-            { "condition": "within_7_days", "points": 5, "label": "Post within last 7 days" },
-            { "condition": "within_14_days", "points": 3, "label": "Post within last 14 days" },
-            { "condition": "within_30_days", "points": 1, "label": "Post within last 30 days" },
-            { "condition": "over_30_days_or_none", "points": 0, "label": "No recent posts" }
+            {
+              "condition": "within_7_days",
+              "points": 5,
+              "label": "Post within last 7 days"
+            },
+            {
+              "condition": "within_14_days",
+              "points": 3,
+              "label": "Post within last 14 days"
+            },
+            {
+              "condition": "within_30_days",
+              "points": 1,
+              "label": "Post within last 30 days"
+            },
+            {
+              "condition": "over_30_days_or_none",
+              "points": 0,
+              "label": "No recent posts"
+            }
           ]
         },
         {
@@ -248,10 +642,26 @@
           "name": "Post Frequency",
           "max_points": 3,
           "rules": [
-            { "condition": "weekly_or_more", "points": 3, "label": "Posts weekly or more" },
-            { "condition": "biweekly", "points": 2, "label": "Posts every 2 weeks" },
-            { "condition": "monthly", "points": 1, "label": "Posts monthly" },
-            { "condition": "rare_or_never", "points": 0, "label": "Rarely or never posts" }
+            {
+              "condition": "weekly_or_more",
+              "points": 3,
+              "label": "Posts weekly or more"
+            },
+            {
+              "condition": "biweekly",
+              "points": 2,
+              "label": "Posts every 2 weeks"
+            },
+            {
+              "condition": "monthly",
+              "points": 1,
+              "label": "Posts monthly"
+            },
+            {
+              "condition": "rare_or_never",
+              "points": 0,
+              "label": "Rarely or never posts"
+            }
           ]
         },
         {
@@ -260,10 +670,46 @@
           "max_points": 2,
           "data_citation": "Q&A deprecated and replaced by Gemini-powered Ask Maps. Website content feeds Ask Maps responses.",
           "rules": [
-            { "condition": "website_with_faq_content", "points": 2, "label": "Website has FAQ/service content for Ask Maps" },
-            { "condition": "basic_website", "points": 1, "label": "Website exists but limited content" },
-            { "condition": "no_website", "points": 0, "label": "No website to feed Ask Maps" }
+            {
+              "condition": "website_with_faq_content",
+              "points": 2,
+              "label": "Website has FAQ/service content for Ask Maps"
+            },
+            {
+              "condition": "basic_website",
+              "points": 1,
+              "label": "Website exists but limited content"
+            },
+            {
+              "condition": "no_website",
+              "points": 0,
+              "label": "No website to feed Ask Maps"
+            }
           ]
+        },
+        {
+          "id": "flag_post_variety",
+          "name": "Post variety (types mix)",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_posts_ctas",
+          "name": "Posts include CTAs",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_posts_images",
+          "name": "Posts include images",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_booking_integration",
+          "name": "Booking integration active",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     },
@@ -279,11 +725,31 @@
           "max_points": 4,
           "data_citation": "Whitespark 2026: 'Dedicated Page for Each Service' = #1 factor for local organic rankings and #2 for AI visibility.",
           "rules": [
-            { "condition": "linked_https_mobile_loads", "points": 4, "label": "Website linked, HTTPS, mobile responsive, loads fast" },
-            { "condition": "linked_https_loads", "points": 3, "label": "Website linked, HTTPS, loads" },
-            { "condition": "linked_loads", "points": 2, "label": "Website linked, loads" },
-            { "condition": "linked_broken", "points": 1, "label": "Website linked but broken" },
-            { "condition": "no_website", "points": 0, "label": "No website linked" }
+            {
+              "condition": "linked_https_mobile_loads",
+              "points": 4,
+              "label": "Website linked, HTTPS, mobile responsive, loads fast"
+            },
+            {
+              "condition": "linked_https_loads",
+              "points": 3,
+              "label": "Website linked, HTTPS, loads"
+            },
+            {
+              "condition": "linked_loads",
+              "points": 2,
+              "label": "Website linked, loads"
+            },
+            {
+              "condition": "linked_broken",
+              "points": 1,
+              "label": "Website linked but broken"
+            },
+            {
+              "condition": "no_website",
+              "points": 0,
+              "label": "No website linked"
+            }
           ]
         },
         {
@@ -291,8 +757,16 @@
           "name": "HTTPS Enabled",
           "max_points": 2,
           "rules": [
-            { "condition": "https", "points": 2, "label": "HTTPS enabled" },
-            { "condition": "http_only", "points": 0, "label": "No HTTPS" }
+            {
+              "condition": "https",
+              "points": 2,
+              "label": "HTTPS enabled"
+            },
+            {
+              "condition": "http_only",
+              "points": 0,
+              "label": "No HTTPS"
+            }
           ]
         },
         {
@@ -300,9 +774,21 @@
           "name": "Website Loads",
           "max_points": 2,
           "rules": [
-            { "condition": "loads_under_3s", "points": 2, "label": "Loads within 3 seconds" },
-            { "condition": "loads_slow", "points": 1, "label": "Loads but slow" },
-            { "condition": "broken", "points": 0, "label": "Does not load" }
+            {
+              "condition": "loads_under_3s",
+              "points": 2,
+              "label": "Loads within 3 seconds"
+            },
+            {
+              "condition": "loads_slow",
+              "points": 1,
+              "label": "Loads but slow"
+            },
+            {
+              "condition": "broken",
+              "points": 0,
+              "label": "Does not load"
+            }
           ]
         },
         {
@@ -311,9 +797,21 @@
           "max_points": 2,
           "data_citation": "NAP consistency between GBP and website is a core citation/trust signal.",
           "rules": [
-            { "condition": "nap_visible", "points": 2, "label": "Business name, address, phone visible on homepage" },
-            { "condition": "partial_nap", "points": 1, "label": "Partial NAP (missing address or phone)" },
-            { "condition": "no_nap", "points": 0, "label": "No NAP found on homepage" }
+            {
+              "condition": "nap_visible",
+              "points": 2,
+              "label": "Business name, address, phone visible on homepage"
+            },
+            {
+              "condition": "partial_nap",
+              "points": 1,
+              "label": "Partial NAP (missing address or phone)"
+            },
+            {
+              "condition": "no_nap",
+              "points": 0,
+              "label": "No NAP found on homepage"
+            }
           ]
         },
         {
@@ -321,9 +819,35 @@
           "name": "Mobile Responsive",
           "max_points": 2,
           "rules": [
-            { "condition": "mobile_friendly", "points": 2, "label": "Mobile responsive" },
-            { "condition": "not_mobile_friendly", "points": 0, "label": "Not mobile responsive" }
+            {
+              "condition": "mobile_friendly",
+              "points": 2,
+              "label": "Mobile responsive"
+            },
+            {
+              "condition": "not_mobile_friendly",
+              "points": 0,
+              "label": "Not mobile responsive"
+            }
           ]
+        },
+        {
+          "id": "flag_schema_markup",
+          "name": "LocalBusiness schema markup",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_schema_nap_match",
+          "name": "Schema NAP matches GBP NAP",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_page_speed",
+          "name": "Page speed (under 3 seconds)",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     },
@@ -338,10 +862,26 @@
           "name": "Review Count vs. Top 3",
           "max_points": 3,
           "rules": [
-            { "condition": "leading", "points": 3, "label": "More reviews than all 3 competitors" },
-            { "condition": "competitive", "points": 2, "label": "Within range of competitors" },
-            { "condition": "behind", "points": 1, "label": "Significantly behind competitors" },
-            { "condition": "far_behind", "points": 0, "label": "Major review gap" }
+            {
+              "condition": "leading",
+              "points": 3,
+              "label": "More reviews than all 3 competitors"
+            },
+            {
+              "condition": "competitive",
+              "points": 2,
+              "label": "Within range of competitors"
+            },
+            {
+              "condition": "behind",
+              "points": 1,
+              "label": "Significantly behind competitors"
+            },
+            {
+              "condition": "far_behind",
+              "points": 0,
+              "label": "Major review gap"
+            }
           ]
         },
         {
@@ -349,9 +889,21 @@
           "name": "Rating vs. Top 3",
           "max_points": 2,
           "rules": [
-            { "condition": "above_average", "points": 2, "label": "Rating above competitor average" },
-            { "condition": "at_average", "points": 1, "label": "Rating at competitor average" },
-            { "condition": "below_average", "points": 0, "label": "Rating below competitor average" }
+            {
+              "condition": "above_average",
+              "points": 2,
+              "label": "Rating above competitor average"
+            },
+            {
+              "condition": "at_average",
+              "points": 1,
+              "label": "Rating at competitor average"
+            },
+            {
+              "condition": "below_average",
+              "points": 0,
+              "label": "Rating below competitor average"
+            }
           ]
         },
         {
@@ -359,20 +911,73 @@
           "name": "Photo Count vs. Top 3",
           "max_points": 3,
           "rules": [
-            { "condition": "leading", "points": 3, "label": "More photos than all competitors" },
-            { "condition": "competitive", "points": 2, "label": "Within range of competitors" },
-            { "condition": "behind", "points": 1, "label": "Fewer photos than competitors" },
-            { "condition": "far_behind", "points": 0, "label": "Major photo gap" }
+            {
+              "condition": "leading",
+              "points": 3,
+              "label": "More photos than all competitors"
+            },
+            {
+              "condition": "competitive",
+              "points": 2,
+              "label": "Within range of competitors"
+            },
+            {
+              "condition": "behind",
+              "points": 1,
+              "label": "Fewer photos than competitors"
+            },
+            {
+              "condition": "far_behind",
+              "points": 0,
+              "label": "Major photo gap"
+            }
           ]
+        },
+        {
+          "id": "flag_velocity_competitors",
+          "name": "Review velocity vs. competitors",
+          "max_points": 0,
+          "type": "flag"
+        },
+        {
+          "id": "flag_post_frequency_competitors",
+          "name": "Post frequency vs. competitors",
+          "max_points": 0,
+          "type": "flag"
         }
       ]
     }
   ],
   "grade_scale": [
-    { "min": 85, "max": 100, "grade": "A", "label": "Excellent. Minor tweaks only." },
-    { "min": 70, "max": 84, "grade": "B", "label": "Good. Key optimizations needed." },
-    { "min": 55, "max": 69, "grade": "C", "label": "Average. Significant gaps." },
-    { "min": 40, "max": 54, "grade": "D", "label": "Below average. Many issues." },
-    { "min": 0, "max": 39, "grade": "F", "label": "Critical. Major overhaul needed." }
+    {
+      "min": 85,
+      "max": 100,
+      "grade": "A",
+      "label": "Excellent. Minor tweaks only."
+    },
+    {
+      "min": 70,
+      "max": 84,
+      "grade": "B",
+      "label": "Good. Key optimizations needed."
+    },
+    {
+      "min": 55,
+      "max": 69,
+      "grade": "C",
+      "label": "Average. Significant gaps."
+    },
+    {
+      "min": 40,
+      "max": 54,
+      "grade": "D",
+      "label": "Below average. Many issues."
+    },
+    {
+      "min": 0,
+      "max": 39,
+      "grade": "F",
+      "label": "Critical. Major overhaul needed."
+    }
   ]
 }

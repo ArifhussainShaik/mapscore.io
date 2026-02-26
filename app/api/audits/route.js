@@ -6,13 +6,15 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectMongo from "@/libs/mongoose";
 import Audit from "@/models/Audit";
 
 export async function GET() {
     try {
-        const { userId } = await auth();
+        const session = await getServerSession(authOptions);
+        const userId = session?.user?.id;
 
         if (!userId) {
             return NextResponse.json(

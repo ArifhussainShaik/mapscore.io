@@ -16,45 +16,31 @@ const userSchema = mongoose.Schema(
     image: {
       type: String,
     },
-    // Dodo Payments
-    dodoCustomerId: {
-      type: String,
-    },
-    dodoSubscriptionId: {
-      type: String,
-    },
-    // Plan management
-    plan: {
-      type: String,
-      enum: ["free", "pro", "agency"],
-      default: "free",
-    },
-    subscriptionStatus: {
-      type: String,
-      enum: ["active", "cancelled", "past_due", "none"],
-      default: "none",
-    },
-    // Access control (kept for ShipFast compatibility)
-    hasAccess: {
-      type: Boolean,
-      default: false,
-    },
-    // Free tier audits tracking
-    auditsThisMonth: {
-      type: Number,
-      default: 0,
-    },
-    auditsResetDate: {
+    emailVerified: {
       type: Date,
     },
-    // Agency white-label
-    agencyName: {
-      type: String,
-      trim: true,
-    },
-    agencyLogoUrl: {
-      type: String,
-    },
+
+    // Credit system
+    credits: { type: Number, default: 0 },
+    is_lifetime: { type: Boolean, default: false },
+    lifetime_monthly_credits: { type: Number, default: 30 },
+    lifetime_credits_reset_date: Date,
+
+    // Payment tracking
+    dodo_customer_id: String,
+
+    // Credit purchases (for expiry tracking)
+    credit_purchases: [{
+      amount: Number,
+      remaining: Number,
+      purchased_at: Date,
+      expires_at: Date,
+      package: String,
+      price_paid: Number
+    }],
+
+    // Stats
+    total_audits_run: { type: Number, default: 0 },
   },
   {
     timestamps: true,

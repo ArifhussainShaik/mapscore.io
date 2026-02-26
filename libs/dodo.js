@@ -36,31 +36,31 @@ export function isDodoConfigured() {
 }
 
 // ─────────────────────────────────────────────
-// Subscriptions
+// Payments (One-Time for Credits / Lifetime)
 // ─────────────────────────────────────────────
 
 /**
- * Create a Dodo subscription for a user.
+ * Create a Dodo one-time payment for a user.
  * Returns a payment link URL that redirects the user to Dodo's checkout.
  *
  * @param {string} userId - The user's MongoDB ID
  * @param {string} productId - The Dodo product ID (prd_XXXXX)
  * @param {string} email - The user's email address
- * @returns {Promise<{ paymentLink: string, subscriptionId: string }>}
+ * @returns {Promise<{ paymentLink: string, paymentId: string }>}
  */
-export async function createSubscription(userId, productId, email) {
+export async function createPayment(userId, productId, email) {
     const client = getClient();
 
     if (!client) {
         console.warn("[Dodo] Not configured — returning mock payment link");
         return {
-            paymentLink: `https://test.dodopayments.com/checkout/${productId}?ref=${userId}`,
-            subscriptionId: `sub_mock_${Date.now()}`,
+            paymentLink: `http://localhost:3000/dashboard`,
+            paymentId: `pay_mock_${Date.now()}`,
         };
     }
 
     try {
-        const subscription = await client.subscriptions.create({
+        const payment = await client.payments.create({
             billing: {
                 city: "",
                 country: "US",
@@ -74,18 +74,18 @@ export async function createSubscription(userId, productId, email) {
             },
             product_id: productId,
             quantity: 1,
-            return_url: process.env.DODO_PAYMENTS_RETURN_URL || "http://localhost:3000/checkout/success",
+            return_url: process.env.DODO_PAYMENTS_RETURN_URL || "http://localhost:3000/dashboard",
             metadata: {
                 user_id: userId,
             },
         });
 
         return {
-            paymentLink: subscription.payment_link || subscription.url || "",
-            subscriptionId: subscription.subscription_id || subscription.id || "",
+            paymentLink: payment.payment_link || payment.url || "",
+            paymentId: payment.payment_id || payment.id || "",
         };
     } catch (error) {
-        console.error("[Dodo] Subscription creation failed:", error);
+        console.error("[Dodo] Payment creation failed:", error);
         throw error;
     }
 }

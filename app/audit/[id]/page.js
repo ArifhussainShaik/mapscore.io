@@ -32,7 +32,34 @@ export default function AuditPage() {
     const [auditData, setAuditData] = useState(null);
     const [isDataReady, setIsDataReady] = useState(false);
     const [error, setError] = useState(null);
+    const [pendingAuditId, setPendingAuditId] = useState(null);
+
     const fetchStartedRef = useRef(false);
+
+    const saveAuditData = useCallback((audit, sessionKey) => {
+        setAuditData(audit);
+        setIsDataReady(true);
+        try {
+            const cacheKey = audit.id ? `audit_db_${audit.id}` : sessionKey;
+            sessionStorage.setItem(cacheKey, JSON.stringify(audit));
+            if (sessionKey !== cacheKey) {
+                sessionStorage.setItem(sessionKey, JSON.stringify(audit));
+            }
+        } catch { /* ignore */ }
+        if (isDbLoad) setScanning(false);
+    }, [isDbLoad]);
+
+    const loadFullAuditById = useCallback(async (dbId, sessionKey) => {
+        try {
+            const res = await fetch(`/api/audit/${dbId}`);
+            if (!res.ok) throw new Error(`Failed to load full audit: ${res.status}`);
+            const { audit } = await res.json();
+            saveAuditData(audit, sessionKey);
+        } catch (err) {
+            setError(err.message);
+            setIsDataReady(true);
+        }
+    }, [saveAuditData]);
 
     useEffect(() => {
         if (fetchStartedRef.current) return;
@@ -55,26 +82,16 @@ export default function AuditPage() {
                             return;
                         }
                     }
-                } catch (_) {
-                    /* sessionStorage might be unavailable */
-                    void 0;
-                }
+                } catch { /* ignore */ }
 
                 // ── Priority 2: Load from DB if this is a MongoDB ObjectId ──
-                if (isMongoId(id)) {
+                if (isMongoId(id) && !businessName) {
                     console.log(`[Audit] Loading from DB: ${id}`);
-                    const res = await fetch(`/api/audit/${id}`);
-                    if (!res.ok) throw new Error(`Failed to load audit: ${res.status}`);
-                    const { audit } = await res.json();
-                    setAuditData(audit);
-                    setIsDataReady(true);
-                    // Cache in sessionStorage for back-button
-                    try { sessionStorage.setItem(sessionKey, JSON.stringify(audit)); } catch (_) { void 0; }
-                    if (isDbLoad) setScanning(false);
+                    await loadFullAuditById(id, sessionKey);
                     return;
                 }
 
-                // ── Priority 3: Run fresh audit ──
+                // ── Priority 3: Run fresh audit (Queue or Sync) ──
                 console.log(`[Audit] Running fresh audit for: ${businessName}`);
                 const response = await fetch("/api/audit/run", {
                     method: "POST",
@@ -87,22 +104,21 @@ export default function AuditPage() {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Audit failed: ${response.status}`);
+                    throw new Error(`Audit initialization failed: ${response.status}`);
                 }
 
-                const { audit } = await response.json();
-                setAuditData(audit);
-                setIsDataReady(true);
+                const data = await response.json();
 
-                // Cache in sessionStorage for back-button
-                try {
-                    const cacheKey = audit.id ? `audit_db_${audit.id}` : sessionKey;
-                    sessionStorage.setItem(cacheKey, JSON.stringify(audit));
-                    // Also cache by placeId so back-button works
-                    if (sessionKey !== cacheKey) {
-                        sessionStorage.setItem(sessionKey, JSON.stringify(audit));
-                    }
-                } catch (_) { void 0; }
+                if (data.status === "pending" && data.auditId) {
+                    // BullMQ queue picked it up => start polling
+                    console.log(`[Audit] Job queued: ${data.auditId}. Starting polling...`);
+                    setPendingAuditId(data.auditId);
+                } else if (data.status === "completed" && data.audit) {
+                    // Sync fallback executed
+                    console.log("[Audit] Sync execution completed.");
+                    saveAuditData(data.audit, sessionKey);
+                }
+
             } catch (err) {
                 console.error("Audit error:", err);
                 setError(err.message);
@@ -112,7 +128,38 @@ export default function AuditPage() {
         }
 
         loadAudit();
-    }, [id, businessName, city, placeId, isDbLoad]);
+    }, [id, businessName, city, placeId, isDbLoad, loadFullAuditById, saveAuditData]);
+
+    // Polling logic when a job is in queue
+    useEffect(() => {
+        if (!pendingAuditId) return;
+
+        console.log(`[Audit] Polling status for ${pendingAuditId}...`);
+        const sessionKey = getSessionKey(id, placeId, businessName);
+
+        const pollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/audit/${pendingAuditId}/status`);
+                if (!res.ok) return;
+
+                const { status } = await res.json();
+
+                if (status === "completed") {
+                    clearInterval(pollInterval);
+                    console.log("[Audit] Polling complete. Fetching full result...");
+                    await loadFullAuditById(pendingAuditId, sessionKey);
+                } else if (status === "failed") {
+                    clearInterval(pollInterval);
+                    setError("Audit pipeline failed processing.");
+                    setIsDataReady(true);
+                }
+            } catch (err) {
+                console.error("[Audit] Polling error:", err);
+            }
+        }, 3000); // Check every 3 seconds
+
+        return () => clearInterval(pollInterval);
+    }, [pendingAuditId, id, placeId, businessName, loadFullAuditById]);
 
     // Called when the scanning animation is done AND data is ready
     const handleScanComplete = useCallback(() => {
@@ -162,7 +209,7 @@ export default function AuditPage() {
                     <span className="text-xs text-base-content/40">
                         Scanned {new Date(auditData?.createdAt).toLocaleDateString()}
                     </span>
-                    <Link href={`/audit/${auditData?.id}/pdf`} className="btn btn-sm btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
+                    <Link href={`/audit/${auditData?.id || auditData?._id}/pdf`} className="btn btn-sm btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
                         📥 Download PDF
                     </Link>
                 </div>

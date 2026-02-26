@@ -30,7 +30,9 @@ export default async function Author({ params }) {
           <h1 className="font-extrabold text-3xl lg:text-5xl tracking-tight mb-2">
             {author.name}
           </h1>
-          <p className="md:text-lg mb-6 md:mb-10 font-medium">{author.job}</p>
+          {author.job && (
+            <p className="md:text-lg mb-6 md:mb-10 font-medium">{author.job}</p>
+          )}
           <p className="md:text-lg text-base-content/80">
             {author.description}
           </p>

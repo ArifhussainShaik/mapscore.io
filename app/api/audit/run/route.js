@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { fetchAuditData, fetchCompetitors } from "@/libs/data-provider";
-
-import { calculateScore } from "@/libs/scoring";
-import { detectIssues, generateActionPlan } from "@/libs/issues";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectMongo from "@/libs/mongoose";
 import Audit from "@/models/Audit";
+import { getAuditQueue } from "@/libs/queue";
+import { isRedisConfigured } from "@/libs/redis";
+
+// Imports for sync fallback ONLY
+import { fetchAuditData, fetchCompetitors } from "@/libs/data-provider";
+import { calculateScore } from "@/libs/scoring";
+import { detectIssues, generateActionPlan } from "@/libs/issues";
 
 export async function POST(req) {
     try {
@@ -18,14 +22,94 @@ export async function POST(req) {
             );
         }
 
-        // Use data-provider to fetch from Serper + Outscraper + PageSpeed
+        // 1. Get user and validate credits
+        await connectMongo();
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const userId = session.user.id;
+        const User = (await import("@/models/User")).default;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const { canRunAudit, deductCredit } = await import("@/libs/credits");
+        if (!canRunAudit(user)) {
+            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        }
+
+        // Deduct 1 credit immediately before processing
+        await deductCredit(user);
+
+        // 2. Create pending audit in MongoDB
+        const pendingAudit = await Audit.create({
+            userId,
+            businessName,
+            googlePlaceId: placeId,
+            status: "pending",
+            createdAt: new Date().toISOString(),
+        });
+
+        const auditId = pendingAudit._id.toString();
+        console.log(`[Audit API] Created pending audit ${auditId} for "${businessName}"`);
+
+        // 3. Queue vs Sync processing
+        if (isRedisConfigured() && getAuditQueue()) {
+            // ASYNC FLOW (Production)
+            const queue = getAuditQueue();
+            await queue.add("run-audit", {
+                auditId,
+                placeId,
+                businessName,
+                city
+            });
+
+            console.log(`[Audit API] Job dispatched to queue for ${auditId}`);
+            return NextResponse.json({
+                auditId,
+                status: "pending",
+                message: "Audit job queued successfully."
+            });
+
+        } else {
+            // SYNC FLOW (Local fallback when REDIS_URL is missing)
+            console.warn(`[Audit API] NO REDIS DETECTED. Running sync fallback for ${auditId}...`);
+            const completedAudit = await runAuditSync(auditId, placeId, businessName, city);
+            return NextResponse.json({
+                auditId,
+                status: "completed",
+                audit: completedAudit
+            });
+        }
+
+    } catch (error) {
+        console.error("[Audit API] Run error:", error);
+        return NextResponse.json(
+            { error: "Failed to initialize audit" },
+            { status: 500 }
+        );
+    }
+}
+
+/**
+ * Synchronous fallback processor (matches worker logic).
+ * Used when Redis/BullMQ is not configured.
+ */
+async function runAuditSync(auditId, placeId, businessName, city) {
+    try {
+        await Audit.findByIdAndUpdate(auditId, { status: "processing" });
+
+        // Step 1: Fetch data
         const { data: rawData, source: dataSource } = await fetchAuditData(
             businessName,
             city,
             placeId
         );
 
-        // Fetch competitors if we have category + location
         if (rawData.primaryCategory && (city || rawData.businessAddress)) {
             const competitorCity = city || extractCity(rawData.businessAddress);
             if (competitorCity) {
@@ -38,61 +122,58 @@ export async function POST(req) {
             }
         }
 
-        // Run scoring engine (works with both real and mock data)
-        const { totalScore, grade, sectionScores, checkResults } =
-            calculateScore(rawData);
+        // Step 2: Scoring
+        const { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData } =
+            await calculateScore(rawData);
 
-        // Detect issues
+        // Step 3: Issues
         const issues = detectIssues(rawData);
-
-        // Generate action plan
         const actionPlan = generateActionPlan(issues);
 
-        // Build audit result
-        const audit = {
+        // Step 4: Build result
+        const auditUpdate = {
             ...rawData,
             totalScore,
             grade,
             sectionScores,
             checkResults,
+            checkpoint_results: checkpointResults || [],
+            percentile_data: percentileData || {},
             issues,
             actionPlan,
             dataSource,
-            createdAt: new Date().toISOString(),
-            cachedUntil: new Date(
-                Date.now() + 7 * 24 * 60 * 60 * 1000
-            ).toISOString(),
+            status: "completed",
+            cachedUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         };
 
-        // ── Compute unreplied review count ──
         const reviewCount = rawData.reviewCount || 0;
         const responseRate = rawData.responseRate ?? 0;
-        audit.unrepliedReviewCount = Math.round(reviewCount * (1 - responseRate));
+        auditUpdate.unrepliedReviewCount = Math.round(reviewCount * (1 - responseRate));
 
-        // ── Compute posts per month ──
-        if (rawData.postFrequency === "weekly") audit.postsPerMonth = 4;
-        else if (rawData.postFrequency === "monthly") audit.postsPerMonth = 1;
-        else if (rawData.postFrequency === "rarely") audit.postsPerMonth = 0;
-        else audit.postsPerMonth = 0;
+        if (rawData.postFrequency === "weekly") auditUpdate.postsPerMonth = 4;
+        else if (rawData.postFrequency === "monthly") auditUpdate.postsPerMonth = 1;
+        else if (rawData.postFrequency === "rarely") auditUpdate.postsPerMonth = 0;
+        else auditUpdate.postsPerMonth = 0;
 
-        // ── Add Google Maps links to competitors ──
+        const validFrequencies = ["weekly", "monthly", "rarely", "never", "unknown"];
+        if (!validFrequencies.includes(auditUpdate.postFrequency)) {
+            auditUpdate.postFrequency = "unknown";
+        }
+
         if (rawData.competitors?.length > 0) {
             for (const comp of rawData.competitors) {
                 if (!comp.mapsUrl && comp.name) {
                     comp.mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(comp.name + " " + (city || ""))}`;
                 }
             }
-            audit.competitors = rawData.competitors;
+            auditUpdate.competitors = rawData.competitors;
         }
 
-        // ── Collect suggested secondary categories ──
         const existingCats = new Set([
             rawData.primaryCategory?.toLowerCase(),
-            ...(rawData.secondaryCategories || []).map(c => c.toLowerCase()),
+            ...(rawData.secondaryCategories || []).map((c) => c.toLowerCase()),
         ].filter(Boolean));
         const suggestions = new Set();
-
-        // From competitors
         if (rawData.competitors?.length > 0) {
             for (const comp of rawData.competitors) {
                 if (comp.category && !existingCats.has(comp.category.toLowerCase())) {
@@ -100,69 +181,33 @@ export async function POST(req) {
                 }
             }
         }
-        audit.suggestedCategories = [...suggestions].slice(0, 5);
+        auditUpdate.suggestedCategories = [...suggestions].slice(0, 5);
 
-        // Remove internal metadata before saving
-        delete audit._source;
-        delete audit._serperCid;
-        delete audit._outscraper;
-        delete audit._servicesChecked;
-        delete audit._descriptionChecked;
+        delete auditUpdate._source;
+        delete auditUpdate._serperCid;
+        delete auditUpdate._outscraper;
+        delete auditUpdate._servicesChecked;
+        delete auditUpdate._descriptionChecked;
 
-        // Normalize postFrequency to match schema enum
-        const validFrequencies = ["weekly", "monthly", "rarely", "never", "unknown"];
-        if (!validFrequencies.includes(audit.postFrequency)) {
-            console.log(`[Audit] Normalizing postFrequency "${audit.postFrequency}" → "unknown"`);
-            audit.postFrequency = "unknown";
-        }
-
-        // Save to MongoDB if user is authenticated
-        let savedAuditId = null;
-        try {
-            const { userId } = await auth();
-            if (userId) {
-                await connectMongo();
-                const savedAudit = await Audit.create({
-                    userId,
-                    ...audit,
-                });
-                savedAuditId = savedAudit._id.toString();
-                console.log(`[Audit] Saved to DB for user ${userId}: ${savedAuditId}`);
-            }
-        } catch (dbError) {
-            // Don't fail the audit if DB save fails — but log the full error
-            console.error("[Audit] DB save failed:", dbError.message);
-            if (dbError.errors) {
-                for (const [field, err] of Object.entries(dbError.errors)) {
-                    console.error(`[Audit] Validation error on '${field}':`, err.message);
-                }
-            }
-        }
-
-        // Add the DB id to the response
-        audit.id = savedAuditId || `audit_${Date.now()}`;
-
-        return NextResponse.json({ audit });
+        // Step 5: Save
+        const finalAudit = await Audit.findByIdAndUpdate(auditId, auditUpdate, { new: true });
+        console.log(`[Audit API] Sync audit ${auditId} completed.`);
+        return finalAudit;
     } catch (error) {
-        console.error("Audit run error:", error);
-        return NextResponse.json(
-            { error: "Failed to run audit" },
-            { status: 500 }
-        );
+        console.error(`[Audit API] Sync audit ${auditId} failed:`, error);
+        await Audit.findByIdAndUpdate(auditId, {
+            status: "failed",
+            _errorMessage: error.message,
+        });
+        throw error;
     }
 }
 
-/**
- * Extract city from a full address string.
- * E.g., "4521 Congress Ave, Austin, TX 78745" → "Austin"
- */
 function extractCity(address) {
     if (!address) return "";
     const parts = address.split(",").map((p) => p.trim());
-    // Usually city is the second part
     if (parts.length >= 2) {
-        return parts[1].replace(/\d+/g, "").trim(); // Remove zip codes
+        return parts[1].replace(/\d+/g, "").trim();
     }
     return parts[0];
 }
-

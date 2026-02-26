@@ -51,13 +51,23 @@ const auditSchema = mongoose.Schema(
         grade: { type: String, enum: ["A", "B", "C", "D", "F"] },
         sectionScores: { type: Object },
         checkResults: { type: Object },
+        checkpoint_results: [{ type: Object }], // array of {key, category, score, maxScore, type, percentile, details, recommendation}
+        percentile_data: { type: Object }, // {review_count_percentile: 35, photo_count_percentile: 42}
+
         // Issues and action plan (flexible structure)
         issues: { type: mongoose.Schema.Types.Mixed, default: [] },
         actionPlan: { type: Object },
         // Suggested categories
         suggestedCategories: [String],
-        // Data source tracking
+        // Data source and Status tracking
         dataSource: { type: String },
+        status: { type: String, enum: ["pending", "processing", "completed", "failed"], default: "pending" },
+        _errorMessage: { type: String },
+
+        // Industry Benchmark mapping
+        industry: { type: String },
+        benchmark_industry: { type: String },
+
         // Cache
         cachedUntil: { type: Date },
     },

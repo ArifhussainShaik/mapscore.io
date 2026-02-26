@@ -1,12 +1,14 @@
 import scoringRules from "@/scoring-rules.json";
+import { calculateAllPercentiles } from "./benchmarks.js";
 
 /**
  * Calculate the audit score for a business based on the scoring rules.
  * @param {Object} auditData - The raw audit data object
- * @returns {{ totalScore: number, grade: string, sectionScores: Object, checkResults: Array }}
+ * @returns {Promise<{ totalScore: number, grade: string, sectionScores: Object, checkResults: Array, checkpointResults: Array, percentileData: Object }>}
  */
-export function calculateScore(auditData) {
+export async function calculateScore(auditData) {
     const checkResults = [];
+    const checkpointResults = [];
     const sectionScores = {};
     let totalScore = 0;
 
@@ -15,12 +17,28 @@ export function calculateScore(auditData) {
 
         for (const check of section.checks) {
             const result = evaluateCheck(check, auditData, section.id);
+
             checkResults.push({
                 sectionId: section.id,
                 sectionName: section.name,
                 ...result,
             });
-            sectionTotal += result.score;
+
+            // Format for PRD v3 checkpoint_results array
+            checkpointResults.push({
+                key: check.id,
+                category: section.id,
+                score: result.score,
+                maxScore: check.max_points,
+                type: check.type || "scored",
+                passed: result.passed,
+                details: result.matchedLabel,
+                recommendation: result.dataCitation,
+            });
+
+            if (check.type !== "flag") {
+                sectionTotal += result.score;
+            }
         }
 
         sectionScores[section.id] = sectionTotal;
@@ -29,17 +47,45 @@ export function calculateScore(auditData) {
 
     const grade = getGrade(totalScore);
 
-    return { totalScore, grade, sectionScores, checkResults };
+    // Calculate percentiles if we have an industry mapping
+    let percentileData = {};
+    if (auditData.primaryCategory) {
+        const pData = await calculateAllPercentiles(auditData, auditData.primaryCategory);
+        if (pData) {
+            percentileData = pData.percentiles;
+            auditData.benchmark_industry = pData.industry; // pass out to caller if needed
+            auditData.industry = pData.industry;
+        }
+    }
+
+    return { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData };
 }
 
 /**
  * Evaluate a single check against the audit data.
  */
 function evaluateCheck(check, data, sectionId) {
-    const { id, name, max_points, rules, data_citation } = check;
+    const { id, name, max_points, rules, data_citation, type } = check;
     let score = 0;
     let matchedRule = null;
+    let passed = null;
 
+    if (type === "flag") {
+        // Evaluate zero-point flags
+        passed = evaluateFlag(id, data);
+        return {
+            checkId: id,
+            checkName: name,
+            maxPoints: max_points,
+            score: 0,
+            passed,
+            matchedLabel: passed ? "Passed" : "Flagged",
+            dataCitation: data_citation || "",
+            type,
+        };
+    }
+
+    // Evaluate standard scored checks
     switch (id) {
         // PROFILE SIGNALS
         case "primary_category":
@@ -65,7 +111,6 @@ function evaluateCheck(check, data, sectionId) {
         case "services":
             const svcCount = data.services?.length || 0;
             if (!data._servicesChecked) {
-                // Can't verify services via API — give benefit of the doubt (partial credit)
                 score = 3;
             } else if (svcCount >= 10) score = 6;
             else if (svcCount >= 5) score = 4;
@@ -75,7 +120,6 @@ function evaluateCheck(check, data, sectionId) {
         case "description":
             const descLen = data.description?.length || 0;
             if (!data._descriptionChecked && descLen === 0) {
-                // Can't verify description via API — give benefit of the doubt
                 score = 2;
             } else {
                 const hasKeywords =
@@ -109,7 +153,7 @@ function evaluateCheck(check, data, sectionId) {
 
         case "products":
             if (data.products?.length > 0) score = 3;
-            else score = 3; // not applicable = full points
+            else score = 3;
             break;
 
         // REVIEW SIGNALS
@@ -164,7 +208,6 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         case "photo_variety":
-            // Simplified: based on owner vs total ratio
             if (data.ownerPhotoCount >= 10 && data.photoCount >= 20) score = 3;
             else if (data.ownerPhotoCount >= 5) score = 2;
             else if (data.ownerPhotoCount >= 1) score = 1;
@@ -203,7 +246,6 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         case "ask_maps_readiness":
-            // If business has a website, assume some content for Ask Maps
             if (data.websiteUrl && data.description) score = 2;
             else if (data.websiteUrl) score = 1;
             break;
@@ -268,14 +310,11 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         default:
-            // Unknown check: score 0
             break;
     }
 
-    // Clamp score to max
     score = Math.min(score, max_points);
 
-    // Find matched rule description
     if (rules) {
         for (const rule of rules) {
             if (rule.points === score) {
@@ -290,19 +329,72 @@ function evaluateCheck(check, data, sectionId) {
         checkName: name,
         maxPoints: max_points,
         score,
+        passed: score >= (max_points / 2),
         matchedLabel: matchedRule?.label || "",
         dataCitation: data_citation || "",
+        type: "scored",
     };
+}
+
+/**
+ * Evaluate zero-point flags (pass/fail).
+ */
+function evaluateFlag(id, data) {
+    switch (id) {
+        case "flag_business_verified": return data.isVerified === true;
+        case "flag_phone_present": return !!data.phone;
+        case "flag_website_present": return !!data.websiteUrl;
+        case "flag_address_present": return !!data.businessAddress;
+        case "flag_special_hours": return false; // Assumed false unless explicitly scraped
+        case "flag_booking_url": return !!data.bookingUrl;
+        case "flag_name_stuffed": return (data.businessName || "").length <= 60; // Flag very long names
+        case "flag_desc_city":
+            const city = data.businessAddress ? data.businessAddress.split(",")[1]?.trim()?.toLowerCase() : null;
+            return city ? (data.description || "").toLowerCase().includes(city) : false;
+        case "flag_desc_keywords":
+            const cat = data.primaryCategory ? data.primaryCategory.toLowerCase() : null;
+            return cat ? (data.description || "").toLowerCase().includes(cat) : false;
+        case "flag_opening_date": return !!data.openingDate;
+        case "flag_short_name": return !!data.shortName;
+
+        case "flag_review_count_industry": return true; // Handled by percentile rendering
+        case "flag_rating_sweet_spot": return data.averageRating >= 4.2 && data.averageRating <= 4.8;
+        case "flag_negative_response_rate": return data.negativeResponseRate == null || data.negativeResponseRate >= 0.5;
+        case "flag_one_star_pct": return data.oneStarPercentage == null || data.oneStarPercentage <= 10;
+        case "flag_velocity_trend": return data.monthlyReviewVelocity > 0;
+        case "flag_reviews_with_text": return data.reviewsWithTextRatio == null || data.reviewsWithTextRatio >= 0.5;
+        case "flag_velocity_industry": return true;
+
+        case "flag_photo_count_industry": return true;
+        case "flag_owner_customer_ratio": return data.ownerPhotoCount >= Math.max(0, (data.photoCount || 0) - (data.ownerPhotoCount || 0));
+        case "flag_video_present": return false;
+        case "flag_interior_photos": return (data.photoCount || 0) > 10;
+        case "flag_team_photos": return (data.ownerPhotoCount || 0) > 5;
+
+        case "flag_post_variety": return (data.postTypes || []).length > 1;
+        case "flag_posts_ctas": return !!data.hasPostCTAs;
+        case "flag_posts_images": return !!data.hasPostImages;
+        case "flag_booking_integration": return !!data.bookingUrl;
+
+        case "flag_schema_markup": return !!data.hasSchema;
+        case "flag_schema_nap_match": return !!data.schemaNapMatch;
+        case "flag_page_speed": return data.loadSpeed == null || data.loadSpeed < 3000;
+
+        case "flag_velocity_competitors": return true;
+        case "flag_post_frequency_competitors": return true;
+
+        default: return true;
+    }
 }
 
 /**
  * Get letter grade from total score.
  */
 export function getGrade(score) {
-    if (score >= 85) return "A";
-    if (score >= 70) return "B";
-    if (score >= 55) return "C";
-    if (score >= 40) return "D";
+    if (score >= 90) return "A";
+    if (score >= 80) return "B";
+    if (score >= 70) return "C";
+    if (score >= 60) return "D";
     return "F";
 }
 
@@ -324,9 +416,9 @@ export function getGradeLabel(grade) {
  * Get score color for the gauge.
  */
 export function getScoreColor(score) {
-    if (score >= 85) return "#10b981";
-    if (score >= 70) return "#3b82f6";
-    if (score >= 55) return "#f59e0b";
-    if (score >= 40) return "#f97316";
+    if (score >= 90) return "#10b981";
+    if (score >= 80) return "#3b82f6";
+    if (score >= 70) return "#eab308";
+    if (score >= 60) return "#f97316";
     return "#ef4444";
 }

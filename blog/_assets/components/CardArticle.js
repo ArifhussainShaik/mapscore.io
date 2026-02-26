@@ -13,7 +13,7 @@ const CardArticle = ({
   const TitleTag = tag;
 
   return (
-    <article className="card bg-base-200 rounded-box overflow-hidden">
+    <article className="card bg-base-200 rounded-box overflow-hidden article-card">
       {article.image?.src && (
         <Link
           href={`/blog/${article.slug}`}
@@ -28,8 +28,7 @@ const CardArticle = ({
               width={600}
               height={338}
               priority={isImagePriority}
-              placeholder="blur"
-              className="aspect-video object-center object-cover hover:scale-[1.03] duration-200 ease-in-out"
+              className="aspect-video object-center object-cover article-card-image"
             />
           </figure>
         </Link>

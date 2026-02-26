@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Popover, Transition } from "@headlessui/react";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "@/app/icon.png";
+import Logo from "@/components/Logo";
 import config from "@/config";
 import { categories } from "../content";
 import ButtonSignin from "@/components/ButtonSignin";
@@ -149,8 +148,8 @@ const HeaderBlog = () => {
   }, [searchParams]);
 
   return (
-    <header className="bg-base-200">
-      <nav className="max-w-7xl flex items-center justify-between px-8 py-3 mx-auto">
+    <header className="header-floating">
+      <nav className="w-full flex items-center justify-between">
         {/* Your logo/name on large screens */}
         <div className="flex lg:flex-1">
           <Link
@@ -158,14 +157,7 @@ const HeaderBlog = () => {
             href="/"
             title={`${config.appName} hompage`}
           >
-            <Image
-              src={logo}
-              alt={`${config.appName} logo`}
-              className="w-8"
-              priority={true}
-              width={32}
-              height={32}
-            />
+            <Logo className="w-8 h-8" />
             <span className="font-extrabold text-lg">{config.appName}</span>
           </Link>
         </div>
@@ -215,10 +207,18 @@ const HeaderBlog = () => {
       </nav>
 
       {/* Mobile menu, show/hide based on menu state. */}
-      <div className={`relative z-50 ${isOpen ? "" : "hidden"}`}>
-        <div
-          className={`fixed inset-y-0 right-0 z-10 w-full px-8 py-3 overflow-y-auto bg-base-200 sm:max-w-sm sm:ring-1 sm:ring-neutral/10 transform origin-right transition ease-in-out duration-300`}
-        >
+      {isOpen && (
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-base-content/20 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          {/* Menu panel */}
+          <div
+            className="fixed inset-y-0 right-0 z-10 w-full px-8 py-3 overflow-y-auto bg-base-200 sm:max-w-sm sm:ring-1 sm:ring-neutral/10 transform origin-right transition ease-in-out duration-300"
+          >
           {/* Your logo/name on small screens */}
           <div className="flex items-center justify-between">
             <Link
@@ -226,15 +226,7 @@ const HeaderBlog = () => {
               title={`${config.appName} hompage`}
               href="/"
             >
-              <Image
-                src={logo}
-                alt={`${config.appName} logo`}
-                className="w-8"
-                placeholder="blur"
-                priority={true}
-                width={32}
-                height={32}
-              />
+              <Logo className="w-8 h-8" />
               <span className="font-extrabold text-lg">{config.appName}</span>
             </Link>
             <button
@@ -282,7 +274,8 @@ const HeaderBlog = () => {
             <div className="flex flex-col">{cta}</div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </header>
   );
 };

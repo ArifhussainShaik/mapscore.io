@@ -1,10 +1,11 @@
-import { Outfit } from "next/font/google";
+import { DM_Serif_Display, Inter } from "next/font/google";
 import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
 import config from "@/config";
 import "./globals.css";
 
-const font = Outfit({ subsets: ["latin"] });
+const fontSerif = DM_Serif_Display({ subsets: ["latin"], weight: "400", variable: "--font-serif" });
+const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const viewport = {
 	themeColor: config.colors.main,
@@ -14,20 +15,16 @@ export const viewport = {
 
 export const metadata = getSEOTags();
 
-import { ClerkProvider } from '@clerk/nextjs'
-
 export default function RootLayout({ children }) {
 	return (
-		<ClerkProvider>
-			<html
-				lang="en"
-				data-theme={config.colors.theme}
-				className={font.className}
-			>
-				<body>
-					<ClientLayout>{children}</ClientLayout>
-				</body>
-			</html>
-		</ClerkProvider>
+		<html
+			lang="en"
+			data-theme={config.colors.theme}
+			className={`${fontSans.variable} ${fontSerif.variable} font-sans`}
+		>
+			<body>
+				<ClientLayout>{children}</ClientLayout>
+			</body>
+		</html>
 	);
 }

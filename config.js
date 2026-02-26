@@ -1,11 +1,11 @@
 const config = {
   // REQUIRED
-  appName: "Mapscore.io",
+  appName: "LocalScore",
   // REQUIRED: a short description of your app for SEO tags
   appDescription:
-    "How healthy is your Google Business Profile? Get a scored audit report with prioritized fixes, competitor comparison, and downloadable PDF in 30 seconds.",
+    "How healthy is your Google Business Profile? Get a free, instant audit with actionable tips to attract more local customers. No signup required.",
   // REQUIRED (no https://, no trailing slash)
-  domainName: "mapscore.io",
+  domainName: "localscore.io",
   crisp: {
     id: "",
     onlyShowOnRoutes: ["/"],
@@ -57,8 +57,8 @@ const config = {
     supportEmail: "support@mapscore.io",
   },
   colors: {
-    theme: "dark",
-    main: "#10b981",
+    theme: "light",
+    main: "#2563eb",
   },
   auth: {
     loginUrl: "/api/auth/signin",

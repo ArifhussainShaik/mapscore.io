@@ -1,0 +1,42 @@
+
+> mapscore-io@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.29.3:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1204ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1055ms (599 modules)
+ GET /api/auth/signin 200 in 1587ms
+ ✓ Compiled in 95ms (405 modules)
+ ○ Compiling / ...
+/*! 🌼 daisyUI 5.0.50 */
+ ✓ Compiled / in 1851ms (808 modules)
+ GET / 200 in 2158ms
+ GET / 200 in 185ms
+ ⚠ Cross origin request detected from 192.168.29.3 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ✓ Compiled /api/auth/[...nextauth] in 471ms (491 modules)
+ ✓ Compiled (810 modules)
+ GET /favicon.ico 200 in 652ms
+ GET /api/auth/session 200 in 651ms
+ GET /api/auth/providers 200 in 17ms
+ GET /api/auth/csrf 200 in 10ms
+ POST /api/auth/signin/google 200 in 208ms
+[next-auth][error][OAUTH_CALLBACK_ERROR] 
+https://next-auth.js.org/errors#oauth_callback_error State cookie was missing. {
+  error: [Error [OAuthCallbackError]: State cookie was missing.] {
+    code: undefined
+  },
+  providerId: 'google',
+  message: 'State cookie was missing.'
+}
+ GET /api/auth/callback/google?state=XarJy05ScPDDxUZo-14dNojLGDyPI89Pc6hstvExkRI&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AfrIepB6RDtHk4q4VqfGkwG571JuPwPwU3shuOfZJCGWE32uQ-2oReYtHdePaz8Tc0f9vg&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent 302 in 222ms
+ GET /api/auth/error?error=OAuthCallback 302 in 6ms
+ GET /api/auth/signin?error=OAuthCallback 200 in 7ms
+ GET / 200 in 232ms
+ GET /api/auth/session 200 in 18ms

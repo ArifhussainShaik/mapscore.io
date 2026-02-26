@@ -1,8 +1,9 @@
 "use client";
 
-import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import BuyCreditsModal from "@/components/BuyCreditsModal";
 
 const GRADE_COLORS = {
   A: "text-emerald-400 bg-emerald-500/20 border-emerald-500/30",
@@ -21,9 +22,14 @@ const SCORE_COLORS = {
 };
 
 export default function Dashboard() {
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
   const [audits, setAudits] = useState([]);
   const [isLoadingAudits, setIsLoadingAudits] = useState(true);
+  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
+
+  const isSignedIn = status === "authenticated";
+  const isLoaded = status !== "loading";
+  const user = session?.user;
 
   // Fetch user's audits from API
   useEffect(() => {
@@ -65,11 +71,12 @@ export default function Dashboard() {
             Access your saved audits, monitoring alerts, and detailed reports.
           </p>
 
-          <SignInButton mode="modal">
-            <button className="btn btn-lg w-full bg-white text-gray-800 hover:bg-gray-100 border-0 mb-3">
-              🚀 Sign In / Sign Up
-            </button>
-          </SignInButton>
+          <button
+            onClick={() => signIn("google")}
+            className="btn btn-lg w-full bg-white text-gray-800 hover:bg-gray-100 border-0 mb-3"
+          >
+            🚀 Sign In / Sign Up
+          </button>
 
           <p className="text-xs text-base-content/40 mt-4">
             By signing in you agree to our terms of service.
@@ -97,22 +104,35 @@ export default function Dashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">Dashboard</h1>
             <p className="text-base-content/50 text-sm mt-1">
-              Welcome back, {user?.firstName || user?.primaryEmailAddress?.emailAddress}
+              Welcome back, {user?.name || user?.email}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/" className="btn btn-brand btn-sm">
               + New Audit
             </Link>
-            {/* Clerk UserButton — handles avatar, menu, sign out */}
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: "w-8 h-8",
-                },
-              }}
-            />
+            <button onClick={() => signOut()} className="btn btn-sm btn-ghost text-base-content/70 hover:text-white">
+              Sign out
+            </button>
           </div>
+        </div>
+
+        {/* Credit Banner */}
+        <div className="glass-card p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-emerald-500/30">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              💳 Credits: <span className={user?.credits > 0 ? "text-emerald-400" : "text-red-400"}>{user?.credits || 0} remaining</span>
+            </h2>
+            {user?.is_lifetime && (
+              <p className="text-xs text-base-content/60 mt-1">Lifetime plan: credits refresh monthly.</p>
+            )}
+            {!user?.is_lifetime && (
+              <p className="text-xs text-base-content/60 mt-1">Unused credits expire after 6 months.</p>
+            )}
+          </div>
+          <button onClick={() => setIsBuyModalOpen(true)} className="btn btn-brand btn-sm">
+            Buy more credits
+          </button>
         </div>
 
         {/* Stats */}
@@ -137,7 +157,7 @@ export default function Dashboard() {
         {/* Audit List */}
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            📋 Saved Audits
+            📋 Your Audits
           </h2>
 
           {isLoadingAudits ? (
@@ -162,75 +182,65 @@ export default function Dashboard() {
               const color = SCORE_COLORS[audit.grade] || "#f59e0b";
 
               return (
-                <Link
-                  key={audit.id || audit._id}
-                  href={`/audit/${audit.id || audit._id}`}
-                  className="glass-card p-5 flex items-center gap-4 hover:border-emerald-500/30 transition-all duration-300 cursor-pointer group block"
-                >
-                  {/* Score */}
-                  <div className="flex-shrink-0 relative w-14 h-14">
-                    <svg width="56" height="56" viewBox="0 0 56 56" className="score-ring">
-                      <circle cx="28" cy="28" r="24" strokeWidth="4" className="score-ring-bg" />
-                      <circle
-                        cx="28"
-                        cy="28"
-                        r="24"
-                        strokeWidth="4"
-                        className="score-ring-fill"
-                        stroke={color}
-                        strokeDasharray={2 * Math.PI * 24}
-                        strokeDashoffset={2 * Math.PI * 24 * (1 - (audit.totalScore || 0) / 100)}
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-bold" style={{ color }}>{audit.totalScore}</span>
+                <div key={audit.id || audit._id} className="glass-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-emerald-500/30 transition-all duration-300 group">
+                  <div className="flex items-center gap-4 cursor-pointer" onClick={() => window.location.href = `/audit/${audit.id || audit._id}`}>
+                    {/* Score */}
+                    <div className="flex-shrink-0 relative w-14 h-14">
+                      <svg width="56" height="56" viewBox="0 0 56 56" className="score-ring">
+                        <circle cx="28" cy="28" r="24" strokeWidth="4" className="score-ring-bg" />
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="24"
+                          strokeWidth="4"
+                          className="score-ring-fill"
+                          stroke={color}
+                          strokeDasharray={2 * Math.PI * 24}
+                          strokeDashoffset={2 * Math.PI * 24 * (1 - (audit.totalScore || 0) / 100)}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-sm font-bold" style={{ color }}>{audit.totalScore}</span>
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white truncate">
+                        {audit.businessName}
+                      </h3>
+                      <p className="text-xs text-base-content/50 mt-0.5 truncate flex items-center gap-2">
+                        <span>{audit.businessAddress}</span>
+                        <span className="hidden sm:inline">&bull;</span>
+                        <span className="hidden sm:inline">{new Date(audit.createdAt).toLocaleDateString()}</span>
+                      </p>
                     </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white group-hover:text-emerald-400 transition-colors truncate">
-                      {audit.businessName}
-                    </h3>
-                    <p className="text-xs text-base-content/50 mt-0.5 truncate">
-                      {audit.businessAddress}
-                    </p>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                    <span className={`px-3 py-1 rounded-lg text-sm font-bold border ${gradeClass}`}>
+                      {audit.grade} ({audit.totalScore})
+                    </span>
+                    <div className="flex gap-2">
+                      <Link href={`/audit/${audit.id || audit._id}`} className="btn btn-sm btn-ghost hover:bg-base-300 px-3">
+                        View
+                      </Link>
+                      <Link href={`/audit/${audit.id || audit._id}/pdf`} className="btn btn-sm btn-ghost hover:bg-base-300 px-3">
+                        PDF
+                      </Link>
+                    </div>
                   </div>
-
-                  {/* Grade badge */}
-                  <span className={`px-3 py-1 rounded-lg text-sm font-bold border ${gradeClass}`}>
-                    {audit.grade}
-                  </span>
-
-                  {/* Meta */}
-                  <div className="hidden sm:flex flex-col items-end gap-1 text-xs text-base-content/40">
-                    <span>{new Date(audit.createdAt).toLocaleDateString()}</span>
-                    <span className="text-base-content/30">{audit.dataSource}</span>
-                  </div>
-
-                  {/* Arrow */}
-                  <svg className="w-5 h-5 text-base-content/20 group-hover:text-emerald-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
-                </Link>
+                </div>
               );
             })
           )}
         </div>
-
-        {/* Upgrade banner */}
-        <div className="glass-card p-6 mt-8 text-center border-emerald-500/20">
-          <h3 className="text-lg font-bold text-white mb-2">
-            Need unlimited audits?
-          </h3>
-          <p className="text-sm text-base-content/50 mb-4">
-            Upgrade to Pro for unlimited audits, full reports, and PDF export.
-          </p>
-          <Link href="/#pricing" className="btn btn-brand btn-sm">
-            Upgrade to Pro — $29/mo
-          </Link>
-        </div>
       </div>
+
+      <BuyCreditsModal
+        isOpen={isBuyModalOpen}
+        onClose={() => setIsBuyModalOpen(false)}
+      />
     </main>
   );
 }

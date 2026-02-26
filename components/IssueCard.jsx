@@ -3,10 +3,55 @@
 import { useState } from "react";
 
 const SEVERITY_STYLES = {
-    critical: { bg: "severity-critical", label: "Critical", icon: "🔴" },
-    high: { bg: "severity-high", label: "High", icon: "🟠" },
-    medium: { bg: "severity-medium", label: "Medium", icon: "🟡" },
-    low: { bg: "severity-low", label: "Low", icon: "🔵" },
+    critical: {
+        border: "border-l-red-500",
+        pillBg: "bg-red-50 text-red-600",
+        pillLabel: "CRITICAL",
+        iconBg: "bg-red-50 text-red-500",
+        icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        ),
+        actionLabel: "Fix Now"
+    },
+    high: {
+        border: "border-l-orange-500",
+        pillBg: "bg-orange-50 text-orange-600",
+        pillLabel: "WARNING",
+        iconBg: "bg-orange-50 text-orange-500",
+        icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        ),
+        actionLabel: "Update"
+    },
+    medium: {
+        border: "border-l-amber-500",
+        pillBg: "bg-amber-50 text-amber-600",
+        pillLabel: "WARNING",
+        iconBg: "bg-amber-50 text-amber-500",
+        icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        ),
+        actionLabel: "Update"
+    },
+    low: {
+        border: "border-l-blue-500",
+        pillBg: "bg-blue-50 text-blue-600",
+        pillLabel: "OPPORTUNITY",
+        iconBg: "bg-blue-50 text-blue-500",
+        icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
+        actionLabel: "Upload"
+    },
 };
 
 export default function IssueCard({ issue, defaultExpanded = false }) {
@@ -14,89 +59,78 @@ export default function IssueCard({ issue, defaultExpanded = false }) {
     const style = SEVERITY_STYLES[issue.severity] || SEVERITY_STYLES.medium;
 
     return (
-        <div className="glass-card overflow-hidden transition-all duration-300">
-            {/* Header - always visible */}
-            <button
-                onClick={() => setExpanded(!expanded)}
-                className="w-full p-4 sm:p-5 flex items-start gap-3 text-left hover:bg-base-content/5 transition-colors"
+        <div className={`bg-white rounded-3xl overflow-hidden transition-all duration-300 shadow-sm border border-slate-100 border-l-[6px] ${style.border}`}>
+            {/* Header / Main Row */}
+            <div
+                className="w-full p-5 sm:p-6 flex items-center justify-between gap-4"
             >
-                <span className="text-lg flex-shrink-0 mt-0.5">{style.icon}</span>
-
-                <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${style.bg}`}>
-                            {style.label}
-                        </span>
-                        <span className="text-xs text-base-content/40 uppercase tracking-wide">
-                            {issue.section}
-                        </span>
+                <div className="flex items-start gap-4">
+                    {/* Icon Circle */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${style.iconBg}`}>
+                        {style.icon}
                     </div>
-                    <h3 className="font-semibold text-base-content text-sm sm:text-base">
-                        {issue.name}
-                    </h3>
-                    <p className="text-sm text-base-content/60 mt-1 line-clamp-2">
-                        {issue.description}
-                    </p>
-                </div>
 
-                <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className="hidden sm:flex flex-col items-end text-xs text-base-content/50">
-                        <span>⏱ {issue.timeToFix}</span>
-                        <span className="mt-0.5">📈 {issue.expectedImpact}</span>
-                    </div>
-                    <svg
-                        className={`w-5 h-5 text-base-content/40 transition-transform duration-300 ${expanded ? "rotate-180" : ""
-                            }`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                    </svg>
-                </div>
-            </button>
-
-            {/* Expanded content */}
-            {expanded && (
-                <div className="px-5 pb-5 border-t border-base-content/10 animate-fade-in-up">
-                    {/* Why it matters */}
-                    <div className="mt-4 p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
-                        <p className="text-xs font-semibold text-amber-400 mb-1 uppercase tracking-wide">
-                            Why This Matters
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${style.pillBg}`}>
+                                {style.pillLabel}
+                            </span>
+                            <span className="text-xs font-semibold text-slate-400">
+                                Est. time: {issue.timeToFix || "5m"}
+                            </span>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                            {issue.name}
+                        </h3>
+                        <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">
+                            {issue.description}
                         </p>
-                        <p className="text-sm text-base-content/70">{issue.whyItMatters}</p>
                     </div>
+                </div>
+
+                {/* Right Action Link */}
+                <button
+                    onClick={() => setExpanded(!expanded)}
+                    className="flex-shrink-0 text-blue-600 font-bold text-sm hover:underline hidden sm:flex items-center gap-1"
+                >
+                    {style.actionLabel}
+                    <svg className={`w-4 h-4 transition-transform ${expanded ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+
+            {/* Expanded content (for "How to fix" details) */}
+            {expanded && (
+                <div className="px-6 pb-6 pt-2 border-t border-slate-100 ml-16 mt-2">
+                    {/* Why it matters */}
+                    {issue.whyItMatters && (
+                        <div className="mb-4">
+                            <p className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-1">
+                                Why This Matters
+                            </p>
+                            <p className="text-sm text-slate-600">{issue.whyItMatters}</p>
+                        </div>
+                    )}
 
                     {/* How to fix */}
-                    <div className="mt-4">
-                        <p className="text-xs font-semibold text-emerald-400 mb-2 uppercase tracking-wide">
-                            How to Fix
-                        </p>
-                        <ol className="space-y-2">
-                            {issue.howToFix?.map((step, i) => (
-                                <li key={i} className="flex items-start gap-2 text-sm text-base-content/70">
-                                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">
-                                        {i + 1}
-                                    </span>
-                                    <span>{step}</span>
-                                </li>
-                            ))}
-                        </ol>
-                    </div>
-
-                    {/* Meta info */}
-                    <div className="mt-4 flex flex-wrap gap-4 text-xs text-base-content/50">
-                        <span className="flex items-center gap-1">
-                            ⏱ <strong>Time to fix:</strong> {issue.timeToFix}
-                        </span>
-                        <span className="flex items-center gap-1">
-                            📈 <strong>Impact:</strong> {issue.expectedImpact}
-                        </span>
-                        <span className="flex items-center gap-1">
-                            ⚡ <strong>Results in:</strong> {issue.timeToResults}
-                        </span>
-                    </div>
+                    {issue.howToFix?.length > 0 && (
+                        <div>
+                            <p className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2">
+                                How to Fix
+                            </p>
+                            <ol className="space-y-2">
+                                {issue.howToFix?.map((step, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold mt-0.5">
+                                            {i + 1}
+                                        </span>
+                                        <span>{step}</span>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

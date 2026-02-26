@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useUser, SignInButton } from "@clerk/nextjs";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import config from "@/config";
 
@@ -9,9 +9,9 @@ import config from "@/config";
 // If logged in: shows user avatar + link to dashboard.
 // If logged out: shows sign-in button.
 const ButtonSignin = ({ text = "Get started", extraStyle }) => {
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
 
-  if (!isLoaded) {
+  if (status === "loading") {
     return (
       <button className={`btn ${extraStyle ? extraStyle : ""}`} disabled>
         <span className="loading loading-spinner loading-xs"></span>
@@ -19,16 +19,17 @@ const ButtonSignin = ({ text = "Get started", extraStyle }) => {
     );
   }
 
-  if (isSignedIn) {
+  if (status === "authenticated") {
+    const user = session?.user;
     return (
       <Link
         href={config.auth.callbackUrl}
         className={`btn ${extraStyle ? extraStyle : ""}`}
       >
-        {user?.imageUrl ? (
+        {user?.image ? (
           <img
-            src={user.imageUrl}
-            alt={user.fullName || "Account"}
+            src={user.image}
+            alt={user.name || "Account"}
             className="w-6 h-6 rounded-full shrink-0"
             referrerPolicy="no-referrer"
             width={24}
@@ -36,20 +37,21 @@ const ButtonSignin = ({ text = "Get started", extraStyle }) => {
           />
         ) : (
           <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
-            {user?.firstName?.charAt(0) || user?.primaryEmailAddress?.emailAddress?.charAt(0)}
+            {user?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
           </span>
         )}
-        {user?.firstName || user?.primaryEmailAddress?.emailAddress || "Account"}
+        {user?.name || user?.email || "Account"}
       </Link>
     );
   }
 
   return (
-    <SignInButton mode="modal">
-      <button className={`btn ${extraStyle ? extraStyle : ""}`}>
-        {text}
-      </button>
-    </SignInButton>
+    <button
+      onClick={() => signIn("google")}
+      className={`btn ${extraStyle ? extraStyle : ""}`}
+    >
+      {text}
+    </button>
   );
 };
 

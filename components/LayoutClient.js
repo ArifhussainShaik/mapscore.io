@@ -6,6 +6,7 @@ import { Crisp } from "crisp-sdk-web";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
+import { SessionProvider } from "next-auth/react";
 import config from "@/config";
 
 // Crisp customer chat support
@@ -38,7 +39,7 @@ const CrispChat = () => {
 // 4. CrispChat: Set Crisp customer chat support
 const ClientLayout = ({ children }) => {
   return (
-    <>
+    <SessionProvider>
       <CrispChat />
 
       {/* Show a progress bar at the top when navigating between pages */}
@@ -59,7 +60,7 @@ const ClientLayout = ({ children }) => {
         id="tooltip"
         className="z-[60] !opacity-100 max-w-sm shadow-lg"
       />
-    </>
+    </SessionProvider>
   );
 };
 
