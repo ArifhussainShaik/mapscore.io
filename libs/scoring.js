@@ -47,6 +47,10 @@ export async function calculateScore(auditData) {
 
     const grade = getGrade(totalScore);
 
+    // Debug logging
+    console.log(`[Scoring] Total: ${totalScore}/100, Grade: ${grade}`);
+    console.log(`[Scoring] Section breakdown:`, sectionScores);
+
     // Calculate percentiles if we have an industry mapping
     let percentileData = {};
     if (auditData.primaryCategory) {

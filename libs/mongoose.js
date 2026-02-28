@@ -9,8 +9,9 @@ const connectMongo = async () => {
   }
   return mongoose
     .connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      dbName: "Localscore",
+      serverSelectionTimeoutMS: 5000,
+      maxPoolSize: 10,
     })
     .catch((e) => console.error("Mongoose Client Error: " + e.message));
 };

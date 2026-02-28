@@ -77,6 +77,8 @@ export async function getPlaceDetails(placeId) {
     }
 
     console.log(`[GooglePlaces] Got: ${place.displayName?.text} (${place.userRatingCount || 0} reviews)`);
+    console.log(`[GooglePlaces] Categories → primaryType: "${place.primaryType}", primaryTypeDisplayName: "${place.primaryTypeDisplayName?.text}"`);
+    console.log(`[GooglePlaces] All types:`, place.types);
 
     return mapPlaceToAuditData(place, placeId);
 }
@@ -90,9 +92,21 @@ function mapPlaceToAuditData(place, placeId) {
 
     // Parse types into categories
     const allTypes = place.types || [];
-    const primaryCategory = place.primaryTypeDisplayName?.text || place.primaryType || "";
+
+    // CRITICAL FIX: Google sometimes returns wrong primary category
+    // Example: "AK Copier Solutions" has types: [internet_cafe, service, manufacturer]
+    // but Google sets primaryType="manufacturer" which is incorrect!
+    // We need to intelligently pick the MOST SPECIFIC category from types array
+
+    // Priority: Choose first NON-GENERIC type from types array
+    const specificTypes = allTypes.filter((t) => !GENERIC_TYPES.includes(t));
+    const bestPrimaryType = specificTypes[0] || place.primaryType;
+    const primaryCategory = formatTypeName(bestPrimaryType);
+
+    console.log(`[GooglePlaces] Primary category fix: Google said "${place.primaryType}", we chose "${bestPrimaryType}" → "${primaryCategory}"`);
+
     const secondaryCategories = allTypes
-        .filter((t) => t !== place.primaryType)
+        .filter((t) => t !== bestPrimaryType)
         .filter((t) => !GENERIC_TYPES.includes(t))
         .map(formatTypeName)
         .slice(0, 5);

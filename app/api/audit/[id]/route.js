@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectMongo from "@/libs/mongoose";
 import Audit from "@/models/Audit";
 
@@ -13,13 +15,27 @@ export async function GET(req, { params }) {
             );
         }
 
+        // ✅ SECURITY: Require authentication
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return NextResponse.json(
+                { error: "Unauthorized - Please sign in" },
+                { status: 401 }
+            );
+        }
+
         // Fetch from MongoDB
         await connectMongo();
-        const audit = await Audit.findById(id).lean();
+
+        // ✅ SECURITY: Only allow users to access their own audits
+        const audit = await Audit.findOne({
+            _id: id,
+            userId: session.user.id
+        }).lean();
 
         if (!audit) {
             return NextResponse.json(
-                { error: "Audit not found" },
+                { error: "Audit not found or access denied" },
                 { status: 404 }
             );
         }
@@ -30,7 +46,7 @@ export async function GET(req, { params }) {
 
         return NextResponse.json({ audit });
     } catch (error) {
-        console.error("Audit fetch error:", error);
+        console.error("[Audit API] Fetch error:", error.message);
         return NextResponse.json(
             { error: "Failed to fetch audit" },
             { status: 500 }

@@ -1,20 +1,15 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { getIndustryBenchmarks, calculatePercentile } from "@/libs/benchmarks";
+
 /**
  * IndustryBenchmarks — "Your Profile vs. Industry Average"
- * Horizontal bar comparisons for key metrics against industry averages.
+ * Uses real benchmark data from libs/benchmarks.js
+ * Shows percentile rankings vs industry
  */
 
-const INDUSTRY_AVERAGES = {
-    reviewCount: { avg: 75, top: 200, label: "Review Count" },
-    averageRating: { avg: 4.1, top: 4.8, label: "Average Rating", max: 5 },
-    photoCount: { avg: 15, top: 50, label: "Photo Count" },
-    responseRate: { avg: 0.3, top: 0.9, label: "Response Rate", isPercent: true },
-    postsPerMonth: { avg: 1, top: 4, label: "Posts / Month", max: 8 },
-    serviceCount: { avg: 3, top: 10, label: "Services Listed" },
-};
-
-function ComparisonBar({ label, yourValue, avgValue, topValue, maxValue, isPercent = false, icon }) {
+function ComparisonBar({ label, yourValue, avgValue, topValue, maxValue, isPercent = false, icon, percentile }) {
     const displayYourValue = isPercent
         ? `${Math.round((yourValue || 0) * 100)}%`
         : yourValue ?? "—";
@@ -65,9 +60,16 @@ function ComparisonBar({ label, yourValue, avgValue, topValue, maxValue, isPerce
                         {label}
                     </span>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${statusColor}`}>
-                    {status}
-                </span>
+                <div className="flex items-center gap-2">
+                    {percentile != null && (
+                        <span className="text-xs text-base-content/50 font-medium">
+                            {percentile}th percentile
+                        </span>
+                    )}
+                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${statusColor}`}>
+                        {status}
+                    </span>
+                </div>
             </div>
 
             {/* Bar */}
@@ -107,44 +109,102 @@ function ComparisonBar({ label, yourValue, avgValue, topValue, maxValue, isPerce
 }
 
 export default function IndustryBenchmarks({ audit }) {
-    if (!audit) return null;
+    const [benchmarkData, setBenchmarkData] = useState(null);
+    const [metrics, setMetrics] = useState([]);
 
-    const metrics = [
-        {
-            ...INDUSTRY_AVERAGES.reviewCount,
-            yourValue: audit.reviewCount,
-            icon: "⭐",
-        },
-        {
-            ...INDUSTRY_AVERAGES.averageRating,
-            yourValue: audit.averageRating,
-            icon: "📈",
-        },
-        {
-            ...INDUSTRY_AVERAGES.photoCount,
-            yourValue: audit.photoCount,
-            icon: "📸",
-        },
-        {
-            ...INDUSTRY_AVERAGES.responseRate,
-            yourValue: audit.responseRate,
-            icon: "💬",
-        },
-        {
-            ...INDUSTRY_AVERAGES.postsPerMonth,
-            yourValue: audit.postsPerMonth,
-            icon: "📢",
-        },
-        {
-            ...INDUSTRY_AVERAGES.serviceCount,
-            yourValue: audit.services?.length || 0,
-            icon: "🛠️",
-        },
-    ];
+    useEffect(() => {
+        if (!audit) return;
+
+        async function loadBenchmarks() {
+            const data = await getIndustryBenchmarks(audit.primaryCategory);
+            if (data) {
+                setBenchmarkData(data);
+
+                // Build metrics with real benchmark data
+                const { benchmarks } = data;
+
+                const metricsToShow = [];
+
+                // Review Count
+                if (benchmarks.review_count) {
+                    const percentile = calculatePercentile(audit.reviewCount || 0, benchmarks.review_count);
+                    metricsToShow.push({
+                        label: "Review Count",
+                        yourValue: audit.reviewCount || 0,
+                        avg: benchmarks.review_count.p50,
+                        top: benchmarks.review_count.p90,
+                        icon: "⭐",
+                        percentile,
+                    });
+                }
+
+                // Photo Count
+                if (benchmarks.photo_count) {
+                    const percentile = calculatePercentile(audit.photoCount || 0, benchmarks.photo_count);
+                    metricsToShow.push({
+                        label: "Photo Count",
+                        yourValue: audit.photoCount || 0,
+                        avg: benchmarks.photo_count.p50,
+                        top: benchmarks.photo_count.p90,
+                        icon: "📸",
+                        percentile,
+                    });
+                }
+
+                // Review Velocity
+                if (benchmarks.review_velocity) {
+                    const percentile = calculatePercentile(audit.monthlyReviewVelocity || 0, benchmarks.review_velocity);
+                    metricsToShow.push({
+                        label: "Reviews / Month",
+                        yourValue: audit.monthlyReviewVelocity || 0,
+                        avg: benchmarks.review_velocity.p50,
+                        top: benchmarks.review_velocity.p90,
+                        icon: "📊",
+                        percentile,
+                    });
+                }
+
+                // Average Rating
+                if (benchmarks.average_rating) {
+                    const percentile = calculatePercentile(audit.averageRating || 0, benchmarks.average_rating);
+                    metricsToShow.push({
+                        label: "Average Rating",
+                        yourValue: audit.averageRating || 0,
+                        avg: benchmarks.average_rating.p50,
+                        top: benchmarks.average_rating.p90,
+                        max: 5,
+                        icon: "⭐",
+                        percentile,
+                    });
+                }
+
+                // Post Rate
+                if (benchmarks.post_rate) {
+                    const percentile = calculatePercentile(audit.postsPerMonth || 0, benchmarks.post_rate);
+                    metricsToShow.push({
+                        label: "Posts / Month",
+                        yourValue: audit.postsPerMonth || 0,
+                        avg: benchmarks.post_rate.p50,
+                        top: benchmarks.post_rate.p90,
+                        icon: "📢",
+                        percentile,
+                    });
+                }
+
+                setMetrics(metricsToShow);
+            }
+        }
+
+        loadBenchmarks();
+    }, [audit]);
 
     const aboveAvgCount = metrics.filter(
         (m) => (m.yourValue || 0) >= m.avg
     ).length;
+
+    if (metrics.length === 0) {
+        return null; // Still loading or no benchmark data
+    }
 
     return (
         <div className="glass-card overflow-hidden">
@@ -155,14 +215,14 @@ export default function IndustryBenchmarks({ audit }) {
                             📊 Industry Benchmarks
                         </h3>
                         <p className="text-sm text-base-content/50 mt-1">
-                            How you compare to the industry average
+                            {benchmarkData ? `${benchmarkData.industry.replace('_', ' ')} industry comparison` : 'How you compare to the industry average'}
                         </p>
                     </div>
                     <div className="text-right">
                         <span
-                            className={`text-2xl font-black ${aboveAvgCount >= 5
+                            className={`text-2xl font-black ${aboveAvgCount >= metrics.length * 0.8
                                     ? "text-emerald-400"
-                                    : aboveAvgCount >= 3
+                                    : aboveAvgCount >= metrics.length * 0.5
                                         ? "text-amber-400"
                                         : "text-red-400"
                                 }`}
@@ -185,6 +245,7 @@ export default function IndustryBenchmarks({ audit }) {
                         maxValue={m.max}
                         isPercent={m.isPercent}
                         icon={m.icon}
+                        percentile={m.percentile}
                     />
                 ))}
             </div>
@@ -193,7 +254,8 @@ export default function IndustryBenchmarks({ audit }) {
             <div className="px-5 pb-4">
                 <p className="text-[10px] text-base-content/30">
                     Industry averages based on BrightLocal 2025 Local Consumer Review Survey
-                    and Google Business Profile benchmark data across 50,000+ listings.
+                    and Google Business Profile benchmark data across 93,000+ listings.
+                    {benchmarkData && ` Showing data for ${benchmarkData.industry.replace('_', ' ')} businesses.`}
                 </p>
             </div>
         </div>

@@ -1,62 +1,110 @@
 "use client";
 
-function estimateDistribution(avgRating, totalReviews) {
-    if (!avgRating || !totalReviews) return null;
-    const avg = Math.min(5, Math.max(1, avgRating));
-    let dist;
-    if (avg >= 4.5) dist = [0.01, 0.02, 0.04, 0.13, 0.80];
-    else if (avg >= 4.0) dist = [0.03, 0.04, 0.08, 0.25, 0.60];
-    else if (avg >= 3.5) dist = [0.06, 0.08, 0.16, 0.30, 0.40];
-    else if (avg >= 3.0) dist = [0.10, 0.12, 0.23, 0.28, 0.27];
-    else if (avg >= 2.5) dist = [0.18, 0.18, 0.24, 0.22, 0.18];
-    else dist = [0.30, 0.22, 0.20, 0.16, 0.12];
-
-    return dist.map((pct, i) => ({
-        stars: i + 1,
-        count: Math.round(pct * totalReviews),
-        pct: Math.round(pct * 100),
-    }));
-}
+import { analyzeBulkReviews, estimateSentimentFromRating, getSentimentInsights } from "@/libs/sentiment";
+import { useState, useEffect } from "react";
 
 export default function ReviewSentiment({ audit }) {
-    if (!audit) return null;
+    const [sentiment, setSentiment] = useState(null);
+    const [insights, setInsights] = useState(null);
 
-    const distribution = estimateDistribution(audit.averageRating || 4.5, audit.reviewCount || 100);
-    if (!distribution) return null;
+    useEffect(() => {
+        if (!audit) return;
+        // Try to analyze real reviews if available
+        if (audit.reviews && Array.isArray(audit.reviews) && audit.reviews.length > 0) {
+            const analysis = analyzeBulkReviews(audit.reviews);
+            setSentiment(analysis);
+            setInsights(getSentimentInsights(analysis));
+        } else if (audit.averageRating && audit.reviewCount) {
+            // Fallback to estimation from rating
+            const estimation = estimateSentimentFromRating(audit.averageRating, audit.reviewCount);
+            setSentiment(estimation);
+            setInsights(getSentimentInsights({ ...estimation, totalReviews: audit.reviewCount }));
+        }
+    }, [audit]);
 
-    // Positive = 4+5 stars
-    const posPct = distribution[3].pct + distribution[4].pct;
-    // Neutral = 3 stars
-    const neuPct = distribution[2].pct;
-    // Negative = 1+2 stars
-    const negPct = distribution[0].pct + distribution[1].pct;
+    if (!sentiment) return null;
+
+    const posPct = sentiment.positivePct || 0;
+    const neuPct = sentiment.neutralPct || 0;
+    const negPct = sentiment.negativePct || 0;
 
     return (
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col h-full">
-            <h3 className="text-xl font-bold font-serif text-slate-900 mb-8">Review Sentiment</h3>
+            <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">Review Sentiment</h3>
+
+            {insights && (
+                <p className="text-sm text-slate-600 mb-6">{insights.message}</p>
+            )}
 
             {/* Horizontal Stacked Bar */}
             <div className="w-full h-8 rounded-full overflow-hidden flex mb-6">
-                <div style={{ width: `${posPct}%` }} className="bg-green-500 h-full"></div>
-                <div style={{ width: `${neuPct}%` }} className="bg-slate-200 h-full"></div>
-                <div style={{ width: `${negPct}%` }} className="bg-red-500 h-full"></div>
+                <div style={{ width: `${posPct}%` }} className="bg-green-500 h-full transition-all duration-700"></div>
+                <div style={{ width: `${neuPct}%` }} className="bg-slate-300 h-full transition-all duration-700"></div>
+                <div style={{ width: `${negPct}%` }} className="bg-red-500 h-full transition-all duration-700"></div>
             </div>
 
-            {/* Legend */}
-            <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold text-slate-600">
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
-                    Positive ({posPct}%)
+            {/* Legend with counts */}
+            <div className="grid grid-cols-3 gap-2 text-center mb-4">
+                <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-600">Positive</span>
+                    </div>
+                    <span className="text-xl font-bold text-green-600">{posPct}%</span>
+                    {sentiment.positive > 0 && (
+                        <span className="text-xs text-slate-400">({sentiment.positive} reviews)</span>
+                    )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
-                    Neutral
+                <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-600">Neutral</span>
+                    </div>
+                    <span className="text-xl font-bold text-slate-600">{neuPct}%</span>
+                    {sentiment.neutral > 0 && (
+                        <span className="text-xs text-slate-400">({sentiment.neutral} reviews)</span>
+                    )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    Negative
+                <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-600">Negative</span>
+                    </div>
+                    <span className="text-xl font-bold text-red-600">{negPct}%</span>
+                    {sentiment.negative > 0 && (
+                        <span className="text-xs text-slate-400">({sentiment.negative} reviews)</span>
+                    )}
                 </div>
             </div>
+
+            {/* Top keywords if available */}
+            {sentiment.topPositiveKeywords && sentiment.topPositiveKeywords.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Most mentioned positive terms:</p>
+                    <div className="flex flex-wrap gap-2">
+                        {sentiment.topPositiveKeywords.slice(0, 3).map((kw, i) => (
+                            <span key={i} className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full">
+                                {kw.keyword}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Recommendations if status is not excellent */}
+            {insights && insights.status !== 'excellent' && insights.recommendations && insights.recommendations.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Key Actions:</p>
+                    <ul className="text-xs text-slate-600 space-y-1">
+                        {insights.recommendations.slice(0, 2).map((rec, i) => (
+                            <li key={i} className="flex items-start gap-2">
+                                <span className="text-blue-500 mt-0.5">•</span>
+                                <span>{rec}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }

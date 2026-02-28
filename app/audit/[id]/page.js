@@ -103,11 +103,11 @@ export default function AuditPage() {
                     }),
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Audit initialization failed: ${response.status}`);
-                }
+                const data = await response.json().catch(() => ({}));
 
-                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `Audit initialization failed: ${response.status}`);
+                }
 
                 if (data.status === "pending" && data.auditId) {
                     // BullMQ queue picked it up => start polling
@@ -215,8 +215,8 @@ export default function AuditPage() {
                 </div>
             </div>
 
-            {/* TODO: Revert isPro to false (or wire to subscription status) when re-enabling payments */}
-            <AuditReport audit={auditData} isPro={true} />
+            {/* Free tier shows limited preview, Pro shows full report */}
+            <AuditReport audit={auditData} isPro={false} />
         </main>
     );
 }

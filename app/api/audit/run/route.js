@@ -1,26 +1,63 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { z } from "zod";
 import connectMongo from "@/libs/mongoose";
 import Audit from "@/models/Audit";
 import { getAuditQueue } from "@/libs/queue";
 import { isRedisConfigured } from "@/libs/redis";
+import { checkRateLimit } from "@/libs/rate-limit";
 
 // Imports for sync fallback ONLY
 import { fetchAuditData, fetchCompetitors } from "@/libs/data-provider";
 import { calculateScore } from "@/libs/scoring";
 import { detectIssues, generateActionPlan } from "@/libs/issues";
 
+// ✅ SECURITY: Input validation schema
+const auditRequestSchema = z.object({
+    placeId: z.string().optional(),
+    businessName: z.string().min(1).max(200).optional(),
+    city: z.string().min(1).max(100).optional()
+}).refine(data => data.placeId || data.businessName, {
+    message: "Either placeId or businessName is required"
+});
+
 export async function POST(req) {
     try {
-        const { placeId, businessName, city } = await req.json();
-
-        if (!placeId && !businessName) {
+        // ✅ SECURITY: Rate limiting
+        const rateLimitResult = await checkRateLimit(req);
+        if (!rateLimitResult.success) {
             return NextResponse.json(
-                { error: "placeId or businessName is required" },
+                {
+                    error: "Too many requests. Please try again later.",
+                    retryAfter: rateLimitResult.reset
+                },
+                {
+                    status: 429,
+                    headers: {
+                        "X-RateLimit-Limit": rateLimitResult.limit.toString(),
+                        "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+                        "X-RateLimit-Reset": rateLimitResult.reset.toISOString()
+                    }
+                }
+            );
+        }
+
+        const body = await req.json();
+
+        // ✅ SECURITY: Validate input
+        const validationResult = auditRequestSchema.safeParse(body);
+        if (!validationResult.success) {
+            return NextResponse.json(
+                {
+                    error: "Invalid input",
+                    details: validationResult.error.errors
+                },
                 { status: 400 }
             );
         }
+
+        const { placeId, businessName, city } = validationResult.data;
 
         // 1. Get user and validate credits
         await connectMongo();

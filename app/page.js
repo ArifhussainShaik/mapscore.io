@@ -18,6 +18,9 @@ export default function LandingPage() {
             <span className="text-xl font-bold text-slate-900 font-serif tracking-tight">
               LocalScore
             </span>
+            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded">
+              Beta
+            </span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">How it works</a>

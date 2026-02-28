@@ -73,7 +73,10 @@ export default function ScoreDashboard({
             {/* Header */}
             <div className="flex justify-between items-start mb-8">
                 <h3 className="text-xl font-bold font-serif text-slate-900">Overall Health</h3>
-                <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold cursor-help" title="Detailed methodology inside">
+                <div
+                    className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold cursor-help hover:bg-slate-300 transition-colors"
+                    title="Score based on: Profile completeness (30%), Reviews & reputation (30%), Local SEO optimization (25%), and Website performance (15%)"
+                >
                     i
                 </div>
             </div>
@@ -104,6 +107,7 @@ export default function ScoreDashboard({
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-900 font-serif font-bold">
                         {formatGrade(grade)}
+                        <span className="text-xs font-sans font-medium text-slate-500 mt-1">{animatedScore}/100</span>
                     </div>
                 </div>
 

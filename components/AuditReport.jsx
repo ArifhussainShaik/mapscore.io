@@ -3,16 +3,12 @@
 import ScoreDashboard from "./ScoreDashboard";
 import IssueCard from "./IssueCard";
 import CompetitorTable from "./CompetitorTable";
-import ActionPlan from "./ActionPlan";
 import PaywallGate from "./PaywallGate";
-// Leaving old ones in case they are used somewhere else or we need them later
-import ProfileChecklist from "./ProfileChecklist";
-import RevenueImpact from "./RevenueImpact";
 import ReviewSentiment from "./ReviewSentiment";
-import LocalSeoReadiness from "./LocalSeoReadiness";
+import RevenueImpact from "./RevenueImpact";
+import NAPChecker from "./NAPChecker";
+import SEOChecklist from "./SEOChecklist";
 import IndustryBenchmarks from "./IndustryBenchmarks";
-import MapVisibility from "./MapVisibility";
-import Link from "next/link";
 
 export default function AuditReport({ audit, isPro = false }) {
     if (!audit) return null;
@@ -55,9 +51,14 @@ export default function AuditReport({ audit, isPro = false }) {
             <div className="max-w-6xl mx-auto">
                 {/* Header Sequence */}
                 <div className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4 tracking-tight">
-                        Your Audit Report
-                    </h1>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                        <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 tracking-tight">
+                            Your Audit Report
+                        </h1>
+                        <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded self-start">
+                            Beta
+                        </span>
+                    </div>
                     <p className="text-slate-600 text-lg max-w-2xl">
                         We&apos;ve analyzed <strong className="text-slate-900 font-bold">&apos;{audit.businessName}&apos;</strong> against local competitors. Here is your health check.
                     </p>
@@ -73,33 +74,31 @@ export default function AuditReport({ audit, isPro = false }) {
                             sectionScores={audit.sectionScores}
                         />
 
-                        {/* Nearby Leaders widget */}
-                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hidden lg:block">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Nearby Leaders</h4>
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">
-                                            HB
-                                        </div>
-                                        <span className="text-sm font-semibold text-slate-900">Halcyon Brew</span>
-                                    </div>
-                                    <span className="font-bold text-green-600">91</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">
-                                            MC
-                                        </div>
-                                        <span className="text-sm font-semibold text-slate-900">Merit Coffee</span>
-                                    </div>
-                                    <span className="font-bold text-green-600">88</span>
+                        {/* Competitor Quick Stats - Real Data */}
+                        {audit.competitors && audit.competitors.length > 0 && (
+                            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hidden lg:block">
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Top Competitors</h4>
+                                <div className="space-y-4">
+                                    {audit.competitors.slice(0, 2).map((comp, idx) => {
+                                        const initials = comp.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+                                        return (
+                                            <div key={idx} className="flex justify-between items-center">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">
+                                                        {initials}
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-slate-900 truncate max-w-[150px]">{comp.name}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-slate-500">⭐ {comp.rating || 'N/A'}</span>
+                                                    <span className="text-xs text-slate-500">({comp.reviewCount || 0})</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                            <button className="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
-                                View Competitor Comparison <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                            </button>
-                        </div>
+                        )}
                     </div>
 
                     {/* RIGHT COLUMN: Grouped Issues */}
@@ -158,24 +157,6 @@ export default function AuditReport({ audit, isPro = false }) {
                             </div>
                         </div>
 
-                        {/* Review Sentiment & Map Visibility row under the Fixes */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-                            {isPro ? (
-                                <>
-                                    <ReviewSentiment audit={audit} />
-                                    <MapVisibility audit={audit} />
-                                </>
-                            ) : (
-                                <>
-                                    <PaywallGate title="Unlock Sentiment">
-                                        <ReviewSentiment audit={audit} />
-                                    </PaywallGate>
-                                    <PaywallGate title="Unlock Map Rankings">
-                                        <MapVisibility audit={audit} />
-                                    </PaywallGate>
-                                </>
-                            )}
-                        </div>
                     </div>
                 </div>
 
@@ -192,6 +173,101 @@ export default function AuditReport({ audit, isPro = false }) {
                                 auditData={audit}
                                 competitors={audit.competitors}
                             />
+                        </PaywallGate>
+                    </div>
+                )}
+
+                {/* Premium Features Section */}
+                {isPro ? (
+                    <>
+                        {/* Revenue Impact - PREMIUM FEATURE #2 */}
+                        <div className="mt-16">
+                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                                Revenue Impact Analysis
+                            </h2>
+                            <p className="text-slate-600 mb-6">
+                                Understand the financial impact of your current profile performance
+                            </p>
+                            <RevenueImpact audit={audit} />
+                        </div>
+
+                        {/* Review Sentiment - PREMIUM FEATURE #1 */}
+                        <div className="mt-16">
+                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                                Customer Sentiment Analysis
+                            </h2>
+                            <p className="text-slate-600 mb-6">
+                                Deep dive into how customers feel about your business
+                            </p>
+                            <ReviewSentiment audit={audit} />
+                        </div>
+
+                        {/* Premium Features Grid: NAP, SEO Checklist, Benchmarks */}
+                        <div className="mt-16">
+                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                                Advanced Diagnostics
+                            </h2>
+                            <p className="text-slate-600 mb-6">
+                                Technical SEO analysis and industry comparisons
+                            </p>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* NAP Checker - PREMIUM FEATURE #3 */}
+                                <NAPChecker audit={audit} />
+
+                                {/* SEO Checklist - PREMIUM FEATURE #4 */}
+                                <SEOChecklist audit={audit} />
+                            </div>
+                        </div>
+
+                        {/* Industry Benchmarks - PREMIUM FEATURE #5 */}
+                        <div className="mt-16">
+                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                                Industry Benchmarks
+                            </h2>
+                            <p className="text-slate-600 mb-6">
+                                See how you stack up against competitors in your industry
+                            </p>
+                            <IndustryBenchmarks audit={audit} />
+                        </div>
+                    </>
+                ) : (
+                    <div className="mt-16">
+                        <PaywallGate title="Unlock Premium Features">
+                            <div className="space-y-16">
+                                {/* Preview of premium features */}
+                                <div>
+                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                        Revenue Impact Analysis
+                                    </h3>
+                                    <RevenueImpact audit={audit} />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                        Review Sentiment Analysis
+                                    </h3>
+                                    <ReviewSentiment audit={audit} />
+                                </div>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">
+                                            NAP Consistency
+                                        </h3>
+                                        <NAPChecker audit={audit} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">
+                                            SEO Checklist
+                                        </h3>
+                                        <SEOChecklist audit={audit} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                        Industry Benchmarks
+                                    </h3>
+                                    <IndustryBenchmarks audit={audit} />
+                                </div>
+                            </div>
                         </PaywallGate>
                     </div>
                 )}
