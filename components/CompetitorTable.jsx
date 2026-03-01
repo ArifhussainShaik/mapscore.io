@@ -130,7 +130,15 @@ export default function CompetitorTable({ competitors, auditData }) {
                             </div>
                         </div>
                         <span className="text-emerald-600 font-bold text-xs tracking-wide uppercase bg-emerald-50 px-3 py-1 rounded-full mb-3">Top Rated</span>
-                        <h3 className="text-xl font-bold text-slate-900 max-w-[200px] truncate" title={rivalName}>{rivalName}</h3>
+                        <a
+                            href={competitors[0]?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rivalName)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xl font-bold text-slate-900 max-w-[200px] truncate hover:text-blue-600 transition-colors underline decoration-transparent hover:decoration-blue-600"
+                            title={`View ${rivalName} on Google Maps`}
+                        >
+                            {rivalName}
+                        </a>
                         <p className="text-sm text-slate-500 flex items-center gap-1">
                             <IconNearMe className="w-4 h-4" /> 0.2 mi away
                         </p>
@@ -163,7 +171,15 @@ export default function CompetitorTable({ competitors, auditData }) {
                             </div>
                         </div>
                         <span className="text-blue-600 font-bold text-xs tracking-wide uppercase bg-blue-50 px-3 py-1 rounded-full mb-3">Elite</span>
-                        <h3 className="text-2xl font-bold text-slate-900 max-w-[200px] truncate" title={leaderName}>{leaderName}</h3>
+                        <a
+                            href={competitors[1]?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(leaderName)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-2xl font-bold text-slate-900 max-w-[200px] truncate hover:text-blue-600 transition-colors underline decoration-transparent hover:decoration-blue-600"
+                            title={`View ${leaderName} on Google Maps`}
+                        >
+                            {leaderName}
+                        </a>
                         <p className="text-sm text-slate-500 flex items-center gap-1">
                             <IconNearMe className="w-4 h-4" /> 0.4 mi away
                         </p>
@@ -178,21 +194,6 @@ export default function CompetitorTable({ competitors, auditData }) {
                             <span className="font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded text-[10px] uppercase">{photoMultiplier > 1 ? `${photoMultiplier}x more` : leaderPhotos}</span>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Bottom CTA Section */}
-            <div className="w-full flex flex-col items-center text-center max-w-lg mx-auto">
-                <h3 className="font-serif text-2xl text-slate-800 mb-6 font-bold">
-                    Don&apos;t let them take your customers.
-                </h3>
-                <button className="group w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 transform hover:-translate-y-0.5 mb-6">
-                    <span className="tracking-wide text-sm md:text-base">GET THE PLAN TO BEAT THEM</span>
-                    <IconArrowForward className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <div className="flex items-center gap-2 text-slate-400 text-sm">
-                    <IconLock className="w-4 h-4" />
-                    <span>Private &amp; Confidential</span>
                 </div>
             </div>
         </div>

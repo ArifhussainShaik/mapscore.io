@@ -40,19 +40,37 @@ const CHECKLIST_ITEMS = [
         id: 'business_description',
         category: 'Content',
         label: 'Business Description Complete',
-        check: (audit) => (audit.description?.length || 0) >= 200,
+        check: (audit) => {
+            // If description data was checked but empty, it's truly missing
+            if (audit._descriptionChecked) {
+                return (audit.description?.length || 0) >= 200;
+            }
+            // If we couldn't check (Outscraper failed), assume it might exist
+            // Return null to show as "unknown" state
+            return null;
+        },
         importance: 'high',
         tip: 'Strong description with keywords',
-        fixTip: 'Write a 500-750 character description with location and service keywords',
+        fixTip: 'Verify your GBP has a 500-750 character description with location and service keywords',
+        unverifiedTip: 'Could not verify automatically - please check your Google Business Profile manually',
     },
     {
         id: 'services_listed',
         category: 'Content',
         label: 'Services Listed (5+)',
-        check: (audit) => (audit.services?.length || 0) >= 5,
+        check: (audit) => {
+            // If services data was checked but empty, it's truly missing
+            if (audit._servicesChecked) {
+                return (audit.services?.length || 0) >= 5;
+            }
+            // If we couldn't check (Outscraper failed), assume it might exist
+            // Return null to show as "unknown" state
+            return null;
+        },
         importance: 'high',
         tip: 'Services section is well populated',
-        fixTip: 'Add at least 5-10 services with descriptions',
+        fixTip: 'Verify you have at least 5-10 services listed with descriptions in your GBP',
+        unverifiedTip: 'Could not verify automatically - please check your Google Business Profile manually',
     },
     {
         id: 'business_hours',
@@ -166,12 +184,13 @@ export default function SEOChecklist({ audit }) {
         categories[item.category].push(item);
     });
 
-    // Calculate stats
-    const totalItems = evaluatedItems.length;
-    const passedItems = evaluatedItems.filter(i => i.passed).length;
-    const criticalPassed = evaluatedItems.filter(i => i.importance === 'critical' && i.passed).length;
-    const criticalTotal = evaluatedItems.filter(i => i.importance === 'critical').length;
-    const completionPct = Math.round((passedItems / totalItems) * 100);
+    // Calculate stats (null = unverified, don't count as pass or fail)
+    const totalItems = evaluatedItems.filter(i => i.passed !== null).length; // Only count verified items
+    const passedItems = evaluatedItems.filter(i => i.passed === true).length;
+    const unverifiedItems = evaluatedItems.filter(i => i.passed === null).length;
+    const criticalPassed = evaluatedItems.filter(i => i.importance === 'critical' && i.passed === true).length;
+    const criticalTotal = evaluatedItems.filter(i => i.importance === 'critical' && i.passed !== null).length;
+    const completionPct = totalItems > 0 ? Math.round((passedItems / totalItems) * 100) : 0;
 
     // SEO readiness score
     let readinessLevel = 'Poor';
@@ -236,14 +255,23 @@ export default function SEOChecklist({ audit }) {
                         </p>
                     </div>
                 )}
+
+                {/* Unverified items note */}
+                {unverifiedItems > 0 && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <p className="text-sm text-amber-700 font-semibold">
+                            ⚠️ {unverifiedItems} item{unverifiedItems !== 1 ? 's' : ''} could not be verified automatically - please check manually
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Category Breakdown */}
             <div className="space-y-3">
                 {Object.entries(categories).map(([categoryName, items]) => {
-                    const categoryPassed = items.filter(i => i.passed).length;
-                    const categoryTotal = items.length;
-                    const categoryPct = Math.round((categoryPassed / categoryTotal) * 100);
+                    const categoryPassed = items.filter(i => i.passed === true).length;
+                    const categoryTotal = items.filter(i => i.passed !== null).length; // Only count verified
+                    const categoryPct = categoryTotal > 0 ? Math.round((categoryPassed / categoryTotal) * 100) : 0;
                     const isExpanded = expandedCategory === categoryName;
 
                     return (
@@ -280,40 +308,44 @@ export default function SEOChecklist({ audit }) {
                             {/* Category Items */}
                             {isExpanded && (
                                 <div className="p-4 bg-white space-y-2">
-                                    {items.map(item => (
-                                        <div
-                                            key={item.id}
-                                            className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
-                                                item.passed ? 'bg-green-50' : 'bg-red-50'
-                                            }`}
-                                        >
-                                            <span className="text-lg flex-shrink-0">
-                                                {item.passed ? '✅' : '❌'}
-                                            </span>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className={`font-semibold text-sm ${
-                                                        item.passed ? 'text-green-700' : 'text-red-700'
-                                                    }`}>
-                                                        {item.label}
-                                                    </span>
-                                                    {item.importance === 'critical' && (
-                                                        <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded">
-                                                            CRITICAL
+                                    {items.map(item => {
+                                        const isUnverified = item.passed === null;
+                                        const bgColor = isUnverified ? 'bg-amber-50' : (item.passed ? 'bg-green-50' : 'bg-red-50');
+                                        const icon = isUnverified ? '⚠️' : (item.passed ? '✅' : '❌');
+                                        const textColor = isUnverified ? 'text-amber-700' : (item.passed ? 'text-green-700' : 'text-red-700');
+                                        const message = isUnverified ? item.unverifiedTip : (item.passed ? item.tip : item.fixTip);
+
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${bgColor}`}
+                                            >
+                                                <span className="text-lg flex-shrink-0">
+                                                    {icon}
+                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className={`font-semibold text-sm ${textColor}`}>
+                                                            {item.label}
                                                         </span>
-                                                    )}
-                                                    {item.importance === 'high' && (
-                                                        <span className="px-1.5 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded">
-                                                            HIGH
-                                                        </span>
-                                                    )}
+                                                        {item.importance === 'critical' && (
+                                                            <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded">
+                                                                CRITICAL
+                                                            </span>
+                                                        )}
+                                                        {item.importance === 'high' && (
+                                                            <span className="px-1.5 py-0.5 bg-orange-100 text-orange-600 text-[10px] font-bold rounded">
+                                                                HIGH
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs text-slate-600">
+                                                        {message}
+                                                    </p>
                                                 </div>
-                                                <p className="text-xs text-slate-600">
-                                                    {item.passed ? item.tip : item.fixTip}
-                                                </p>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>

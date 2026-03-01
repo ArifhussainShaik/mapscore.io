@@ -77,6 +77,40 @@ export default function ReviewSentiment({ audit }) {
                 </div>
             </div>
 
+            {/* Owner Response Rate */}
+            {audit.reviewCount > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                    <p className="text-xs font-semibold text-slate-700 mb-3">Owner Response Rate:</p>
+                    <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-blue-500 transition-all duration-700"
+                                    style={{ width: `${((audit.responseRate || 0) * 100).toFixed(0)}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                        <span className="text-sm font-bold text-slate-900 min-w-[50px] text-right">
+                            {((audit.responseRate || 0) * 100).toFixed(0)}%
+                        </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                        <div className="text-center p-2 bg-green-50 rounded-lg">
+                            <p className="text-[10px] text-slate-600 mb-1">Replied</p>
+                            <p className="text-base font-bold text-green-700">
+                                {Math.round((audit.responseRate || 0) * audit.reviewCount)}
+                            </p>
+                        </div>
+                        <div className="text-center p-2 bg-red-50 rounded-lg">
+                            <p className="text-[10px] text-slate-600 mb-1">Not Replied</p>
+                            <p className="text-base font-bold text-red-700">
+                                {Math.round((1 - (audit.responseRate || 0)) * audit.reviewCount)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Top keywords if available */}
             {sentiment.topPositiveKeywords && sentiment.topPositiveKeywords.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-100">

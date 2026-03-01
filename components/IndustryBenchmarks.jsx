@@ -52,55 +52,55 @@ function ComparisonBar({ label, yourValue, avgValue, topValue, maxValue, isPerce
                     : "text-red-400 bg-red-500/10";
 
     return (
-        <div className="p-3 rounded-lg bg-base-content/5 hover:bg-base-content/8 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                    <span className="text-base">{icon}</span>
-                    <span className="text-sm font-medium text-base-content/80">
+        <div className="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200">
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                    <span className="text-xl">{icon}</span>
+                    <span className="text-sm font-semibold text-slate-900">
                         {label}
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
                     {percentile != null && (
-                        <span className="text-xs text-base-content/50 font-medium">
+                        <span className="text-xs text-slate-500 font-medium">
                             {percentile}th percentile
                         </span>
                     )}
-                    <span className={`text-xs px-2 py-0.5 rounded-md font-medium ${statusColor}`}>
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${statusColor}`}>
                         {status}
                     </span>
                 </div>
             </div>
 
             {/* Bar */}
-            <div className="relative w-full bg-base-content/10 rounded-full h-4 overflow-hidden">
+            <div className="relative w-full bg-white rounded-full h-5 overflow-hidden border border-slate-200 shadow-inner">
                 {/* Industry average marker */}
                 <div
-                    className="absolute top-0 bottom-0 w-0.5 bg-base-content/30 z-10"
+                    className="absolute top-0 bottom-0 w-0.5 bg-slate-400 z-10"
                     style={{ left: `${avgPct}%` }}
                 >
-                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-base-content/40 whitespace-nowrap">
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] text-slate-600 whitespace-nowrap font-medium">
                         avg: {displayAvgValue}
                     </div>
                 </div>
 
                 {/* Your value bar */}
                 <div
-                    className="h-4 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2"
+                    className="h-5 rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-2.5 shadow-sm"
                     style={{
                         width: `${Math.max(yourPct, 5)}%`,
                         backgroundColor: yourColor,
                     }}
                 >
-                    <span className="text-[10px] font-bold text-white drop-shadow-sm">
+                    <span className="text-xs font-bold text-white drop-shadow-sm">
                         {displayYourValue}
                     </span>
                 </div>
             </div>
 
-            <div className="flex justify-between mt-1.5">
-                <span className="text-[10px] text-base-content/30">0</span>
-                <span className="text-[10px] text-base-content/30">
+            <div className="flex justify-between mt-2">
+                <span className="text-[10px] text-slate-400 font-medium">0</span>
+                <span className="text-[10px] text-slate-600 font-medium">
                     Top: {displayTopValue}
                 </span>
             </div>
@@ -207,34 +207,36 @@ export default function IndustryBenchmarks({ audit }) {
     }
 
     return (
-        <div className="glass-card overflow-hidden">
-            <div className="p-5 border-b border-base-content/10">
-                <div className="flex items-center justify-between">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 sm:p-8 border-b border-slate-100">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <h3 className="text-lg font-bold flex items-center gap-2">
+                        <h3 className="text-xl font-bold font-serif text-slate-900 flex items-center gap-2 mb-2">
                             📊 Industry Benchmarks
                         </h3>
-                        <p className="text-sm text-base-content/50 mt-1">
+                        <p className="text-sm text-slate-600">
                             {benchmarkData ? `${benchmarkData.industry.replace('_', ' ')} industry comparison` : 'How you compare to the industry average'}
                         </p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex flex-col items-center bg-white rounded-2xl px-6 py-4 shadow-sm border border-slate-200">
                         <span
-                            className={`text-2xl font-black ${aboveAvgCount >= metrics.length * 0.8
-                                    ? "text-emerald-400"
+                            className={`text-3xl font-black ${aboveAvgCount >= metrics.length * 0.8
+                                    ? "text-emerald-600"
                                     : aboveAvgCount >= metrics.length * 0.5
-                                        ? "text-amber-400"
-                                        : "text-red-400"
+                                        ? "text-amber-600"
+                                        : "text-red-600"
                                 }`}
                         >
                             {aboveAvgCount}/{metrics.length}
                         </span>
-                        <p className="text-xs text-base-content/40">above average</p>
+                        <p className="text-xs text-slate-500 font-medium mt-1">above average</p>
                     </div>
                 </div>
             </div>
 
-            <div className="p-5 space-y-4">
+            {/* Metrics */}
+            <div className="p-6 sm:p-8 space-y-5">
                 {metrics.map((m) => (
                     <ComparisonBar
                         key={m.label}
@@ -251,9 +253,9 @@ export default function IndustryBenchmarks({ audit }) {
             </div>
 
             {/* Source note */}
-            <div className="px-5 pb-4">
-                <p className="text-[10px] text-base-content/30">
-                    Industry averages based on BrightLocal 2025 Local Consumer Review Survey
+            <div className="px-6 sm:px-8 pb-6 bg-slate-50 border-t border-slate-100">
+                <p className="text-xs text-slate-500 leading-relaxed pt-4">
+                    📈 Industry averages based on BrightLocal 2025 Local Consumer Review Survey
                     and Google Business Profile benchmark data across 93,000+ listings.
                     {benchmarkData && ` Showing data for ${benchmarkData.industry.replace('_', ' ')} businesses.`}
                 </p>

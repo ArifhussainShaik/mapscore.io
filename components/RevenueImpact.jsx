@@ -12,11 +12,29 @@
 const BENCHMARKS = {
     avgMonthlyViews: 1260, // Avg GBP views per month (BrightLocal)
     topProfileConversion: 0.05, // Top profiles convert at ~5%
-    avgValuePerCustomer: 150, // Conservative avg transaction value
     ratingImpactFactor: 0.12, // 12% more reviews per 0.1 star increase
 };
 
+// Market-specific average customer values
+const MARKET_VALUES = {
+    // US/Default market
+    default: { avgValuePerCustomer: 150, currency: "$", symbol: "$" },
+    // Indian market (₹2500 ≈ $30 USD)
+    india: { avgValuePerCustomer: 2500, currency: "INR", symbol: "₹" },
+};
+
+// Detect market based on business address
+function detectMarket(audit) {
+    const address = audit.businessAddress || "";
+    if (address.toLowerCase().includes("india") || address.toLowerCase().includes("andhra")) {
+        return "india";
+    }
+    return "default";
+}
+
 function estimateImpact(audit) {
+    const market = detectMarket(audit);
+    const marketConfig = MARKET_VALUES[market] || MARKET_VALUES.default;
     const score = audit.totalScore || 0;
     const rating = audit.averageRating || 3.0;
     const reviewCount = audit.reviewCount || 0;
@@ -54,7 +72,7 @@ function estimateImpact(audit) {
 
     // Lost opportunity
     const lostCustomers = Math.max(0, potentialCustomers - monthlyCustomers);
-    const lostRevenue = lostCustomers * BENCHMARKS.avgValuePerCustomer;
+    const lostRevenue = lostCustomers * marketConfig.avgValuePerCustomer;
 
     return {
         estimatedViews,
@@ -64,6 +82,8 @@ function estimateImpact(audit) {
         lostRevenue,
         conversionRate: Math.round(conversionRate * 1000) / 10,
         visibilityMultiplier: Math.round(visibilityMultiplier * 100),
+        currencySymbol: marketConfig.symbol,
+        market,
     };
 }
 
@@ -100,7 +120,7 @@ export default function RevenueImpact({ audit }) {
                         Estimated Monthly Lost Revenue
                     </p>
                     <p className="text-4xl md:text-5xl font-black text-red-400">
-                        <AnimatedNumber value={impact.lostRevenue} prefix="$" />
+                        <AnimatedNumber value={impact.lostRevenue} prefix={impact.currencySymbol} />
                     </p>
                     <p className="text-sm text-base-content/50 mt-2">
                         ~{impact.lostCustomers} potential customers not reaching you
