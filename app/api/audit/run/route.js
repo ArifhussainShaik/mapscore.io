@@ -138,30 +138,34 @@ export async function POST(req) {
  */
 async function runAuditSync(auditId, placeId, businessName, city) {
     try {
+        const startTime = Date.now();
         await Audit.findByIdAndUpdate(auditId, { status: "processing" });
 
-        // Step 1: Fetch data
+        // Step 1: Fetch data (DataForSEO calls now run in parallel internally)
         const { data: rawData, source: dataSource } = await fetchAuditData(
             businessName,
             city,
             placeId
         );
 
-        if (rawData.primaryCategory && (city || rawData.businessAddress)) {
-            const competitorCity = city || extractCity(rawData.businessAddress);
-            if (competitorCity) {
-                const competitors = await fetchCompetitors(
-                    rawData.primaryCategory,
-                    competitorCity,
-                    rawData.businessName
-                );
-                rawData.competitors = competitors;
-            }
-        }
+        // Step 2: Start competitor fetch AND scoring in parallel
+        // Competitor fetch needs primaryCategory from audit data, so it starts here
+        const competitorCity = city || extractCity(rawData.businessAddress);
+        const competitorPromise = (rawData.primaryCategory && competitorCity)
+            ? fetchCompetitors(rawData.primaryCategory, competitorCity, rawData.businessName)
+            : Promise.resolve([]);
 
-        // Step 2: Scoring
-        const { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData } =
-            await calculateScore(rawData);
+        // Run scoring concurrently with competitor fetch
+        const scoringPromise = calculateScore(rawData);
+
+        const [competitors, scoringResult] = await Promise.all([
+            competitorPromise,
+            scoringPromise,
+        ]);
+
+        rawData.competitors = competitors;
+
+        const { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData } = scoringResult;
 
         // Step 3: Issues
         const issues = detectIssues(rawData);
@@ -228,7 +232,8 @@ async function runAuditSync(auditId, placeId, businessName, city) {
 
         // Step 5: Save
         const finalAudit = await Audit.findByIdAndUpdate(auditId, auditUpdate, { new: true });
-        console.log(`[Audit API] Sync audit ${auditId} completed.`);
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`[Audit API] ✅ Sync audit ${auditId} completed in ${elapsed}s`);
         return finalAudit;
     } catch (error) {
         console.error(`[Audit API] Sync audit ${auditId} failed:`, error);

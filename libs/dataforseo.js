@@ -29,7 +29,7 @@ export function isDataForSEOConfigured() {
     return !!(process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD);
 }
 
-async function dataforseoFetch(endpoint, body) {
+export async function dataforseoFetch(endpoint, body) {
     const auth = getAuthHeader();
     if (!auth) throw new Error("DataForSEO credentials not configured");
 
@@ -198,10 +198,10 @@ export async function getBusinessPosts(keyword, locationCode = 2840) {
 // Task polling (DataForSEO async pattern)
 // ─────────────────────────────────────────────
 
-async function pollForTask(taskId, getEndpoint, maxAttempts = 20) {
+export async function pollForTask(taskId, getEndpoint, maxAttempts = 12) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        // Wait before polling (increasing delay)
-        const delay = attempt < 3 ? 5000 : 7000;
+        // Wait before polling (reduced delay for faster audits)
+        const delay = attempt < 3 ? 3000 : 5000;
         await new Promise((resolve) => setTimeout(resolve, delay));
 
         try {
@@ -242,7 +242,7 @@ async function pollForTask(taskId, getEndpoint, maxAttempts = 20) {
 // Data mapping: Business Info → Audit format
 // ─────────────────────────────────────────────
 
-function mapBusinessInfoToAuditData(info) {
+export function mapBusinessInfoToAuditData(info) {
     const items = info.items || [];
     // Find the main business listing
     const biz = items.find((i) => i.type === "maps_search") || items[0] || {};
@@ -284,7 +284,7 @@ function mapBusinessInfoToAuditData(info) {
 // Data mapping: Reviews → Metrics
 // ─────────────────────────────────────────────
 
-function mapReviewsToMetrics(resultData) {
+export function mapReviewsToMetrics(resultData) {
     const reviews = resultData.items || [];
     const totalReviews = resultData.reviews_count || reviews.length;
     const avgRating = resultData.rating?.value || null;
@@ -348,7 +348,7 @@ function mapReviewsToMetrics(resultData) {
 // Data mapping: Posts → Metrics
 // ─────────────────────────────────────────────
 
-function mapPostsToMetrics(resultData) {
+export function mapPostsToMetrics(resultData) {
     const posts = resultData.items || [];
 
     if (posts.length === 0) {
