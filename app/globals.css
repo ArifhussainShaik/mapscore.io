@@ -37,6 +37,33 @@
   --animate-score-fill: score-fill 1.5s ease-out forwards;
   --animate-fade-in-up: fade-in-up 0.6s ease-out forwards;
   --animate-scan-line: scan-line 2s ease-in-out infinite;
+  --animate-slide-up: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-up-delayed: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+  --animate-scale-in: scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
   @keyframes shimmer {
     0% {
@@ -304,6 +331,67 @@ progress::-webkit-progress-value {
 
 .stagger-children>*:nth-child(6) {
   animation-delay: 0.6s;
+}
+
+/* Scroll-triggered reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.reveal.visible {
+  animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.reveal-delay-1.visible {
+  animation-delay: 0.1s;
+}
+
+.reveal-delay-2.visible {
+  animation-delay: 0.2s;
+}
+
+.reveal-delay-3.visible {
+  animation-delay: 0.3s;
+}
+
+.reveal-delay-4.visible {
+  animation-delay: 0.4s;
+}
+
+/* Grain texture overlay */
+.grain::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.grain > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Warm dashboard card (unified theme) */
+.warm-card {
+  background: white;
+  border: 1px solid #e5e0d5;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.warm-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 /* ========================================

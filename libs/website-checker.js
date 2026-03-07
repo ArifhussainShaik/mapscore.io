@@ -29,7 +29,7 @@ export async function checkSchemaMarkup(url) {
             signal: AbortSignal.timeout(15000),
             redirect: "follow",
             headers: {
-                "User-Agent": "Mozilla/5.0 (compatible; Mapscore/1.0; +https://mapscore.io)",
+                "User-Agent": "Mozilla/5.0 (compatible; LocalScore/1.0; +https://localscore.io)",
             },
         });
 

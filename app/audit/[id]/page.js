@@ -215,9 +215,7 @@ export default function AuditPage() {
                 </div>
             </div>
 
-            {/* Free tier shows limited preview, Pro shows full report */}
-            {/* TEMPORARY: isPro set to true for testing new features */}
-            <AuditReport audit={auditData} isPro={true} />
+            <AuditReport audit={auditData} isPro={false} />
         </main>
     );
 }

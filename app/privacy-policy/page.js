@@ -59,7 +59,7 @@ const PrivacyPolicy = () => {
         >
           {`Last Updated: February 15, 2026
 
-Thank you for visiting Mapscore.io ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://mapscore.io (the "Website").
+Thank you for visiting LocalScore ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://localscore.io (the "Website").
 
 By accessing or using the Website, you agree to the terms of this Privacy Policy. If you do not agree with the practices described in this policy, please do not use the Website.
 
@@ -87,7 +87,7 @@ We do not share your personal data with any third parties except as required for
 
 4. Children's Privacy
 
-Mapscore.io is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
+LocalScore is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
 
 5. Updates to the Privacy Policy
 
@@ -97,11 +97,11 @@ We may update this Privacy Policy from time to time to reflect changes in our pr
 
 If you have any questions, concerns, or requests related to this Privacy Policy, you can contact us at:
 
-Email: support@mapscore.io
+Email: support@localscore.io
 
 For all other inquiries, please visit our support page on the Website.
 
-By using Mapscore.io, you consent to the terms of this Privacy Policy.`}
+By using LocalScore, you consent to the terms of this Privacy Policy.`}
         </pre>
       </div>
     </main>

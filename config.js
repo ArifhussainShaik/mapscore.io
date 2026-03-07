@@ -21,7 +21,7 @@ const config = {
         currency: "USD",
         interval: "month",
         features: [
-          { name: "Unlimited audits" },
+          { name: "15 audits/month" },
           { name: "Full detailed reports" },
           { name: "PDF export" },
           { name: "Competitor comparison (top 3)" },
@@ -39,7 +39,7 @@ const config = {
         features: [
           { name: "Everything in Pro" },
           { name: "Bulk audit (50 profiles)" },
-          { name: "Custom branding on PDFs" },
+          { name: "PDF report exports" },
           { name: "Client-ready presentation" },
           { name: "API access" },
         ],
@@ -52,9 +52,9 @@ const config = {
     cdn: "https://cdn-id.cloudfront.net/",
   },
   resend: {
-    fromNoReply: `Mapscore <noreply@mapscore.io>`,
-    fromAdmin: `Mapscore Team <team@mapscore.io>`,
-    supportEmail: "support@mapscore.io",
+    fromNoReply: `LocalScore <noreply@localscore.io>`,
+    fromAdmin: `LocalScore Team <team@localscore.io>`,
+    supportEmail: "support@localscore.io",
   },
   colors: {
     theme: "light",

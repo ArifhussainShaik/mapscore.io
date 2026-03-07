@@ -59,21 +59,21 @@ const TOS = () => {
         >
           {`Last Updated: February 15, 2026
 
-Welcome to Mapscore.io!
+Welcome to LocalScore!
 
-These Terms of Service ("Terms") govern your use of the Mapscore.io website at https://mapscore.io ("Website") and the services provided by Mapscore.io. By using our Website and services, you agree to these Terms.
+These Terms of Service ("Terms") govern your use of the LocalScore website at https://localscore.io ("Website") and the services provided by LocalScore. By using our Website and services, you agree to these Terms.
 
-1. Description of Mapscore.io
+1. Description of LocalScore
 
-Mapscore.io is a platform that offers Google Business Profile (GBP) audit tools to assist businesses and SEO professionals in improving their local search rankings.
+LocalScore is a platform that offers Google Business Profile (GBP) audit tools to assist businesses and SEO professionals in improving their local search rankings.
 
 2. Subscriptions and Usage Rights
 
-When you subscribe to a plan on Mapscore.io, you gain access to our auditing tools and reports according to the limits of your plan. You may use the reports for your own business or for your clients. You may not resell access to the tool itself. Subscription details and cancellation policies are available on our pricing page.
+When you purchase credits on LocalScore, you gain access to our auditing tools and reports according to your credit balance. You may use the reports for your own business or for your clients. You may not resell access to the tool itself. Credit pack details are available on our pricing page.
 
 3. User Data and Privacy
 
-We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://mapscore.io/privacy-policy.
+We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://localscore.io/privacy-policy.
 
 4. Non-Personal Data Collection
 
@@ -87,9 +87,9 @@ These Terms are governed by the laws of the United States.
 
 We may update these Terms from time to time. Users will be notified of any significant changes via email.
 
-For any questions or concerns regarding these Terms of Service, please contact us at support@mapscore.io.
+For any questions or concerns regarding these Terms of Service, please contact us at support@localscore.io.
 
-Thank you for using Mapscore.io!`}
+Thank you for using LocalScore!`}
         </pre>
       </div>
     </main>

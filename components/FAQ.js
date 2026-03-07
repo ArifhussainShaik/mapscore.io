@@ -37,19 +37,19 @@ const faqList = [
       "Our scoring engine evaluates your profile across 6 key categories: Profile Completeness, Review Signals, Visual Content, Activity & Engagement, Website Performance, and Competitive Position. Each category is weighted based on its impact on local search rankings, and your total score (0-100) determines your grade from A (excellent) to F (needs work).",
   },
   {
-    question: "Is Mapscore.io free to use?",
+    question: "Is LocalScore free to use?",
     answer: (
       <div className="space-y-2 leading-relaxed">
         <p>
           Yes! You can run a free GBP audit for any business without signing up.
           The free audit includes your overall score, grade, key issues, and a
-          personalized action plan. Pro and Agency plans unlock unlimited audits,
+          personalized action plan. Paid credit packs unlock additional audits,
           detailed reports, PDF exports, and competitor benchmarking.
         </p>
       </div>
     ),
     answerText:
-      "Yes! You can run a free GBP audit for any business without signing up. The free audit includes your overall score, grade, key issues, and a personalized action plan. Pro and Agency plans unlock unlimited audits, detailed reports, PDF exports, and competitor benchmarking.",
+      "Yes! You can run a free GBP audit for any business without signing up. The free audit includes your overall score, grade, key issues, and a personalized action plan. Paid credit packs unlock additional audits, detailed reports, PDF exports, and competitor benchmarking.",
   },
   {
     question: "What data sources does the audit use?",

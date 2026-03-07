@@ -4,6 +4,7 @@ import config from "@/config";
 import Link from "next/link";
 import ButtonSignin from "@/components/ButtonSignin";
 import Pricing from "@/components/Pricing";
+import ScrollReveal from "@/components/ScrollReveal";
 
 export default function LandingPage() {
   return (
@@ -33,32 +34,38 @@ export default function LandingPage() {
         </nav>
       </header>
 
-      <main className="bg-[#F4F2EB] text-slate-900 font-sans selection:bg-blue-200">
+      <main className="bg-[#F4F2EB] text-slate-900 font-sans selection:bg-blue-200 grain">
         {/* ===== HERO ===== */}
         <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-24 overflow-hidden">
+          {/* Subtle radial glow behind hero */}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-radial from-blue-200/30 via-transparent to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
           <div className="relative z-10 max-w-4xl mx-auto w-full">
 
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm text-slate-700 text-sm font-medium mb-8">
-              <div className="flex -space-x-2">
-                <img src="https://i.pravatar.cc/100?img=33" className="w-6 h-6 rounded-full border-2 border-white" alt="User" />
-                <img src="https://i.pravatar.cc/100?img=11" className="w-6 h-6 rounded-full border-2 border-white" alt="User" />
-                <img src="https://i.pravatar.cc/100?img=47" className="w-6 h-6 rounded-full border-2 border-white" alt="User" />
+            {/* Pill Badge — animated entrance */}
+            <div className="opacity-0 animate-[slide-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.1s_forwards]">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-slate-200/60 shadow-sm text-slate-700 text-sm font-medium mb-8">
+                <div className="w-5 h-5 rounded-full bg-[#00c565] text-white flex items-center justify-center flex-shrink-0">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span>Free Google Business Profile audit — no signup required</span>
               </div>
-              <span className="ml-1">Join <span className="font-bold text-slate-900">2,401</span> audited businesses today</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold font-serif text-slate-900 leading-[1.1] tracking-tight mb-6">
+            {/* Heading — staggered entrance */}
+            <h1 className="text-5xl md:text-7xl font-bold font-serif text-slate-900 leading-[1.1] tracking-tight mb-6 opacity-0 animate-[slide-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.25s_forwards]">
               Find out how your Google<br />Business Profile really<br />performs
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-12">
+            <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-12 opacity-0 animate-[slide-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.4s_forwards]">
               Get a free, instant audit with actionable tips to attract more local<br className="hidden md:block" />
               customers. No signup required.
             </p>
 
-            {/* Search Box Area */}
-            <div id="search" className="max-w-4xl mx-auto w-full flex flex-col items-center">
+            {/* Search Box Area — delayed entrance */}
+            <div id="search" className="max-w-4xl mx-auto w-full flex flex-col items-center opacity-0 animate-[scale-in_0.6s_cubic-bezier(0.16,1,0.3,1)_0.6s_forwards]">
               <div className="w-full mb-6 relative">
                 <SearchBar variant="hero" />
               </div>
@@ -75,41 +82,38 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ===== RECENT AUDITS ===== */}
+        {/* ===== WHAT WE CHECK ===== */}
         <section className="py-16 px-6 max-w-7xl mx-auto w-full">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold font-serif text-slate-900">Recent Audits</h2>
-            <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-slate-500 uppercase">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-              Live Updates
+          <ScrollReveal>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold font-serif text-slate-900">What we analyze</h2>
+              <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-slate-500 uppercase">
+                60+ checks
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: "🍕", name: "Luigi's Pizzeria", loc: "Brooklyn, NY", rating: "4.8" },
-              { icon: "☕️", name: "Morning Brew", loc: "Austin, TX", rating: "5.0" },
-              { icon: "🪴", name: "Green Leaf Nursery", loc: "Portland, OR", rating: "4.2" },
-              { icon: "✂️", name: "Sharp Cuts Barber", loc: "Chicago, IL", rating: "4.7" }
-            ].map((audit, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-12">
-                  <div className="text-3xl">{audit.icon}</div>
-                  <div className="px-2 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-md flex items-center gap-1">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Verified
+              { icon: "📋", name: "Profile Completeness", loc: "Categories, hours, description, attributes", rating: "18 checks" },
+              { icon: "⭐", name: "Reviews & Reputation", loc: "Count, rating, recency, response rate", rating: "12 checks" },
+              { icon: "📸", name: "Visual Content", loc: "Photo count, variety, logo, cover photo", rating: "10 checks" },
+              { icon: "🏆", name: "Competitive Position", loc: "Review gap, rating gap, photo gap vs rivals", rating: "5 checks" }
+            ].map((item, i) => (
+              <ScrollReveal key={i} delay={i < 4 ? i + 1 : 4}>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-slate-100/80 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  <div className="flex justify-between items-start mb-12">
+                    <div className="text-3xl">{item.icon}</div>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900">{item.name}</h3>
+                    <p className="text-sm text-slate-500 mb-3">{item.loc}</p>
+                    <div className="flex items-center gap-1 text-blue-600 text-sm font-semibold">
+                      {item.rating}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900">{audit.name}</h3>
-                  <p className="text-sm text-slate-500 mb-3">{audit.loc}</p>
-                  <div className="flex items-center gap-1 text-amber-400 text-sm">
-                    {"★★★★★"} <span className="text-slate-900 font-semibold ml-1">{audit.rating}</span>
-                  </div>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </section>
@@ -117,10 +121,12 @@ export default function LandingPage() {
         {/* ===== HOW IT WORKS ===== */}
         <section id="how-it-works" className="py-32 px-6 border-t border-slate-200/50">
           <div className="max-w-5xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
-              Your audit in 3 simple steps
-            </h2>
-            <p className="text-slate-600 mb-20">No technical skills needed. Takes 30 seconds.</p>
+            <ScrollReveal>
+              <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
+                Your audit in 3 simple steps
+              </h2>
+              <p className="text-slate-600 mb-20">No technical skills needed. Takes 30 seconds.</p>
+            </ScrollReveal>
 
             <div className="relative">
               {/* Connecting Line */}
@@ -159,142 +165,183 @@ export default function LandingPage() {
                     desc: "Prioritized fixes written in plain English, not SEO jargon."
                   }
                 ].map((step, i) => (
-                  <div key={i} className="flex flex-col items-center">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 bg-white shadow-sm ring-8 ring-[#F4F2EB] ${step.bg}`}>
-                      {step.icon}
+                  <ScrollReveal key={i} delay={i + 1}>
+                    <div className="flex flex-col items-center">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 bg-white shadow-sm ring-8 ring-[#F4F2EB] ${step.bg}`}>
+                        {step.icon}
+                      </div>
+                      <h3 className="text-xl font-bold font-serif text-slate-900 mb-3">{step.title}</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed px-4">{step.desc}</p>
                     </div>
-                    <h3 className="text-xl font-bold font-serif text-slate-900 mb-3">{step.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed px-4">{step.desc}</p>
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        {/* ===== SAMPLE REPORTS ===== */}
-        <section className="py-24 px-6 bg-[#F4F2EB]">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
-              See what your audit looks like
-            </h2>
-            <p className="text-slate-600 mb-16">Click any example to explore a full report.</p>
+        {/* ===== SAMPLE REPORTS — Asymmetric/offset layout (Task 5) ===== */}
+        <section className="py-24 px-6 bg-[#F4F2EB] overflow-hidden">
+          <div className="max-w-6xl mx-auto">
+            <ScrollReveal>
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
+                  See what your audit looks like
+                </h2>
+                <p className="text-slate-600">Here's what your report will include.</p>
+              </div>
+            </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-              {/* Example 1 */}
-              <Link href="/audit/demo?business=Mario's" className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-all group block">
-                <div className="flex justify-between items-start mb-12">
-                  <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
-                    🍝
-                  </div>
-                  <div className="w-14 h-14 rounded-full border-4 border-blue-500 flex items-center justify-center text-xl font-bold text-blue-600 font-sans">
-                    B+
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Mario&apos;s Italian Kitchen</h3>
-                <p className="text-sm text-slate-500 mb-6">Good start, room to grow</p>
+            {/* Asymmetric bento grid — breaking the 3-col monotony */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 text-left">
+              {/* Large featured card */}
+              <ScrollReveal className="md:col-span-7">
+                <div className="block bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full relative overflow-hidden">
+                  {/* Decorative accent */}
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-blue-50 to-transparent rounded-bl-full pointer-events-none"></div>
 
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Hours complete</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 12 photos (need 30+)</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> No review responses</li>
-                </ul>
+                  <div className="relative">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">
+                          🍝
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-slate-900">Mario&apos;s Italian Kitchen</h3>
+                          <p className="text-sm text-slate-500">Good start, room to grow</p>
+                        </div>
+                      </div>
+                      <div className="w-16 h-16 rounded-full border-4 border-blue-500 flex items-center justify-center text-2xl font-bold text-blue-600 font-sans">
+                        B+
+                      </div>
+                    </div>
 
-                <span className="text-blue-600 font-semibold text-sm group-hover:underline">View full report &rarr;</span>
-              </Link>
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                      <div className="bg-slate-50 rounded-xl p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Photos</p>
+                        <p className="text-lg font-bold text-slate-900">12 <span className="text-sm font-normal text-amber-500">/ 30+ needed</span></p>
+                      </div>
+                      <div className="bg-slate-50 rounded-xl p-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Reviews</p>
+                        <p className="text-lg font-bold text-slate-900">47 <span className="text-sm font-normal text-red-500">0% replied</span></p>
+                      </div>
+                    </div>
 
-              {/* Example 2 */}
-              <Link href="/audit/demo?business=Smith" className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-all group block">
-                <div className="flex justify-between items-start mb-12">
-                  <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-xl">
-                    🧰
-                  </div>
-                  <div className="w-14 h-14 rounded-full border-4 border-red-500 flex items-center justify-center text-xl font-bold text-red-600 font-sans">
-                    D
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Smith & Sons Plumbing</h3>
-                <p className="text-sm text-slate-500 mb-6">Needs urgent attention</p>
+                    <ul className="space-y-3 mb-6">
+                      <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Hours complete</li>
+                      <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 12 photos (need 30+)</li>
+                      <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> No review responses</li>
+                    </ul>
 
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> No website linked</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> 0 recent posts</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Rating under 4.0</li>
-                </ul>
-
-                <span className="text-blue-600 font-semibold text-sm group-hover:underline">View full report &rarr;</span>
-              </Link>
-
-              {/* Example 3 */}
-              <Link href="/audit/demo?business=Bright" className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-all group block">
-                <div className="flex justify-between items-start mb-12">
-                  <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl">
-                    🦷
-                  </div>
-                  <div className="w-14 h-14 rounded-full border-4 border-green-500 flex items-center justify-center text-xl font-bold text-green-600 font-sans">
-                    A
+                    <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1">
+                      Sample report preview
+                    </span>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Bright Smile Dental</h3>
-                <p className="text-sm text-slate-500 mb-6">Excellent performance</p>
+              </ScrollReveal>
 
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 100% profile complete</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> High engagement</li>
-                  <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Review velocity optimal</li>
-                </ul>
+              {/* Stacked right column */}
+              <div className="md:col-span-5 flex flex-col gap-6">
+                <ScrollReveal delay={1}>
+                  <div className="block bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-red-50 to-transparent rounded-bl-full pointer-events-none"></div>
+                    <div className="relative">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-xl">
+                          🧰
+                        </div>
+                        <div className="w-14 h-14 rounded-full border-4 border-red-500 flex items-center justify-center text-xl font-bold text-red-600 font-sans">
+                          D
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">Smith & Sons Plumbing</h3>
+                      <p className="text-sm text-slate-500 mb-4">Needs urgent attention</p>
 
-                <span className="text-blue-600 font-semibold text-sm group-hover:underline">View full report &rarr;</span>
-              </Link>
+                      <ul className="space-y-2 mb-4">
+                        <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> No website linked</li>
+                        <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> 0 recent posts</li>
+                      </ul>
+
+                      <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1">
+                        Sample report preview
+                      </span>
+                    </div>
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal delay={2}>
+                  <div className="block bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-green-50 to-transparent rounded-bl-full pointer-events-none"></div>
+                    <div className="relative">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl">
+                          🦷
+                        </div>
+                        <div className="w-14 h-14 rounded-full border-4 border-green-500 flex items-center justify-center text-xl font-bold text-green-600 font-sans">
+                          A
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">Bright Smile Dental</h3>
+                      <p className="text-sm text-slate-500 mb-4">Excellent performance</p>
+
+                      <ul className="space-y-2 mb-4">
+                        <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 100% profile complete</li>
+                        <li className="flex items-center gap-2 text-sm text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> High engagement</li>
+                      </ul>
+
+                      <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1">
+                        Sample report preview
+                      </span>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ===== TESTIMONIALS ===== */}
+        {/* ===== WHY LOCAL BUSINESSES USE LOCALSCORE ===== */}
         <section className="py-24 px-6 border-t border-slate-200/50">
-          <div className="max-w-6xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-16">
-              Local business owners love their results
-            </h2>
+          <div className="max-w-6xl mx-auto">
+            <ScrollReveal>
+              <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-16 text-center md:text-left">
+                Common issues we<br className="hidden md:block" /> catch for businesses
+              </h2>
+            </ScrollReveal>
 
+            {/* Offset grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
               {[
                 {
-                  quote: "I had no idea my hours were wrong on Google. The audit caught it in seconds. Got 3 more calls that week.",
-                  name: "Lisa Chen",
-                  role: "Golden Dragon, Portland OR",
-                  image: "https://i.pravatar.cc/150?u=lisachen",
+                  icon: "⏰",
+                  title: "Incorrect business hours",
+                  desc: "Wrong hours on your Google profile means lost customers who show up when you're closed — or skip you entirely.",
+                  offset: "md:mt-0",
                 },
                 {
-                  quote: "My competitor was outranking me because they had more photos. This showed me exactly what to fix.",
-                  name: "Mike Thompson",
-                  role: "Thompson's HVAC, Austin TX",
-                  image: "https://i.pravatar.cc/150?u=miket",
+                  icon: "📸",
+                  title: "Not enough photos",
+                  desc: "Businesses with 20+ photos get significantly more direction requests. Most profiles we audit have fewer than 10.",
+                  offset: "md:mt-12",
                 },
                 {
-                  quote: "I use this for all my clients. The reports look professional and save me hours every month.",
-                  name: "Sarah Williams",
-                  role: "Marketing Consultant, Chicago IL",
-                  image: "https://i.pravatar.cc/150?u=sarahw",
+                  icon: "💬",
+                  title: "Unanswered reviews",
+                  desc: "Responding to reviews signals active management to Google. We check your response rate and flag missed replies.",
+                  offset: "md:-mt-4",
                 },
               ].map((t, i) => (
-                <div key={i} className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
-                  <div>
-                    <div className="flex gap-1 text-amber-400 mb-6">
-                      ★★★★★
-                    </div>
-                    <p className="text-slate-600 leading-relaxed italic mb-8">
-                      &quot;{t.quote}&quot;
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <img src={t.image} alt={t.name} className="w-12 h-12 rounded-full border border-slate-100" />
+                <ScrollReveal key={i} delay={i + 1} className={t.offset}>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-sm border border-slate-100/80 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300 h-full">
                     <div>
-                      <p className="text-sm font-bold text-slate-900">{t.name}</p>
-                      <p className="text-xs text-slate-500">{t.role}</p>
+                      <div className="text-4xl mb-6">{t.icon}</div>
+                      <h3 className="text-xl font-bold text-slate-900 mb-3 font-serif">{t.title}</h3>
+                      <p className="text-slate-600 leading-relaxed">
+                        {t.desc}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -303,29 +350,27 @@ export default function LandingPage() {
         <Pricing />
 
         {/* ===== BOTTOM CTA ===== */}
-        <section className="py-24 px-6 bg-[#E8E6DF] border-t border-slate-200/50">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-10">
-              Ready to see how you stack up?
-            </h2>
-            <div className="bg-white p-2 rounded-full shadow-lg border border-slate-100 flex items-center mb-6 max-w-xl mx-auto">
-              {/* Dummy input for visual since SearchBar is more complex and handles its own stuff, we fake it for the bottom CTA visual fidelity based on the screenshot */}
-              <div className="w-full pl-4 flex items-center bg-white rounded-full">
-                <input type="text" placeholder="Enter your business name..." className="flex-grow bg-transparent border-0 focus:ring-0 text-sm py-2" readOnly />
-                <button className="bg-blue-600 text-white rounded-full px-6 py-2.5 text-sm font-bold ml-2">Get Free Audit</button>
+        <ScrollReveal>
+          <section className="py-24 px-6 bg-[#E8E6DF] border-t border-slate-200/50">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-10">
+                Ready to see how you stack up?
+              </h2>
+              <div className="max-w-xl mx-auto mb-6">
+                <SearchBar variant="hero" />
               </div>
-            </div>
 
-            <div className="flex items-center justify-center gap-3 text-xs text-slate-500">
-              <div className="flex -space-x-1">
-                <div className="w-4 h-4 rounded-full bg-blue-400"></div>
-                <div className="w-4 h-4 rounded-full bg-green-400"></div>
-                <div className="w-4 h-4 rounded-full bg-amber-400"></div>
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                <div className="w-4 h-4 rounded-full bg-[#00c565] text-white flex items-center justify-center flex-shrink-0">
+                  <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                Free audit — no signup required — results in 30 seconds
               </div>
-              Join 2,401 local businesses improving their Google presence
             </div>
-          </div>
-        </section>
+          </section>
+        </ScrollReveal>
 
         {/* ===== FOOTER ===== */}
         <footer className="bg-[#2C2B29] text-slate-300 py-16 px-6">
@@ -345,37 +390,32 @@ export default function LandingPage() {
             <div>
               <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">Product</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">How it Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Sample Reports</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Case Studies</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a></li>
+                <li><a href="#search" className="hover:text-white transition-colors">Run an Audit</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">Resources</h4>
+              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">Legal</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">SEO Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Google Profile Guide</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Review Templates</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/tos" className="hover:text-white transition-colors">Terms of Service</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">Company</h4>
+              <h4 className="text-white font-bold text-xs uppercase tracking-widest mb-4">Account</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><ButtonSignin text="Sign in" extraStyle="text-sm text-slate-300 hover:text-white transition-colors bg-transparent border-0 p-0 min-h-0 h-auto" /></li>
               </ul>
             </div>
           </div>
 
           <div className="max-w-7xl mx-auto pt-8 border-t border-slate-700 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
             <p>© {new Date().getFullYear()} LocalScore. All rights reserved.</p>
-            <p className="mt-2 md:mt-0">Made with care for local businesses <span className="text-red-500">❤️</span></p>
+            <p className="mt-2 md:mt-0">Made with care for local businesses</p>
           </div>
         </footer>
       </main>

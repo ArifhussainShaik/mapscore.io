@@ -108,8 +108,7 @@ export default function AuditPDFView() {
                         <div className="pdf-logo">
                             <span style={{ fontSize: "24px" }}>📊</span>
                             <span>
-                                Map<span style={{ color: "#10b981" }}>score</span>
-                                <span style={{ fontSize: "10px", opacity: 0.5 }}>.io</span>
+                                Local<span style={{ color: "#10b981" }}>Score</span>
                             </span>
                         </div>
                         <div className="pdf-date">
@@ -168,7 +167,7 @@ export default function AuditPDFView() {
                     </div>
 
                     <div className="pdf-footer">
-                        <span>Mapscore.io — Confidential Audit Report</span>
+                        <span>LocalScore — Confidential Audit Report</span>
                         <span>Page 1</span>
                     </div>
                 </div>
@@ -178,7 +177,7 @@ export default function AuditPDFView() {
                     <div className="pdf-header">
                         <div className="pdf-logo">
                             <span style={{ fontSize: "24px" }}>📊</span>
-                            <span>Map<span style={{ color: "#10b981" }}>score</span><span style={{ fontSize: "10px", opacity: 0.5 }}>.io</span></span>
+                            <span>Local<span style={{ color: "#10b981" }}>Score</span></span>
                         </div>
                         <div className="pdf-date">{audit.businessName}</div>
                     </div>
@@ -212,7 +211,7 @@ export default function AuditPDFView() {
                     </div>
 
                     <div className="pdf-footer">
-                        <span>Mapscore.io — Confidential Audit Report</span>
+                        <span>LocalScore — Confidential Audit Report</span>
                         <span>Page 2</span>
                     </div>
                 </div>
@@ -222,7 +221,7 @@ export default function AuditPDFView() {
                     <div className="pdf-header">
                         <div className="pdf-logo">
                             <span style={{ fontSize: "24px" }}>📊</span>
-                            <span>Map<span style={{ color: "#10b981" }}>score</span><span style={{ fontSize: "10px", opacity: 0.5 }}>.io</span></span>
+                            <span>Local<span style={{ color: "#10b981" }}>Score</span></span>
                         </div>
                         <div className="pdf-date">{audit.businessName}</div>
                     </div>
@@ -317,12 +316,12 @@ export default function AuditPDFView() {
                     <div className="pdf-cta">
                         <p>Need help implementing these fixes?</p>
                         <p style={{ fontWeight: 700, color: "#10b981" }}>
-                            Visit mapscore.io to schedule a consultation or upgrade to Pro for ongoing monitoring.
+                            Visit localscore.io to buy more audit credits or get a Lifetime plan for ongoing monitoring.
                         </p>
                     </div>
 
                     <div className="pdf-footer">
-                        <span>Mapscore.io — Confidential Audit Report</span>
+                        <span>LocalScore — Confidential Audit Report</span>
                         <span>Page 3</span>
                     </div>
                 </div>

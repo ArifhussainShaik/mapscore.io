@@ -40,20 +40,20 @@ export default function CompetitorTable({ competitors, auditData }) {
     const youReviews = auditData?.reviewCount || 0;
     const youPhotos = auditData?.photoCount || 0;
 
-    // Rival Data (First Competitor)
-    const rivalName = competitors[0]?.name || "Rival Business";
-    const rivalScore = Math.min(100, (auditData?.totalScore || 70) + 16);
+    // Rival Data (First Competitor) - use actual competitor data only, no fabricated scores
+    const rivalName = competitors[0]?.name || "Competitor 1";
     const rivalReviews = competitors[0]?.reviewCount || 0;
+    const rivalRating = competitors[0]?.rating || 0;
     const rivalPhotos = competitors[0]?.photoCount || 0;
     const moreReviewsRival = rivalReviews > youReviews ? rivalReviews - youReviews : 0;
 
     // Leader Data (Second Competitor)
-    const leaderName = competitors[1]?.name || "Market Leader";
-    const leaderScore = Math.min(100, (auditData?.totalScore || 70) + 19);
+    const leaderName = competitors[1]?.name || "Competitor 2";
     const leaderReviews = competitors[1]?.reviewCount || 0;
+    const leaderRating = competitors[1]?.rating || 0;
     const leaderPhotos = competitors[1]?.photoCount || 0;
     const moreReviewsLeader = leaderReviews > youReviews ? leaderReviews - youReviews : 0;
-    const photoMultiplier = youPhotos > 0 ? Math.round(leaderPhotos / youPhotos) : 2;
+    const photoMultiplier = youPhotos > 0 ? Math.round(leaderPhotos / youPhotos) : 0;
 
     return (
         <div className="w-full max-w-[1200px] mx-auto py-12">
@@ -87,7 +87,6 @@ export default function CompetitorTable({ competitors, auditData }) {
                     </div>
                     <div className="flex flex-col items-center mb-6 mt-2">
                         <div className="relative w-24 h-24 mb-4 flex items-center justify-center">
-                            {/* Score Ring SVG */}
                             <svg className="transform -rotate-90 w-24 h-24 whitespace-nowrap">
                                 <circle className="text-slate-100" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeWidth="8"></circle>
                                 <circle className="text-amber-500" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * youScore) / 100} strokeWidth="8"></circle>
@@ -96,7 +95,7 @@ export default function CompetitorTable({ competitors, auditData }) {
                                 <span className="text-3xl font-bold text-slate-900">{youScore}</span>
                             </div>
                         </div>
-                        <span className="text-amber-600 font-bold text-xs tracking-wide uppercase bg-amber-50 px-3 py-1 rounded-full mb-3">Needs Work</span>
+                        <span className={`font-bold text-xs tracking-wide uppercase px-3 py-1 rounded-full mb-3 ${youScore >= 80 ? 'text-emerald-600 bg-emerald-50' : youScore >= 60 ? 'text-amber-600 bg-amber-50' : 'text-red-600 bg-red-50'}`}>{youScore >= 80 ? 'Strong' : youScore >= 60 ? 'Needs Work' : 'Needs Attention'}</span>
                         <h3 className="text-xl font-bold text-slate-900 max-w-[200px] truncate" title={youName}>{youName}</h3>
                         <p className="text-sm text-slate-500 truncate" title={auditData?.address}>
                             {auditData?.address?.split(",")[0] || "Your Address"}
@@ -120,16 +119,13 @@ export default function CompetitorTable({ competitors, auditData }) {
                         <IconSwords className="w-4 h-4" /> RIVAL
                     </div>
                     <div className="flex flex-col items-center mb-6 mt-2">
-                        <div className="relative w-24 h-24 mb-4 flex items-center justify-center">
-                            <svg className="transform -rotate-90 w-24 h-24 whitespace-nowrap">
-                                <circle className="text-slate-100" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeWidth="8"></circle>
-                                <circle className="text-emerald-500" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * rivalScore) / 100} strokeWidth="8"></circle>
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-3xl font-bold text-slate-900">{rivalScore}</span>
+                        <div className="relative w-24 h-24 mb-4 flex items-center justify-center bg-emerald-50 rounded-full">
+                            <div className="flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold text-slate-900">{rivalRating || "—"}</span>
+                                <span className="text-xs text-slate-500">rating</span>
                             </div>
                         </div>
-                        <span className="text-emerald-600 font-bold text-xs tracking-wide uppercase bg-emerald-50 px-3 py-1 rounded-full mb-3">Top Rated</span>
+                        <span className="text-emerald-600 font-bold text-xs tracking-wide uppercase bg-emerald-50 px-3 py-1 rounded-full mb-3">{rivalReviews} reviews</span>
                         <a
                             href={competitors[0]?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rivalName)}`}
                             target="_blank"
@@ -161,16 +157,13 @@ export default function CompetitorTable({ competitors, auditData }) {
                         <IconTrophy className="w-4 h-4" /> MARKET LEADER
                     </div>
                     <div className="flex flex-col items-center mb-6 mt-2">
-                        <div className="relative w-28 h-28 mb-4 flex items-center justify-center">
-                            <svg className="transform -rotate-90 w-28 h-28 whitespace-nowrap">
-                                <circle className="text-slate-100" cx="56" cy="56" fill="transparent" r="46" stroke="currentColor" strokeWidth="8"></circle>
-                                <circle className="text-blue-600" cx="56" cy="56" fill="transparent" r="46" stroke="currentColor" strokeDasharray="289" strokeDashoffset={289 - (289 * leaderScore) / 100} strokeWidth="8"></circle>
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-4xl font-bold text-slate-900">{leaderScore}</span>
+                        <div className="relative w-28 h-28 mb-4 flex items-center justify-center bg-blue-50 rounded-full">
+                            <div className="flex flex-col items-center justify-center">
+                                <span className="text-3xl font-bold text-slate-900">{leaderRating || "—"}</span>
+                                <span className="text-xs text-slate-500">rating</span>
                             </div>
                         </div>
-                        <span className="text-blue-600 font-bold text-xs tracking-wide uppercase bg-blue-50 px-3 py-1 rounded-full mb-3">Elite</span>
+                        <span className="text-blue-600 font-bold text-xs tracking-wide uppercase bg-blue-50 px-3 py-1 rounded-full mb-3">{leaderReviews} reviews</span>
                         <a
                             href={competitors[1]?.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(leaderName)}`}
                             target="_blank"
