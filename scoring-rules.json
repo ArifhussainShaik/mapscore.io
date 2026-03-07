@@ -11,7 +11,7 @@
     {
       "id": "profile",
       "name": "GBP Profile Signals",
-      "max_points": 32,
+      "max_points": 33,
       "weight_source": "Whitespark 2026: GBP Signals = 32% of local pack ranking factors",
       "checks": [
         {
@@ -175,28 +175,46 @@
         {
           "id": "products",
           "name": "Products Section",
-          "max_points": 3,
+          "max_points": 1,
           "data_citation": "Engagement and conversion signal. Applicable for retail, food, and product-based categories.",
           "rules": [
             {
               "condition": "products_listed_with_details",
-              "points": 3,
+              "points": 1,
               "label": "Products listed with prices and descriptions"
             },
             {
               "condition": "some_products",
-              "points": 2,
+              "points": 1,
               "label": "Some products listed"
             },
             {
               "condition": "no_products_applicable",
-              "points": 1,
+              "points": 0,
               "label": "No products (but category suggests they should)"
             },
             {
               "condition": "not_applicable",
-              "points": 3,
+              "points": 1,
               "label": "Products not applicable for this category (full points)"
+            }
+          ]
+        },
+        {
+          "id": "service_description_quality",
+          "name": "Service Description Quality",
+          "max_points": 1,
+          "data_citation": "Whitespark 2026: 'Dedicated page for each service' ranked #1 for local organic. Service descriptions build relevance signals.",
+          "rules": [
+            {
+              "condition": "services_with_descriptions",
+              "points": 1,
+              "label": "Services listed with descriptions"
+            },
+            {
+              "condition": "services_no_descriptions",
+              "points": 0,
+              "label": "Services listed without descriptions"
             }
           ]
         },
@@ -606,7 +624,7 @@
     {
       "id": "activity",
       "name": "Activity Signals",
-      "max_points": 10,
+      "max_points": 9,
       "weight_source": "Sterling Sky: Posts don't directly affect rankings. But posting shows active profile. Low-moderate signal.",
       "checks": [
         {
@@ -667,12 +685,12 @@
         {
           "id": "ask_maps_readiness",
           "name": "Q&A / Ask Maps Readiness",
-          "max_points": 2,
+          "max_points": 1,
           "data_citation": "Q&A deprecated and replaced by Gemini-powered Ask Maps. Website content feeds Ask Maps responses.",
           "rules": [
             {
               "condition": "website_with_faq_content",
-              "points": 2,
+              "points": 1,
               "label": "Website has FAQ/service content for Ask Maps"
             },
             {
@@ -716,7 +734,7 @@
     {
       "id": "website",
       "name": "Website Signals",
-      "max_points": 12,
+      "max_points": 14,
       "weight_source": "Whitespark 2026: Website/On-Page = 18% of local pack factors. Dedicated service pages = #1 local organic factor.",
       "checks": [
         {
@@ -848,6 +866,29 @@
           "name": "Page speed (under 3 seconds)",
           "max_points": 0,
           "type": "flag"
+        },
+        {
+          "id": "landing_page_type",
+          "name": "Landing Page Type",
+          "max_points": 2,
+          "data_citation": "Whitespark 2026: GBP linking to dedicated location/service page vs homepage. Dedicated pages rank significantly better.",
+          "rules": [
+            {
+              "condition": "dedicated_page",
+              "points": 2,
+              "label": "GBP links to dedicated location or service page"
+            },
+            {
+              "condition": "homepage",
+              "points": 1,
+              "label": "GBP links to homepage (not a dedicated page)"
+            },
+            {
+              "condition": "no_website",
+              "points": 0,
+              "label": "No website linked"
+            }
+          ]
         }
       ]
     },

@@ -156,8 +156,18 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         case "products":
-            if (data.products?.length > 0) score = 3;
-            else score = 3;
+            if (data.products?.length > 0) score = 1;
+            else score = 1;
+            break;
+
+        case "service_description_quality":
+            // Check if services have descriptions
+            if (data.services?.length > 0) {
+                const hasDescriptions = data.services.some(s =>
+                    typeof s === 'object' && (s.description?.length > 0 || s.text?.length > 0)
+                );
+                score = hasDescriptions ? 1 : 0;
+            }
             break;
 
         // REVIEW SIGNALS
@@ -250,7 +260,7 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         case "ask_maps_readiness":
-            if (data.websiteUrl && data.description) score = 2;
+            if (data.websiteUrl && data.description) score = 1;
             else if (data.websiteUrl) score = 1;
             break;
 
@@ -279,6 +289,24 @@ function evaluateCheck(check, data, sectionId) {
         case "website_mobile":
             score = data.websiteMobile ? 2 : 0;
             break;
+
+        case "landing_page_type": {
+            if (data.websiteUrl) {
+                try {
+                    const url = new URL(data.websiteUrl.startsWith('http') ? data.websiteUrl : `https://${data.websiteUrl}`);
+                    const path = url.pathname.replace(/\/+$/, ''); // strip trailing slashes
+                    // If the path is empty or just '/', it's a homepage
+                    if (path && path !== '' && path !== '/index.html' && path !== '/index.php') {
+                        score = 2; // Dedicated page
+                    } else {
+                        score = 1; // Homepage
+                    }
+                } catch {
+                    score = 1; // Has URL but can't parse
+                }
+            }
+            break;
+        }
 
         // COMPETITIVE POSITION
         case "review_count_gap":

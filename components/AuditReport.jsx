@@ -9,6 +9,8 @@ import RevenueImpact from "./RevenueImpact";
 import NAPChecker from "./NAPChecker";
 import SEOChecklist from "./SEOChecklist";
 import IndustryBenchmarks from "./IndustryBenchmarks";
+import CategoryInsights from "./CategoryInsights";
+import ProfileActivity from "./ProfileActivity";
 
 export default function AuditReport({ audit, isPro = false }) {
     if (!audit) return null;
@@ -24,20 +26,43 @@ export default function AuditReport({ audit, isPro = false }) {
     const warningIssues = allIssues.filter(i => i.severity === "medium");
     const opportunityIssues = allIssues.filter(i => i.severity === "low");
 
-    // "Looking Good" passes - generate from audit data
+    // "Looking Good" passes - generate from audit data with specific values
     const passedChecks = [];
-    if (audit.hasLogo) passedChecks.push("Logo uploaded");
-    if (audit.hasCoverPhoto) passedChecks.push("Cover photo matched");
+    if (audit.hasLogo) passedChecks.push("Logo uploaded and visible");
+    if (audit.hasCoverPhoto) passedChecks.push("Cover photo set");
     if (audit.hours && Object.keys(audit.hours).length > 0 && !allIssues.some(i => i.category === "hours")) {
-        passedChecks.push("Business hours are complete");
+        const dayCount = Object.keys(audit.hours).length;
+        passedChecks.push(`Business hours set for ${dayCount} day${dayCount !== 1 ? 's' : ''}/week`);
     }
-    if (audit.primaryCategory && !allIssues.some(i => i.category === "categories")) {
-        passedChecks.push("Categories are optimized");
+    if (audit.primaryCategory && !allIssues.some(i => i.id === "PROF-008")) {
+        const matchCount = (audit.competitors || []).filter(
+            c => c.category?.toLowerCase() === audit.primaryCategory?.toLowerCase()
+        ).length;
+        const total = (audit.competitors || []).length;
+        passedChecks.push(
+            total > 0
+                ? `Primary category "${audit.primaryCategory}" matches ${matchCount}/${total} competitors`
+                : `Primary category "${audit.primaryCategory}" is set`
+        );
+    }
+    if ((audit.secondaryCategories || []).length >= 3) {
+        passedChecks.push(`${audit.secondaryCategories.length} secondary categories active`);
+    }
+    if (audit.monthlyReviewVelocity >= 2) {
+        passedChecks.push(`Review velocity: ${audit.monthlyReviewVelocity.toFixed(1)} reviews/month`);
     }
     if (audit.reviewCount > 10 && !allIssues.some(i => i.name.includes("Review"))) {
-        passedChecks.push("Healthy review profile");
+        passedChecks.push(`${audit.reviewCount} reviews with ${audit.averageRating?.toFixed(1) || 'N/A'} ⭐ average`);
     }
-    if (audit.websiteLoads && audit.websiteMobile) passedChecks.push("Website is mobile-friendly and fast");
+    if (audit.responseRate >= 0.5) {
+        passedChecks.push(`Responding to ${Math.round(audit.responseRate * 100)}% of reviews`);
+    }
+    if (audit.websiteLoads && audit.websiteMobile) passedChecks.push("Website is mobile-friendly and loads fast");
+    if (audit.websiteHttps) passedChecks.push("Website uses HTTPS");
+    if (audit.websiteHasNap) passedChecks.push("NAP consistent on website");
+    if (audit.photoCount >= 20) passedChecks.push(`${audit.photoCount} photos uploaded`);
+    if ((audit.services || []).length >= 5) passedChecks.push(`${audit.services.length} services listed`);
+    if (audit.description?.length >= 250) passedChecks.push(`Business description: ${audit.description.length} characters`);
 
     // Ensure we have at least 3 looking good items
     if (passedChecks.length === 0) {
@@ -158,6 +183,12 @@ export default function AuditReport({ audit, isPro = false }) {
                         </div>
 
                     </div>
+                </div>
+
+                {/* Category Analysis + Profile Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 mb-8">
+                    <CategoryInsights audit={audit} />
+                    <ProfileActivity audit={audit} />
                 </div>
 
                 {/* Middle Section: Competitor Table */}

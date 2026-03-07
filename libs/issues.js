@@ -182,6 +182,19 @@ function shouldTrigger(issue, data) {
     if (t === "website_not_loading" && data.websiteUrl && data.websiteLoads === false) return true;
     if (t === "website_not_mobile" && data.websiteUrl && data.websiteMobile === false) return true;
     if (t === "no_nap_on_homepage" && data.websiteUrl && !data.websiteHasNap) return true;
+    if (t === "website_links_to_homepage" && data.websiteUrl) {
+        try {
+            const url = new URL(data.websiteUrl.startsWith('http') ? data.websiteUrl : `https://${data.websiteUrl}`);
+            const path = url.pathname.replace(/\/+$/, '');
+            if (!path || path === '' || path === '/index.html' || path === '/index.php') return true;
+        } catch { /* ignore parse errors */ }
+    }
+    if (t === "services_without_descriptions" && data._servicesChecked && data.services?.length > 0) {
+        const hasDesc = data.services.some(s =>
+            typeof s === 'object' && (s.description?.length > 0 || s.text?.length > 0)
+        );
+        if (!hasDesc) return true;
+    }
 
     return false;
 }

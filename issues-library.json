@@ -654,6 +654,44 @@
       "time_to_fix": "15 minutes per post",
       "expected_impact": "Low",
       "time_to_results": "Ongoing engagement benefit"
+    },
+    {
+      "id": "WEB-006",
+      "category": "website",
+      "name": "GBP links to generic homepage",
+      "severity": "medium",
+      "trigger": "website_links_to_homepage",
+      "what_we_found": "Your Google Business Profile links to your website's homepage ({website_url}) instead of a dedicated location or service page.",
+      "why_it_matters": "Whitespark 2026: 'Dedicated Page for Each Service on Website' is the #1 factor for local organic rankings. Linking your GBP to a dedicated location page with your NAP, services, hours, and embedded map performs significantly better than a generic homepage.",
+      "how_to_fix": [
+        "Create a dedicated location page on your website (e.g., /locations/your-city)",
+        "Include your full NAP, business hours, embedded Google Map, and services",
+        "Add LocalBusiness schema markup on this page",
+        "Update your GBP website link to point to this dedicated page",
+        "Include customer reviews or testimonials on the page"
+      ],
+      "time_to_fix": "1-2 hours to create the page, 2 minutes to update GBP link",
+      "expected_impact": "High",
+      "time_to_results": "2-4 weeks for ranking impact"
+    },
+    {
+      "id": "PROF-014",
+      "category": "profile",
+      "name": "Services listed without descriptions",
+      "severity": "medium",
+      "trigger": "services_without_descriptions",
+      "what_we_found": "Your services are listed but don't include descriptions. Each service allows up to 300 characters of description text.",
+      "why_it_matters": "Service descriptions add keyword relevance signals to your profile. Sterling Sky confirmed services have direct ranking impact, and descriptions amplify that effect by providing Google with more context about what you offer.",
+      "how_to_fix": [
+        "Go to Edit Services in your GBP dashboard",
+        "Click on each service to add a description",
+        "Write a 150-300 character description for each service",
+        "Include relevant keywords naturally (service type + location)",
+        "Focus on pre-defined services first (stronger ranking signal)"
+      ],
+      "time_to_fix": "20-30 minutes",
+      "expected_impact": "Medium",
+      "time_to_results": "24-72 hours"
     }
   ]
 }
