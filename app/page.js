@@ -1,6 +1,5 @@
 import SearchBar from "@/components/SearchBar";
-import FAQ from "@/components/FAQ";
-import config from "@/config";
+
 import Link from "next/link";
 import ButtonSignin from "@/components/ButtonSignin";
 import Pricing from "@/components/Pricing";
@@ -188,7 +187,7 @@ export default function LandingPage() {
                 <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
                   See what your audit looks like
                 </h2>
-                <p className="text-slate-600">Here's what your report will include.</p>
+                <p className="text-slate-600">Here&apos;s what your report will include.</p>
               </div>
             </ScrollReveal>
 

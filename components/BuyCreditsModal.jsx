@@ -10,7 +10,7 @@ const PACKAGES = [
 ];
 
 export default function BuyCreditsModal({ isOpen, onClose }) {
-    const { data: session } = useSession();
+    useSession();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 

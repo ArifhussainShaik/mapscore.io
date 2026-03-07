@@ -10,7 +10,7 @@ const PACKAGES = [
 ];
 
 export default function Pricing() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isLifetime, setIsLifetime] = useState(false);
   const [loading, setLoading] = useState(false);
 

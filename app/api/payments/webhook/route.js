@@ -20,7 +20,7 @@ export async function POST(req) {
         let payload;
         try {
             payload = verifyWebhookSignature(rawBody, headersList);
-        } catch (err) {
+        } catch {
             return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
         }
 
