@@ -74,13 +74,12 @@ export async function POST(req) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        const { canRunAudit, deductCredit } = await import("@/libs/credits");
-        if (!canRunAudit(user)) {
-            return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-        }
-
-        // Deduct 1 credit immediately before processing
-        await deductCredit(user);
+        // ⚠️ TEMPORARY: Paywall disabled for testing — RE-ENABLE BEFORE GOING LIVE
+        // const { canRunAudit, deductCredit } = await import("@/libs/credits");
+        // if (!canRunAudit(user)) {
+        //     return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+        // }
+        // await deductCredit(user);
 
         // 2. Create pending audit in MongoDB
         const pendingAudit = await Audit.create({
