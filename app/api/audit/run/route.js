@@ -12,6 +12,7 @@ import { checkRateLimit } from "@/libs/rate-limit";
 import { fetchAuditData, fetchCompetitors } from "@/libs/data-provider";
 import { calculateScore } from "@/libs/scoring";
 import { detectIssues, generateActionPlan } from "@/libs/issues";
+import { calculateStanding } from "@/libs/neighborhood";
 import { IS_TESTING_MODE } from "@/libs/config";
 
 // ✅ SECURITY: Input validation schema
@@ -174,17 +175,19 @@ async function runAuditSync(auditId, placeId, businessName, city) {
         const competitorCity = city || extractCity(rawData.businessAddress);
         const competitorPromise = (rawData.primaryCategory && competitorCity)
             ? fetchCompetitors(rawData.primaryCategory, competitorCity, rawData.businessName)
-            : Promise.resolve([]);
+            : Promise.resolve({ competitors: [], searchQueries: [] });
 
         // Run scoring concurrently with competitor fetch
         const scoringPromise = calculateScore(rawData);
 
-        const [competitors, scoringResult] = await Promise.all([
+        const [competitorResult, scoringResult] = await Promise.all([
             competitorPromise,
             scoringPromise,
         ]);
 
-        rawData.competitors = competitors;
+        // Destructure the new competitor format
+        const { competitors: fetchedCompetitors, searchQueries } = competitorResult;
+        rawData.competitors = fetchedCompetitors;
 
         const { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData } = scoringResult;
 
@@ -244,6 +247,18 @@ async function runAuditSync(auditId, placeId, businessName, city) {
             }
         }
         auditUpdate.suggestedCategories = [...suggestions].slice(0, 5);
+
+        // Calculate neighborhood standings
+        if (rawData.competitors?.length > 0) {
+            const standingsResult = calculateStanding(rawData, rawData.competitors);
+            auditUpdate.neighborhoodStandings = {
+                standing: standingsResult.standing,
+                totalCompared: standingsResult.totalCompared,
+                searchQueries: searchQueries || [],
+                competitors: rawData.competitors,
+            };
+            console.log(`[AuditRun] Neighborhood standing: ${standingsResult.standing}/${standingsResult.totalCompared}`);
+        }
 
         delete auditUpdate._source;
         delete auditUpdate._serperCid;

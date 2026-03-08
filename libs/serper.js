@@ -166,45 +166,109 @@ export async function getBusinessDetails(businessName, city, placeId) {
 }
 
 // ─────────────────────────────────────────────
-// 3. Get competitors
+// 3. Get competitors via Map Pack search rankings
 // ─────────────────────────────────────────────
 
 /**
- * Find top competitors for a business based on its category and location.
+ * Find top competitors from actual Google Map Pack search results.
+ * Uses the /search endpoint which returns the real map pack,
+ * NOT the /maps endpoint which returns proximity-based results.
  *
- * @param {string} category - Business category (e.g., "Plumber")
+ * @param {string} category - Business primary category (e.g., "Auto repair shop")
  * @param {string} city - City/location
  * @param {string} [excludeName] - Business name to exclude from results
- * @returns {Promise<Array>} Array of competitor objects
+ * @returns {Promise<{ competitors: Array, searchQueries: string[] }>}
  */
 export async function getCompetitors(category, city, excludeName = "") {
-    const query = `${category} in ${city}`;
+    // Build multiple search queries to find real map pack competitors
+    const searchQueries = [
+        `${category} ${city}`,
+        `${category} near me ${city}`,
+        `best ${category} ${city}`,
+    ];
 
-    const data = await serperFetch("/maps", {
-        q: query,
-        num: 10,
-    });
+    console.log(`[Serper] Searching map pack with ${searchQueries.length} queries for "${category}" in "${city}"`);
 
-    const places = data.places || [];
+    const allPlaces = [];
 
-    // Filter out the target business and take top 3
-    const competitors = places
-        .filter((p) => {
-            const name = (p.title || "").toLowerCase();
-            const exclude = excludeName.toLowerCase();
-            return !name.includes(exclude) && !exclude.includes(name);
+    for (const query of searchQueries) {
+        try {
+            const data = await serperFetch("/search", {
+                q: query,
+                num: 5,
+            });
+
+            // The /search endpoint returns a "places" array = the map pack
+            const places = data.places || [];
+
+            console.log(`[Serper] Query "${query}" returned ${places.length} map pack results`);
+
+            for (const place of places.slice(0, 5)) {
+                allPlaces.push({
+                    name: place.title || "",
+                    category: place.type || place.category || category,
+                    reviewCount: place.ratingCount || 0,
+                    rating: place.rating || 0,
+                    address: place.address || "",
+                    cid: place.cid || "",
+                    position: place.position || 0,
+                    query,
+                });
+            }
+        } catch (error) {
+            console.warn(`[Serper] Query "${query}" failed:`, error.message);
+        }
+    }
+
+    // Deduplicate by name (case insensitive) and count appearances
+    const competitorMap = new Map();
+    for (const place of allPlaces) {
+        const key = place.name.toLowerCase().trim();
+        if (!key) continue;
+
+        // Skip the user's business
+        const exclude = excludeName.toLowerCase().trim();
+        if (exclude && (key.includes(exclude) || exclude.includes(key))) continue;
+
+        if (competitorMap.has(key)) {
+            const existing = competitorMap.get(key);
+            existing.appearanceCount++;
+            // Keep the better data (more reviews, etc.)
+            if (place.reviewCount > existing.reviewCount) {
+                existing.reviewCount = place.reviewCount;
+            }
+            if (place.rating > existing.rating) {
+                existing.rating = place.rating;
+            }
+        } else {
+            competitorMap.set(key, {
+                name: place.name,
+                category: place.category,
+                reviewCount: place.reviewCount,
+                rating: place.rating,
+                address: place.address,
+                cid: place.cid,
+                photoCount: 20,  // Estimate — Serper doesn't return this
+                postActivity: "unknown",
+                appearanceCount: 1,
+            });
+        }
+    }
+
+    // Sort by appearance count (most frequent = highest ranking), then by reviews
+    const topCompetitors = [...competitorMap.values()]
+        .sort((a, b) => {
+            if (b.appearanceCount !== a.appearanceCount) return b.appearanceCount - a.appearanceCount;
+            return b.reviewCount - a.reviewCount;
         })
-        .slice(0, 3)
-        .map((p) => ({
-            name: p.title || "",
-            category: p.type || p.category || category,
-            reviewCount: p.ratingCount || 0,
-            rating: p.rating || 0,
-            photoCount: p.thumbnailUrl ? 20 : 0,  // Estimate
-            postActivity: "unknown",
-        }));
+        .slice(0, 3);
 
-    return competitors;
+    console.log(`[Serper] Found ${topCompetitors.length} unique competitors from ${allPlaces.length} total results`);
+
+    return {
+        competitors: topCompetitors,
+        searchQueries,
+    };
 }
 
 // ─────────────────────────────────────────────

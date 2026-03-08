@@ -105,11 +105,11 @@
       "what_we_found": "Your profile has no secondary categories. You can add up to 9 secondary categories to expand your search visibility.",
       "why_it_matters": "Joy Hawkins confirmed that more relevant categories help rankings, they do not dilute them. Each secondary category allows your business to appear in additional search queries. Most optimized profiles use 3-5 secondary categories.",
       "how_to_fix": [
-        "Go to Edit Profile in your GBP dashboard",
-        "Navigate to the category section",
-        "Add 3-5 secondary categories relevant to your services",
-        "Use GMB Everywhere or PlePer to see what categories competitors use",
-        "Only add categories for services you genuinely offer"
+        "YOUR CURRENT CATEGORY: {primary_category} (primary only, no secondary categories)",
+        "COMPETITOR CATEGORIES: {competitor_category_list}",
+        "SUGGESTED CATEGORIES TO ADD: {suggested_categories_list}",
+        "Go to Edit Profile → Category section in your GBP dashboard",
+        "Add 3-5 categories from above that match services you actually offer"
       ],
       "time_to_fix": "15 minutes",
       "expected_impact": "Medium-High",
@@ -124,8 +124,10 @@
       "what_we_found": "Your profile has only {secondary_categories_count} secondary categories. You can add up to 9.",
       "why_it_matters": "Additional relevant categories expand the search queries where your business appears. Your competitors may have more categories, giving them visibility for searches you're missing.",
       "how_to_fix": [
-        "Research what additional categories your competitors use",
-        "Add any relevant categories you're missing",
+        "YOUR CATEGORIES: {user_category_summary}",
+        "COMPETITOR CATEGORIES: {competitor_category_list}",
+        "SUGGESTED CATEGORIES TO ADD: {suggested_categories_list}",
+        "Go to Edit Profile → Category section and add relevant categories from above",
         "Target 3-5 total secondary categories"
       ],
       "time_to_fix": "10 minutes",
@@ -141,10 +143,10 @@
       "what_we_found": "Your primary category '{primary_category}' differs from what your top competitors use. Most competitors in your area use '{competitor_common_category}'.",
       "why_it_matters": "Whitespark 2026: Primary category is the #1 controllable local pack ranking factor. 84% of top-3 ranking businesses had categories closely matching competitors (BrightLocal). A single category change caused a documented drop from #1 to #31 (Joy Hawkins).",
       "how_to_fix": [
-        "Research competitor categories using GMB Everywhere or PlePer",
-        "Record your current rankings as a baseline",
-        "Test switching to the competitor-matching category",
-        "Monitor rankings for 60-90 days",
+        "Your top competitors use these primary categories: {competitor_category_list}",
+        "Consider testing '{competitor_common_category}' as your primary category if it matches your services",
+        "Record your current rankings as a baseline before switching",
+        "Monitor rankings for 60-90 days after any change",
         "If rankings improve, keep the new category",
         "If rankings drop, switch back immediately"
       ],

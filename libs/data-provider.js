@@ -7,6 +7,7 @@ import { getPlaceDetails, isGooglePlacesConfigured } from "@/libs/google-places"
 import { getFullBusinessData, isOutscraperConfigured } from "@/libs/outscraper";
 import { getCompetitors, isSerperConfigured } from "@/libs/serper";
 import { checkWebsite } from "@/libs/pagespeed";
+import { extractSchemaMarkup } from "@/libs/schema-extractor";
 
 /**
  * Fetch complete audit data for a business using the restored legacy pipeline.
@@ -47,6 +48,10 @@ export async function fetchAuditData(businessName, city, placeId) {
                 // Merge Outscraper data carefully over Base Places data
                 auditData = {
                     ...auditData,
+                    // ISSUE-1 FIX: Prefer Outscraper's real GBP category name over Google Places machine types
+                    primaryCategory: deepData.primaryCategory || auditData.primaryCategory,
+                    secondaryCategories: deepData.secondaryCategories?.length > 0 ? deepData.secondaryCategories : auditData.secondaryCategories,
+
                     hours: Object.keys(deepData.hours || {}).length > 0 ? deepData.hours : auditData.hours,
                     services: deepData.services?.length ? deepData.services : auditData.services,
                     attributes: Object.keys(deepData.attributes || {}).length ? deepData.attributes : auditData.attributes,
@@ -99,6 +104,32 @@ export async function fetchAuditData(businessName, city, placeId) {
             }
         }
 
+        // ── 4. Website Schema NAP Extraction ──
+        if (auditData.websiteUrl) {
+            try {
+                console.log(`[DataProvider] Extracting schema markup from "${auditData.websiteUrl}"`);
+                const schemaData = await extractSchemaMarkup(auditData.websiteUrl);
+
+                if (schemaData) {
+                    auditData.websiteNAP = {
+                        name: schemaData.name || null,
+                        phone: schemaData.telephone || null,
+                        address: typeof schemaData.address === 'string'
+                            ? schemaData.address
+                            : schemaData.address || null,
+                    };
+                    source += "+schema";
+                    console.log(`[DataProvider] Schema NAP extracted: ${JSON.stringify(auditData.websiteNAP)}`);
+                } else {
+                    auditData.websiteNAP = null;
+                    console.log("[DataProvider] No schema markup found on website");
+                }
+            } catch (error) {
+                console.warn("[DataProvider] Schema extraction failed:", error.message);
+                auditData.websiteNAP = null;
+            }
+        }
+
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         console.log(`[DataProvider] ✅ All data fetched in ${elapsed}s`);
 
@@ -111,24 +142,24 @@ export async function fetchAuditData(businessName, city, placeId) {
 }
 
 /**
- * Fetch competitor businesses.
- * Delegates to Serper (the best source for competitor search).
+ * Fetch competitor businesses via Map Pack search rankings.
+ * Returns competitors and the search queries used.
  *
  * @param {string} category
  * @param {string} city
  * @param {string} [excludeName]
- * @returns {Promise<Array>}
+ * @returns {Promise<{ competitors: Array, searchQueries: string[] }>}
  */
 export async function fetchCompetitors(category, city, excludeName = "") {
     if (!isSerperConfigured()) {
         console.warn("[DataProvider] Serper not configured — no competitor data");
-        return [];
+        return { competitors: [], searchQueries: [] };
     }
 
     try {
         return await getCompetitors(category, city, excludeName);
     } catch (error) {
         console.error("[DataProvider] Competitor fetch failed:", error.message);
-        return [];
+        return { competitors: [], searchQueries: [] };
     }
 }

@@ -42,6 +42,16 @@ function interpolate(text, data) {
     const replacements = {
         "{primary_category}": data.primaryCategory || "Not Set",
         "{competitor_common_category}": competitorCommonCategory,
+        "{competitor_category_list}": (data.competitors || [])
+            .map(c => `${c.name} (${c.category || "Unknown"})`)
+            .join(", ") || "No competitor data available",
+        "{user_category_summary}": [
+            `✓ ${data.primaryCategory || "Not Set"} (primary)`,
+            ...(data.secondaryCategories || []).map(c => `✓ ${c} (secondary)`)
+        ].join(", "),
+        "{suggested_categories_list}": (data.suggestedCategories || []).length > 0
+            ? data.suggestedCategories.join(", ")
+            : "Run a full audit with competitor data to see suggestions",
         "{services_count}": data.services?.length || 0,
         "{description_length}": data.description?.length || 0,
         "{secondary_categories_count}": data.secondaryCategories?.length || 0,
@@ -91,7 +101,7 @@ export function detectIssues(auditData) {
                 severity: issue.severity,
                 description: interpolate(issue.what_we_found, auditData),
                 whyItMatters: interpolate(issue.why_it_matters, auditData),
-                howToFix: issue.how_to_fix,
+                howToFix: issue.how_to_fix.map(step => interpolate(step, auditData)),
                 timeToFix: issue.time_to_fix,
                 expectedImpact: issue.expected_impact,
                 timeToResults: issue.time_to_results,

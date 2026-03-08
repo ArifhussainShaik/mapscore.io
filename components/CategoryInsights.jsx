@@ -43,8 +43,8 @@ export default function CategoryInsights({ audit }) {
                     <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Primary Category</span>
                     {primaryMatchPct !== null && (
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${primaryMatchPct >= 66 ? "bg-green-50 text-green-600" :
-                                primaryMatchPct >= 33 ? "bg-amber-50 text-amber-600" :
-                                    "bg-red-50 text-red-600"
+                            primaryMatchPct >= 33 ? "bg-amber-50 text-amber-600" :
+                                "bg-red-50 text-red-600"
                             }`}>
                             {primaryMatchPct >= 66 ? "✓ Matches competitors" :
                                 primaryMatchPct >= 33 ? "⚠ Partial match" :
@@ -81,34 +81,94 @@ export default function CategoryInsights({ audit }) {
                 )}
             </div>
 
-            {/* Competitor Categories Comparison */}
-            {competitors.length > 0 && (
-                <div className="mb-6">
-                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-3">
-                        Competitor Categories
-                    </span>
-                    <div className="space-y-2">
-                        {competitors.map((comp, i) => (
-                            <div key={i} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-2.5">
-                                <span className="text-sm font-semibold text-slate-700 truncate max-w-[55%]">{comp.name}</span>
-                                <span className={`text-sm font-medium px-2.5 py-0.5 rounded-full ${comp.category?.toLowerCase() === primary.toLowerCase()
-                                        ? "bg-green-50 text-green-600"
-                                        : "bg-slate-100 text-slate-600"
-                                    }`}>
-                                    {comp.category || "Unknown"}
-                                    {comp.category?.toLowerCase() === primary.toLowerCase() && " ✓"}
-                                </span>
-                            </div>
-                        ))}
+            {/* Category Gap Analysis Table */}
+            {competitors.length > 0 && (() => {
+                // Build unified category list
+                const allCategories = new Map();
+
+                // Add user categories
+                allCategories.set(primary.toLowerCase(), { displayName: primary, isUser: true, competitors: [] });
+                secondaries.forEach(c => {
+                    allCategories.set(c.toLowerCase(), { displayName: c, isUser: true, competitors: [] });
+                });
+
+                // Add competitor categories
+                competitors.forEach((comp) => {
+                    if (comp.category) {
+                        const key = comp.category.toLowerCase();
+                        if (!allCategories.has(key)) {
+                            allCategories.set(key, { displayName: comp.category, isUser: false, competitors: [] });
+                        }
+                        allCategories.get(key).competitors.push(comp.name);
+                    }
+                });
+
+                const sortedCategories = [...allCategories.entries()].sort((a, b) => {
+                    // User categories first, then by competitor count
+                    if (a[1].isUser && !b[1].isUser) return -1;
+                    if (!a[1].isUser && b[1].isUser) return 1;
+                    return b[1].competitors.length - a[1].competitors.length;
+                });
+
+                const compAvgCategories = competitors.length > 0
+                    ? (competitors.reduce((s, c) => s + (c.category ? 1 : 0), 0) / competitors.length).toFixed(1)
+                    : 0;
+
+                return (
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                Category Gap Analysis
+                            </span>
+                            <span className="text-xs text-slate-500">
+                                You: {1 + secondaries.length} | Competitor avg: {compAvgCategories}
+                            </span>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm border-collapse">
+                                <thead>
+                                    <tr className="border-b border-slate-200">
+                                        <th className="text-left py-2 pr-3 text-xs font-bold text-slate-500 uppercase">Category</th>
+                                        <th className="text-center py-2 px-2 text-xs font-bold text-slate-500 uppercase">You</th>
+                                        {competitors.map((comp, i) => (
+                                            <th key={i} className="text-center py-2 px-2 text-xs font-bold text-slate-500 uppercase truncate max-w-[100px]" title={comp.name}>
+                                                {comp.name.length > 12 ? comp.name.slice(0, 12) + '…' : comp.name}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sortedCategories.map(([, catData], idx) => (
+                                        <tr key={idx} className={`border-b border-slate-100 ${!catData.isUser ? 'bg-red-50/30' : ''}`}>
+                                            <td className="py-2 pr-3 font-medium text-slate-700">{catData.displayName}</td>
+                                            <td className="text-center py-2 px-2">
+                                                {catData.isUser
+                                                    ? <span className="text-green-600 font-bold">✓</span>
+                                                    : <span className="text-red-400 font-bold">✗</span>
+                                                }
+                                            </td>
+                                            {competitors.map((comp, ci) => (
+                                                <td key={ci} className="text-center py-2 px-2">
+                                                    {catData.competitors.includes(comp.name)
+                                                        ? <span className="text-green-600">✓</span>
+                                                        : <span className="text-slate-300">—</span>
+                                                    }
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* Suggested Categories */}
             {suggested.length > 0 && (
                 <div className="bg-blue-50/60 rounded-2xl p-4 border border-blue-100">
                     <span className="text-xs font-bold uppercase tracking-widest text-blue-600 block mb-3">
-                        💡 Suggested Categories from Competitors
+                        💡 Recommended Categories to Add
                     </span>
                     <div className="flex flex-wrap gap-2">
                         {suggested.map((cat, i) => (
@@ -118,7 +178,7 @@ export default function CategoryInsights({ audit }) {
                         ))}
                     </div>
                     <p className="text-xs text-blue-500 mt-3">
-                        These categories are used by competitors but not on your profile. Adding relevant ones can expand your search visibility.
+                        These categories are used by competitors but not on your profile. Add them if they match services you offer.
                     </p>
                 </div>
             )}
