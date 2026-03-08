@@ -7,55 +7,69 @@ import connectMongo from "@/libs/mongoose";
 
 // Use App Router dynamic route convention
 export async function POST(req, { params }) {
+    console.log('[UNLOCK] === Starting unlock process ===');
+
     try {
-        await connectMongo();
-
+        // 1. Session check
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        console.log('[UNLOCK] Session:', session?.user?.email);
+        if (!session) {
+            return Response.json({ error: 'Not authenticated' }, { status: 401 });
         }
 
-        const auditId = params.id;
+        // 2. Get user
+        await connectMongo();
+        const User = (await import("@/models/User")).default;
+        const user = await User.findOne({ email: session.user.email });
+        console.log('[UNLOCK] User found:', user?._id);
+        if (!user) {
+            return Response.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // 3. Get audit
+        const { id } = await params;
+        const auditId = id;
+        console.log('[UNLOCK] Audit ID:', auditId);
         const audit = await Audit.findById(auditId);
-
+        console.log('[UNLOCK] Audit found:', audit?._id);
         if (!audit) {
-            return NextResponse.json({ error: "Audit not found" }, { status: 404 });
+            return Response.json({ error: 'Audit not found' }, { status: 404 });
         }
 
-        // DOUBLE-UNLOCK GUARD: If already unlocked, return success immediately without deducting credit.
+        // 4. Check if already unlocked
         if (audit.isUnlocked) {
-            return NextResponse.json({ success: true, message: "Report is already unlocked." });
+            console.log('[UNLOCK] Already unlocked');
+            return Response.json({ success: true, alreadyUnlocked: true });
         }
 
-        // Check if user has enough credits
-        const availableCredits = await getAvailableCredits(session.user.id);
-
+        // 5. Check credits
+        const availableCredits = await getAvailableCredits(user._id);
+        console.log('[UNLOCK] Available credits:', availableCredits);
         if (availableCredits < 1) {
-            return NextResponse.json({
-                error: "Insufficient credits",
-                code: "NO_CREDITS"
-            }, { status: 403 });
+            return Response.json({ error: 'Insufficient credits' }, { status: 400 });
         }
 
-        // Use atomic MongoDB $inc to deduct a credit safely
-        const deductSuccess = await consumeCredit(session.user.id);
-
-        if (!deductSuccess) {
-            return NextResponse.json({
-                error: "Failed to deduct credit, please try again."
-            }, { status: 500 });
+        // 6. Consume credit
+        console.log('[UNLOCK] Attempting to consume credit...');
+        const creditResult = await consumeCredit(user._id, 1, auditId);
+        console.log('[UNLOCK] Credit consumption result:', creditResult);
+        if (!creditResult.success) {
+            return Response.json({ error: creditResult.error || 'Credit deduction failed' }, { status: 400 });
         }
 
-        // Officially unlock the audit
+        // 7. Mark audit as unlocked
+        console.log('[UNLOCK] Marking audit as unlocked...');
         audit.isUnlocked = true;
         audit.unlockedAt = new Date();
-        audit.unlockedBy = session.user.id;
+        audit.unlockedBy = user._id;
         await audit.save();
+        console.log('[UNLOCK] Audit saved successfully');
 
-        return NextResponse.json({ success: true, message: "Report successfully unlocked!" });
+        return Response.json({ success: true, creditsRemaining: creditResult.creditsRemaining });
 
     } catch (error) {
-        console.error("Unlock error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error('[UNLOCK] ERROR:', error.message);
+        console.error('[UNLOCK] Stack:', error.stack);
+        return Response.json({ error: error.message }, { status: 500 });
     }
 }

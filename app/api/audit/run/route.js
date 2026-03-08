@@ -86,9 +86,9 @@ export async function POST(req) {
             if (availableCredits < 1) {
                 return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
             }
-            const deductSuccess = await consumeCredit(user._id.toString());
-            if (!deductSuccess) {
-                return NextResponse.json({ error: "Failed to deduct credit, please try again." }, { status: 500 });
+            const deductResult = await consumeCredit(user._id.toString());
+            if (!deductResult.success) {
+                return NextResponse.json({ error: deductResult.error || "Failed to deduct credit, please try again." }, { status: 500 });
             }
         }
 

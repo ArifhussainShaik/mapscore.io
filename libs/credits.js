@@ -43,41 +43,52 @@ export async function getAvailableCredits(userId) {
  * @param {string} userId
  * @returns {Promise<boolean>} True if successful, false if insufficient credits or error.
  */
-export async function consumeCredit(userId) {
-    await connectMongo();
-    const user = await User.findById(userId);
-    if (!user) return false;
+export async function consumeCredit(userId, amount = 1, auditId = null) {
+    console.log('[CREDITS] consumeCredit called:', { userId, amount, auditId });
 
-    // 1. Find the oldest valid batch (FIFO)
-    const validBatches = getValidCreditHistory(user)
-        .sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return { success: false, error: 'User not found' };
+        }
 
-    if (validBatches.length === 0) {
-        return false; // No valid credits
-    }
+        // Check available credits
+        const available = await getAvailableCredits(userId);
+        console.log('[CREDITS] Available before deduction:', available);
+        if (available < amount) {
+            return { success: false, error: 'Insufficient credits' };
+        }
 
-    const batchToUseId = validBatches[0]._id;
+        // FIFO: Find oldest non-expired credit with remaining balance
+        const now = new Date();
+        let remaining = amount;
 
-    // 2. ATOMIC UPDATE: Decrement top-level credits, increment used, and decrement the specific batch
-    // Using FindOneAndUpdate ensures two rapid clicks don't deduct the same credit instance.
-    const result = await User.findOneAndUpdate(
-        {
-            _id: userId,
-            "creditHistory._id": batchToUseId,
-            "creditHistory.creditsRemaining": { $gt: 0 }, // Safety guard
-            credits: { $gt: 0 } // Safety guard
-        },
-        {
-            $inc: {
-                credits: -1,
-                creditsUsed: 1,
-                "creditHistory.$.creditsRemaining": -1
+        for (let credit of user.creditHistory) {
+            if (remaining <= 0) break;
+            if (credit.expiryDate > now && credit.creditsRemaining > 0) {
+                const deduct = Math.min(credit.creditsRemaining, remaining);
+                credit.creditsRemaining -= deduct;
+                remaining -= deduct;
+                console.log('[CREDITS] Deducted', deduct, 'from credit pack, remaining:', credit.creditsRemaining);
             }
-        },
-        { new: true } // Return updated doc
-    );
+        }
 
-    return !!result; // Return true if atomic update succeeded
+        // Update user
+        user.creditsUsed = (user.creditsUsed || 0) + amount;
+        user.credits = (user.credits || 0) - amount;
+        await user.save();
+
+        console.log('[CREDITS] User saved, new balance:', user.credits);
+
+        return {
+            success: true,
+            creditsRemaining: user.credits
+        };
+
+    } catch (error) {
+        console.error('[CREDITS] Error in consumeCredit:', error.message);
+        return { success: false, error: error.message };
+    }
 }
 
 /**
