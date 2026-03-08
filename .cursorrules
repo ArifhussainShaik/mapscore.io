@@ -18,3 +18,6 @@ You are strictly forbidden from reading or referencing any files located in the 
 
 ## 4. The Memory Commit Protocol
 If we encounter a complex bug and successfully resolve it together, you must ask me if you should append the technical solution to `.ai-context/master-architecture.md` so that you do not make the same mistake in future sessions.
+## 5. The Strict Approval Gate (NO AUTO-CODING)
+You are strictly forbidden from writing, modifying, creating, or deleting any codebase files until I explicitly reply with the exact word: "APPROVED". 
+When I ask for an implementation plan, an audit, or a strategy, you must output it strictly as standard chat text. You must completely disable your file-modification tools until the "APPROVED" command is given. Violating this rule risks destabilizing the production environment.

@@ -1,173 +1,121 @@
 "use client";
 
-/**
- * RevenueImpact — Estimated monthly impact calculator.
- * Uses industry benchmarks (BrightLocal, Google) to estimate
- * how many potential customers the business is losing due to their score.
- *
- * This is the key conversion-driving section — quantifies the cost of inaction.
- */
-
-// Industry benchmarks (BrightLocal 2025 Local Consumer Review Survey + Google data)
-const BENCHMARKS = {
-    avgMonthlyViews: 1260, // Avg GBP views per month (BrightLocal)
-    topProfileConversion: 0.05, // Top profiles convert at ~5%
-    ratingImpactFactor: 0.12, // 12% more reviews per 0.1 star increase
-};
-
-// Market-specific average customer values
-const MARKET_VALUES = {
-    // US/Default market
-    default: { avgValuePerCustomer: 150, currency: "$", symbol: "$" },
-    // Indian market (₹2500 ≈ $30 USD)
-    india: { avgValuePerCustomer: 2500, currency: "INR", symbol: "₹" },
-};
-
-// Detect market based on business address
-function detectMarket(audit) {
-    const address = audit.businessAddress || "";
-    if (address.toLowerCase().includes("india") || address.toLowerCase().includes("andhra")) {
-        return "india";
-    }
-    return "default";
-}
-
-function estimateImpact(audit) {
-    const market = detectMarket(audit);
-    const marketConfig = MARKET_VALUES[market] || MARKET_VALUES.default;
-    const score = audit.totalScore || 0;
-    const rating = audit.averageRating || 3.0;
-    const reviewCount = audit.reviewCount || 0;
-
-    // Estimate visibility multiplier based on score
-    // Score 90+ = 1.5x visibility, Score 50 = 0.6x, Score 30 = 0.3x
-    const visibilityMultiplier = Math.min(1.5, Math.max(0.2, score / 65));
-
-    // Estimate monthly views
-    const estimatedViews = Math.round(
-        BENCHMARKS.avgMonthlyViews * visibilityMultiplier
-    );
-
-    // Conversion rate adjusted by rating
-    const ratingBoost = (rating - 3.0) * BENCHMARKS.ratingImpactFactor;
-    const conversionRate = Math.min(
-        0.08,
-        Math.max(0.01, BENCHMARKS.topProfileConversion + ratingBoost)
-    );
-
-    // Review trust multiplier (more reviews = higher conversion)
-    const reviewTrust = Math.min(1.3, 0.5 + reviewCount / 100);
-
-    // Estimated monthly customers
-    const monthlyCustomers = Math.round(
-        estimatedViews * conversionRate * reviewTrust
-    );
-
-    // Potential customers at optimal score (90+)
-    const potentialViews = Math.round(BENCHMARKS.avgMonthlyViews * 1.5);
-    const potentialConversion = Math.min(0.08, BENCHMARKS.topProfileConversion + 0.02);
-    const potentialCustomers = Math.round(
-        potentialViews * potentialConversion * Math.min(1.3, 0.5 + reviewCount / 50)
-    );
-
-    // Lost opportunity
-    const lostCustomers = Math.max(0, potentialCustomers - monthlyCustomers);
-    const lostRevenue = lostCustomers * marketConfig.avgValuePerCustomer;
-
-    return {
-        estimatedViews,
-        monthlyCustomers,
-        potentialCustomers,
-        lostCustomers,
-        lostRevenue,
-        conversionRate: Math.round(conversionRate * 1000) / 10,
-        visibilityMultiplier: Math.round(visibilityMultiplier * 100),
-        currencySymbol: marketConfig.symbol,
-        market,
-    };
-}
-
-function AnimatedNumber({ value, prefix = "", suffix = "" }) {
-    return (
-        <span>
-            {prefix}
-            {value.toLocaleString()}
-            {suffix}
-        </span>
-    );
-}
+import { useState } from "react";
 
 export default function RevenueImpact({ audit }) {
-    if (!audit || !audit.totalScore) return null;
+    const [avgCustomerValue, setAvgCustomerValue] = useState(150);
 
-    const impact = estimateImpact(audit);
+    if (!audit) return null;
+
+    // 1. Calculate Competitor Average Reviews
+    const competitors = audit.competitors || [];
+    let avgCompetitorReviews = 0;
+
+    if (competitors.length > 0) {
+        const totalCompetitorReviews = competitors.reduce((sum, comp) => sum + (comp.reviewCount || 0), 0);
+        avgCompetitorReviews = Math.round(totalCompetitorReviews / competitors.length);
+    }
+
+    const businessReviews = audit.reviewCount || 0;
+
+    // 2. Calculate the Gap (Floor at 0 if business is winning)
+    const reviewGap = Math.max(0, avgCompetitorReviews - businessReviews);
+
+    // 3. Apply the Formula
+    // 5% conversion rate on the missing reviews (assuming each review represents a certain volume of lost customers who chose competitors)
+    const monthlyLostCustomers = Math.round(reviewGap * 0.05);
+    const annualLostCustomers = monthlyLostCustomers * 12;
+    const annualRevenueLoss = annualLostCustomers * avgCustomerValue;
 
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-slate-100 bg-emerald-50 text-emerald-800">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                    <span className="text-emerald-500">💰</span> Estimated Monthly Impact
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col md:flex-row">
+            {/* Left Side: The Hook & Calculation */}
+            <div className="p-6 md:p-8 md:w-1/2 flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/50">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider w-max mb-6">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Revenue Leak
+                </span>
+
+                <h3 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight mb-2 font-serif">
+                    You could be losing <br />
+                    <span className="text-red-500">${annualRevenueLoss.toLocaleString()}</span> <span className="text-2xl text-slate-500 font-sans font-medium">/ year</span>
                 </h3>
-                <p className="text-sm text-emerald-700/70 mt-1 font-medium">
-                    What your current GBP score means for your bottom line
+
+                <p className="text-slate-600 text-base mb-8">
+                    Based on your review gap against the top competitors in your area.
                 </p>
+
+                <div className="space-y-4 text-sm font-medium text-slate-600 bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                    <div className="flex justify-between items-center">
+                        <span>Top Competitor Avg. Reviews</span>
+                        <span className="font-bold text-slate-900">{avgCompetitorReviews}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span>Your Reviews</span>
+                        <span className="font-bold text-slate-900">{businessReviews}</span>
+                    </div>
+                    <div className="w-full h-px bg-slate-100 my-2"></div>
+                    <div className="flex justify-between items-center text-red-600 font-bold">
+                        <span>Review Deficit</span>
+                        <span>-{reviewGap}</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="p-5 md:p-6">
-                {/* Main impact number */}
-                <div className="text-center mb-6 p-5 rounded-2xl bg-red-50 border border-red-100 shadow-inner">
-                    <p className="text-xs text-red-600/70 font-bold uppercase tracking-wider mb-2">
-                        Estimated Monthly Lost Revenue
-                    </p>
-                    <p className="text-4xl md:text-5xl font-black text-red-600 tracking-tight">
-                        <AnimatedNumber value={impact.lostRevenue} prefix={impact.currencySymbol} />
-                    </p>
-                    <p className="text-sm text-red-700/60 mt-2 font-medium">
-                        ~{impact.lostCustomers} potential customers not reaching you
+            {/* Right Side: Interactive Controls */}
+            <div className="p-6 md:p-8 md:w-1/2 flex flex-col justify-center bg-white">
+                <div className="mb-6">
+                    <h4 className="text-lg font-bold text-slate-900 mb-1">Calculate Your Value</h4>
+                    <p className="text-sm text-slate-500">
+                        Adjust the slider below to see how much a single customer is worth to your business annually.
                     </p>
                 </div>
 
-                {/* Metric cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Est. Views</p>
-                        <p className="text-xl font-bold text-slate-900 mt-1">
-                            <AnimatedNumber value={impact.estimatedViews} />
-                        </p>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Current Cust</p>
-                        <p className="text-xl font-bold text-slate-900 mt-1">
-                            <AnimatedNumber value={impact.monthlyCustomers} suffix="/mo" />
-                        </p>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Potential Cust</p>
-                        <p className="text-xl font-bold text-emerald-600 mt-1">
-                            <AnimatedNumber value={impact.potentialCustomers} suffix="/mo" />
-                        </p>
-                    </div>
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Visibility</p>
-                        <p className={`text-xl font-bold mt-1 ${impact.visibilityMultiplier >= 100
-                            ? "text-emerald-600"
-                            : impact.visibilityMultiplier >= 60
-                                ? "text-amber-500"
-                                : "text-red-500"
-                            }`}>
-                            {impact.visibilityMultiplier}%
-                        </p>
-                    </div>
-                </div>
+                <div className="space-y-6">
+                    {/* Input Control */}
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
+                                Avg. Customer Value ($)
+                            </label>
+                            <div className="relative">
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                                <input
+                                    type="number"
+                                    min="10"
+                                    max="5000"
+                                    value={avgCustomerValue}
+                                    onChange={(e) => setAvgCustomerValue(Number(e.target.value) || 0)}
+                                    className="input input-bordered input-md w-28 pl-7 text-lg font-bold text-emerald-700 bg-emerald-50 border-emerald-200 focus:outline-emerald-500"
+                                />
+                            </div>
+                        </div>
 
-                {/* Explanation */}
-                <div className="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-500">
-                    <p className="text-xs leading-relaxed font-medium">
-                        📊 Based on BrightLocal 2025 data: average GBP receives 1,260 monthly views.
-                        Top profiles get 50% more visibility & 5-8% conversion rates.
-                        Estimates use your score ({audit.totalScore}/100), rating ({audit.averageRating?.toFixed(1) || "N/A"}★),
-                        and review count ({audit.reviewCount || 0}).
-                    </p>
+                        {/* Range Slider */}
+                        <input
+                            type="range"
+                            min="10"
+                            max="5000"
+                            value={avgCustomerValue}
+                            onChange={(e) => setAvgCustomerValue(Number(e.target.value))}
+                            className="range range-primary range-sm"
+                            style={{ '--range-shdw': '#10b981' }} // Emerald tailwind override
+                        />
+                        <div className="w-full flex justify-between text-xs px-1 text-slate-400 mt-2 font-medium">
+                            <span>$10</span>
+                            <span>$2,500</span>
+                            <span>$5,000+</span>
+                        </div>
+                    </div>
+
+                    <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mt-6">
+                        <div className="flex gap-3">
+                            <div className="text-blue-500 text-xl font-serif">i</div>
+                            <p className="text-xs text-blue-700/80 leading-relaxed font-medium">
+                                * Methodology: Estimate based on a conservative 5% review-to-customer conversion rate assumption. Local consumers overwhelmingly choose businesses with higher review volumes over competitors lacking social proof.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
