@@ -7,6 +7,39 @@
 
 ---
 
+## [2026-03-08] Testing Mode implementation & Vercel Build Fixes
+
+### Features Added
+- **Testing Mode**: Implemented global `TESTING_MODE=true` toggle to entirely bypass the `PaywallGate`, skip MongoDB lookup caches for audits, and force Next.js native `fetch` bypasses for external API enrichment. 
+
+### Bugs Fixed
+- **Outscraper Data Not Reaching Reports**: Rewrote `data-provider.js` to enforce Google Places + Outscraper merger instead of defaulting to the inactive DataForSEO pipeline.
+- **Posts Showing January 1970**: Fixed Outscraper returning Unix timestamp in seconds by adding multiplication by `1000`.
+- **Score Overflow (13/12 possible)**: Added `sectionTotal = Math.min(sectionTotal, sectionMaxPoints)` max boundary clamp to scoring aggregation.
+- **Products Penalizing Score**: Set `isNA = true` when products is null, excluding them from the denominator since Outscraper doesn't return products.
+- **Vercel Build Failure**: Fixed NextAuth configured with `authOptions` instead of `@/auth`, renamed `useCredit` to `consumeCredit` globally to prevent ESLint hook collisions outside components, and escaped HTML characters in markup.
+
+### Files Changed
+- `libs/data-provider.js` - Rewrote to enforce Outscraper pipeline
+- `libs/outscraper.js` - Fixed timestamp conversion, explicit null for products
+- `libs/scoring.js` - Added max boundary clamp, N/A handling for products
+- `app/api/audit/[id]/unlock/route.js` - Fixed NextAuth import and React Hook ESLint collision
+- `app/pricing/page.js` - Fixed NextAuth import, unused Link, and unescaped HTML entities
+- `components/PaywallGate.jsx` - Fixed unused catch variable
+- `libs/credits.js` - Renamed `useCredit` to `consumeCredit` to fix ESLint hook warning
+- `libs/config.js` - Created to expose `IS_TESTING_MODE`
+- `app/api/audit/run/route.js` - Implemented testing mode cache bypasses
+- `.env.local` - Added `TESTING_MODE=true`
+- `.ai-context/master-architecture.md` - Updated to v1.1
+- `.ai-context/CHANGELOG.md` (Created master history file)
+- `.ai-context/SESSION-LOG.md` (Created active session tracker)
+- `.cursorrules` (Appended the Changelog Protocol rules)
+
+### Technical Decisions
+- Implemented a structured `[YYYY-MM-DD]` historical tracking format.
+- Mandated the AI agent (via `.cursorrules`) to always read the changelog at the start of a session and record fixes.
+
+
 ## [2026-03-08] Credit System + Bug Fixes
 
 ### Features Added
