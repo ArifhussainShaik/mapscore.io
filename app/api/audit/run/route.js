@@ -173,6 +173,7 @@ async function runAuditSync(auditId, placeId, businessName, city) {
         // Step 2: Start competitor fetch AND scoring in parallel
         // Competitor fetch needs primaryCategory from audit data, so it starts here
         const competitorCity = city || extractCity(rawData.businessAddress);
+        console.log('[AUDIT] About to fetch competitors for:', { category: rawData.primaryCategory, city: competitorCity, excludeName: rawData.businessName });
         const competitorPromise = (rawData.primaryCategory && competitorCity)
             ? fetchCompetitors(rawData.primaryCategory, competitorCity, rawData.businessName)
             : Promise.resolve({ competitors: [], searchQueries: [] });
@@ -187,6 +188,10 @@ async function runAuditSync(auditId, placeId, businessName, city) {
 
         // Destructure the new competitor format
         const { competitors: fetchedCompetitors, searchQueries } = competitorResult;
+        console.log('[AUDIT] competitorResult type:', typeof competitorResult, 'keys:', Object.keys(competitorResult));
+        console.log('[AUDIT] Competitors fetched:', fetchedCompetitors?.length);
+        console.log('[AUDIT] Competitor names:', fetchedCompetitors?.map(c => c.name));
+        console.log('[AUDIT] Search queries:', searchQueries);
         rawData.competitors = fetchedCompetitors;
 
         const { totalScore, grade, sectionScores, checkResults, checkpointResults, percentileData } = scoringResult;
@@ -267,6 +272,7 @@ async function runAuditSync(auditId, placeId, businessName, city) {
         delete auditUpdate._descriptionChecked;
 
         // Step 5: Save
+        console.log('[AUDIT] Saving audit with competitors:', auditUpdate.competitors?.length, 'neighborhoodStandings:', !!auditUpdate.neighborhoodStandings);
         const finalAudit = await Audit.findByIdAndUpdate(auditId, auditUpdate, { new: true });
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         console.log(`[Audit API] ✅ Sync audit ${auditId} completed in ${elapsed}s`);
