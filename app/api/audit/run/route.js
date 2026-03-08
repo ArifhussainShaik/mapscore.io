@@ -122,10 +122,16 @@ export async function POST(req) {
             // SYNC FLOW (Local fallback when REDIS_URL is missing)
             console.warn(`[Audit API] NO REDIS DETECTED. Running sync fallback for ${auditId}...`);
             const completedAudit = await runAuditSync(auditId, placeId, businessName, city);
+            const { getAvailableCredits } = await import("@/libs/credits");
+            const availableCredits = await getAvailableCredits(session.user.id);
+            const auditOutput = completedAudit.toObject ? completedAudit.toObject() : completedAudit;
+            auditOutput.availableCredits = availableCredits;
+            auditOutput.id = auditOutput._id?.toString() || auditId;
+
             return NextResponse.json({
                 auditId,
                 status: "completed",
-                audit: completedAudit
+                audit: auditOutput
             });
         }
 

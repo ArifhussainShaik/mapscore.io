@@ -213,7 +213,12 @@ export default function AuditReport({ audit, isPro = false }) {
                     />
                 ) : (
                     <div className="mt-16">
-                        <PaywallGate title="Unlock Neighborhood Standings">
+                        <PaywallGate
+                            title="Unlock Neighborhood Standings"
+                            auditId={audit.id || audit._id}
+                            availableCredits={audit.availableCredits || 0}
+                            isUnlocked={audit.isUnlocked}
+                        >
                             <CompetitorTable
                                 auditData={audit}
                                 competitors={audit.competitors}
@@ -277,7 +282,12 @@ export default function AuditReport({ audit, isPro = false }) {
                     </>
                 ) : (
                     <div className="mt-16">
-                        <PaywallGate title="Unlock Premium Features">
+                        <PaywallGate
+                            title="Unlock Premium Features"
+                            auditId={audit.id || audit._id}
+                            availableCredits={audit.availableCredits || 0}
+                            isUnlocked={audit.isUnlocked}
+                        >
                             <div className="space-y-16">
                                 {/* Preview of premium features */}
                                 <div>

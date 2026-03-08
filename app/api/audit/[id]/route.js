@@ -44,6 +44,10 @@ export async function GET(req, { params }) {
         audit.id = audit._id.toString();
         delete audit._id;
 
+        const { getAvailableCredits } = await import("@/libs/credits");
+        const availableCredits = await getAvailableCredits(session.user.id);
+        audit.availableCredits = availableCredits;
+
         return NextResponse.json({ audit });
     } catch (error) {
         console.error("[Audit API] Fetch error:", error.message);
