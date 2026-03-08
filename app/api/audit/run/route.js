@@ -172,8 +172,8 @@ async function runAuditSync(auditId, placeId, businessName, city) {
 
         // Step 2: Start competitor fetch AND scoring in parallel
         // Competitor fetch needs primaryCategory from audit data, so it starts here
-        const competitorCity = city || extractCity(rawData.businessAddress);
-        console.log('[AUDIT] About to fetch competitors for:', { category: rawData.primaryCategory, city: competitorCity, excludeName: rawData.businessName });
+        const competitorCity = extractCityState(rawData.businessAddress) || city || extractCityState(city);
+        console.log('[AUDIT] About to fetch competitors for:', { category: rawData.primaryCategory, city: competitorCity, rawAddress: rawData.businessAddress, excludeName: rawData.businessName });
         const competitorPromise = (rawData.primaryCategory && competitorCity)
             ? fetchCompetitors(rawData.primaryCategory, competitorCity, rawData.businessName)
             : Promise.resolve({ competitors: [], searchQueries: [] });
@@ -287,11 +287,39 @@ async function runAuditSync(auditId, placeId, businessName, city) {
     }
 }
 
-function extractCity(address) {
-    if (!address) return "";
-    const parts = address.split(",").map((p) => p.trim());
-    if (parts.length >= 2) {
-        return parts[1].replace(/\d+/g, "").trim();
+/**
+ * Extract city and state from a full address string.
+ * Examples:
+ *   "452 State Highway 121, Coppell, TX, USA" → "Coppell, TX"
+ *   "123 Main St, Dallas, TX 75201, USA" → "Dallas, TX"
+ *   "19232 Beach Blvd, Huntington Beach, CA 92648" → "Huntington Beach, CA"
+ */
+function extractCityState(address) {
+    if (!address) return null;
+
+    const parts = address.split(',').map(p => p.trim());
+
+    // Look for a US state abbreviation (2 capital letters)
+    for (let i = 0; i < parts.length; i++) {
+        const stateMatch = parts[i].match(/\b([A-Z]{2})\b/);
+        if (stateMatch && i > 0) {
+            const state = stateMatch[1];
+            // Walk backwards to find the city (skip street-like parts)
+            for (let j = i - 1; j >= 0; j--) {
+                const candidate = parts[j];
+                // Skip if it looks like a street (has numbers or road suffixes)
+                if (/\d/.test(candidate)) continue;
+                if (/\b(St|Ave|Blvd|Rd|Dr|Ln|Hwy|Highway|Suite|Ste|Apt|Floor|Fl)\b/i.test(candidate)) continue;
+                return `${candidate}, ${state}`;
+            }
+        }
     }
-    return parts[0];
+
+    // Fallback: return parts before "USA"/"US", last 2
+    const filtered = parts.filter(p => p !== 'USA' && p !== 'US');
+    if (filtered.length >= 2) {
+        return filtered.slice(-2).join(', ');
+    }
+
+    return address;
 }
