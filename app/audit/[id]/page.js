@@ -61,6 +61,18 @@ export default function AuditPage() {
         }
     }, [saveAuditData]);
 
+    const fetchLatestCredits = useCallback(async (currentAuditData) => {
+        try {
+            const res = await fetch("/api/user/credits");
+            if (res.ok) {
+                const data = await res.json();
+                setAuditData(prev => prev ? { ...prev, availableCredits: data.availableCredits } : prev);
+            }
+        } catch (err) {
+            console.error("Failed to fetch latest credits:", err);
+        }
+    }, []);
+
     useEffect(() => {
         if (fetchStartedRef.current) return;
         fetchStartedRef.current = true;
@@ -79,6 +91,8 @@ export default function AuditPage() {
                             setAuditData(parsed);
                             setIsDataReady(true);
                             if (isDbLoad) setScanning(false);
+                            // Even if cached, fetch fresh credits silently
+                            fetchLatestCredits();
                             return;
                         }
                     }
