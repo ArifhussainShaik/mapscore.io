@@ -81,11 +81,15 @@ export async function POST(req) {
 
         // ⚠️ ENFORCE PAYWALL ONLY IF NOT IN TESTING MODE
         if (!IS_TESTING_MODE) {
-            const { canRunAudit, deductCredit } = await import("@/libs/credits");
-            if (!canRunAudit(user)) {
+            const { getAvailableCredits, consumeCredit } = await import("@/libs/credits");
+            const availableCredits = await getAvailableCredits(user._id.toString());
+            if (availableCredits < 1) {
                 return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
             }
-            await deductCredit(user);
+            const deductSuccess = await consumeCredit(user._id.toString());
+            if (!deductSuccess) {
+                return NextResponse.json({ error: "Failed to deduct credit, please try again." }, { status: 500 });
+            }
         }
 
         // 2. Create pending audit in MongoDB
