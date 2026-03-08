@@ -35,7 +35,8 @@ export default function PaywallGate({ children, auditId, availableCredits = 0, i
                 }
                 setIsUnlocking(false);
             }
-        } catch (error) {
+        } catch (err) {
+            console.error("PaywallGate unlock error:", err);
             toast.error("An error occurred. Please try again.");
             setIsUnlocking(false);
         }

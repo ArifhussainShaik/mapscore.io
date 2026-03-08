@@ -8,6 +8,10 @@
 - `libs/data-provider.js` - Rewrote to enforce Outscraper pipeline
 - `libs/outscraper.js` - Fixed timestamp conversion, explicit null for products
 - `libs/scoring.js` - Added max boundary clamp, N/A handling for products
+- `app/api/audit/[id]/unlock/route.js` - Fixed NextAuth import and React Hook ESLint collision
+- `app/pricing/page.js` - Fixed NextAuth import, unused Link, and unescaped HTML entities
+- `components/PaywallGate.jsx` - Fixed unused catch variable
+- `libs/credits.js` - Renamed `useCredit` to `consumeCredit` to fix ESLint hook warning
 - `.ai-context/master-architecture.md` - Updated to v1.1
 - `.ai-context/CHANGELOG.md` (Created master history file)
 - `.ai-context/SESSION-LOG.md` (Created active session tracker)
@@ -34,6 +38,11 @@
 - Root cause: Outscraper doesn't return products, but scoring treated null as 0
 - Fix: Set `isNA = true` when products is null, excludes from denominator
 - Files: `libs/outscraper.js`, `libs/scoring.js`
+
+**Vercel Build Failure (NextAuth `@/auth` unresolved, ESLint Errors)**
+- Root cause: NextAuth configured with `authOptions` pattern, not `@/auth`; ESLint caught React Hook collisions (`useCredit`) outside components and unescaped entities (`"`).
+- Fix: Used `getServerSession(authOptions)` across API routes. Renamed `useCredit` to `consumeCredit` globally. Fixed unescaped HTML characters in markup.
+- Files: `app/api/audit/[id]/unlock/route.js`, `app/pricing/page.js`, `components/PaywallGate.jsx`, `libs/credits.js`
 
 ### Decisions Made
 - Implemented a structured `[YYYY-MM-DD]` historical tracking format.

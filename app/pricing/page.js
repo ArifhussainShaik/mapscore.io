@@ -1,6 +1,6 @@
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getAvailableCredits } from "@/libs/credits";
-import Link from "next/link";
 
 export const metadata = {
     title: "Pricing | LocalScore",
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function PricingPage() {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     let currentBalance = 0;
 
     if (session?.user?.id) {
@@ -162,11 +162,11 @@ export default async function PricingPage() {
                     <div className="space-y-6">
                         <div className="bg-white p-6 rounded-2xl border border-slate-100">
                             <h4 className="font-bold text-slate-900 mb-2">Do credits expire?</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">Yes. All purchased credits are valid for exactly one year (365 days) from the date of purchase. We use a "First In, First Out" (FIFO) system, meaning the oldest credits in your account are automatically used first.</p>
+                            <p className="text-slate-600 text-sm leading-relaxed">Yes. All purchased credits are valid for exactly one year (365 days) from the date of purchase. We use a &quot;First In, First Out&quot; (FIFO) system, meaning the oldest credits in your account are automatically used first.</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-slate-100">
-                            <h4 className="font-bold text-slate-900 mb-2">What does "1 Credit" actually unlock?</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">A single credit permanently unlocks a full, 100-point LocalScore audit report. This grants you unlimited access to view that specific business's competitor comparison table, revenue impact calculator, PDF export feature, and priority action plan. Free preview reports cost 0 credits.</p>
+                            <h4 className="font-bold text-slate-900 mb-2">What does &quot;1 Credit&quot; actually unlock?</h4>
+                            <p className="text-slate-600 text-sm leading-relaxed">A single credit permanently unlocks a full, 100-point LocalScore audit report. This grants you unlimited access to view that specific business&apos;s competitor comparison table, revenue impact calculator, PDF export feature, and priority action plan. Free preview reports cost 0 credits.</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl border border-slate-100">
                             <h4 className="font-bold text-slate-900 mb-2">Is this a monthly subscription?</h4>

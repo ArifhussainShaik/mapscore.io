@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Audit from "@/models/Audit";
-import { getAvailableCredits, useCredit } from "@/libs/credits";
+import { getAvailableCredits, consumeCredit } from "@/libs/credits";
 import connectMongo from "@/libs/mongoose";
 
 // Use App Router dynamic route convention
@@ -9,7 +10,7 @@ export async function POST(req, { params }) {
     try {
         await connectMongo();
 
-        const session = await auth();
+        const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
@@ -37,7 +38,7 @@ export async function POST(req, { params }) {
         }
 
         // Use atomic MongoDB $inc to deduct a credit safely
-        const deductSuccess = await useCredit(session.user.id);
+        const deductSuccess = await consumeCredit(session.user.id);
 
         if (!deductSuccess) {
             return NextResponse.json({

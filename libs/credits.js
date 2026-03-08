@@ -38,11 +38,12 @@ export async function getAvailableCredits(userId) {
 }
 
 /**
- * Deducts 1 credit from the user's oldest valid batch.
- * Uses atomic MongoDB operations ($inc) to prevent race conditions during concurrent unlocks.
- * @returns {boolean} true if successful, false if insufficient credits.
+ * Atomically deducts 1 credit from the user's oldest valid batch.
+ *
+ * @param {string} userId
+ * @returns {Promise<boolean>} True if successful, false if insufficient credits or error.
  */
-export async function useCredit(userId) {
+export async function consumeCredit(userId) {
     await connectMongo();
     const user = await User.findById(userId);
     if (!user) return false;
