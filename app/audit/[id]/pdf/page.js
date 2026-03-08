@@ -85,6 +85,11 @@ export default function AuditPDFView() {
         window.print();
     };
 
+    const cleanText = (text) => {
+        if (!text) return "";
+        return text.replace(/☐|\[\s?\]/g, "").trim();
+    };
+
     return (
         <>
             {/* Print button — hidden in print */}
@@ -191,11 +196,12 @@ export default function AuditPDFView() {
                                     <span className="pdf-issue-severity" data-severity={issue.severity}>
                                         {SEVERITY_ICONS[issue.severity]} {issue.severity?.toUpperCase()}
                                     </span>
-                                    <span className="pdf-issue-section">{issue.section}</span>
-                                    <span className="pdf-issue-time">⏱ {issue.timeToFix}</span>
+                                    <span className="pdf-issue-time">
+                                        <span className="pdf-time-badge">⏱ {issue.timeToFix}</span>
+                                    </span>
                                 </div>
                                 <h3 className="pdf-issue-name">{issue.name}</h3>
-                                <p className="pdf-issue-desc">{issue.description}</p>
+                                <p className="pdf-issue-desc">{cleanText(issue.description)}</p>
                                 {issue.howToFix && issue.howToFix.length > 0 && (
                                     <div className="pdf-how-to-fix">
                                         <strong>How to fix:</strong>

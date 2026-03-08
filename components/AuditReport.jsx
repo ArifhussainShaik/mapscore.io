@@ -89,16 +89,19 @@ export default function AuditReport({ audit, isPro = false }) {
                     </p>
                 </div>
 
-                {/* Top Section: Health vs Fixes */}
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 mb-6">
-                    {/* LEFT COLUMN: Overall Health */}
-                    <div className="flex flex-col gap-6">
-                        <ScoreDashboard
-                            totalScore={audit.totalScore}
-                            grade={audit.grade}
-                            sectionScores={audit.sectionScores}
-                        />
+                {/* Top Health Dashboard (Full Width) */}
+                <div className="mb-6">
+                    <ScoreDashboard
+                        totalScore={audit.totalScore}
+                        grade={audit.grade}
+                        sectionScores={audit.sectionScores}
+                    />
+                </div>
 
+                {/* Main Content Grid: Side Data vs Fixes */}
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 mb-6">
+                    {/* LEFT COLUMN: Quick Stats & Impact */}
+                    <div className="flex flex-col gap-6">
                         {/* Competitor Quick Stats - Real Data */}
                         {audit.competitors && audit.competitors.length > 0 && (
                             <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hidden lg:block">

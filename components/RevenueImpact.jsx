@@ -103,57 +103,57 @@ export default function RevenueImpact({ audit }) {
     const impact = estimateImpact(audit);
 
     return (
-        <div className="glass-card overflow-hidden border-amber-500/20">
-            <div className="p-5 border-b border-base-content/10 bg-gradient-to-r from-amber-500/5 to-transparent">
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-100 bg-emerald-50 text-emerald-800">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                    💰 Estimated Monthly Impact
+                    <span className="text-emerald-500">💰</span> Estimated Monthly Impact
                 </h3>
-                <p className="text-sm text-base-content/50 mt-1">
+                <p className="text-sm text-emerald-700/70 mt-1 font-medium">
                     What your current GBP score means for your bottom line
                 </p>
             </div>
 
-            <div className="p-5">
+            <div className="p-5 md:p-6">
                 {/* Main impact number */}
-                <div className="text-center mb-6 p-5 rounded-xl bg-gradient-to-b from-red-500/10 to-transparent border border-red-500/10">
-                    <p className="text-xs text-base-content/50 uppercase tracking-wider mb-2">
+                <div className="text-center mb-6 p-5 rounded-2xl bg-red-50 border border-red-100 shadow-inner">
+                    <p className="text-xs text-red-600/70 font-bold uppercase tracking-wider mb-2">
                         Estimated Monthly Lost Revenue
                     </p>
-                    <p className="text-4xl md:text-5xl font-black text-red-400">
+                    <p className="text-4xl md:text-5xl font-black text-red-600 tracking-tight">
                         <AnimatedNumber value={impact.lostRevenue} prefix={impact.currencySymbol} />
                     </p>
-                    <p className="text-sm text-base-content/50 mt-2">
+                    <p className="text-sm text-red-700/60 mt-2 font-medium">
                         ~{impact.lostCustomers} potential customers not reaching you
                     </p>
                 </div>
 
                 {/* Metric cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div className="p-3 rounded-lg bg-base-content/5 text-center">
-                        <p className="text-xs text-base-content/50">Est. Monthly Views</p>
-                        <p className="text-lg font-bold text-white mt-1">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Est. Views</p>
+                        <p className="text-xl font-bold text-slate-900 mt-1">
                             <AnimatedNumber value={impact.estimatedViews} />
                         </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-base-content/5 text-center">
-                        <p className="text-xs text-base-content/50">Current Customers</p>
-                        <p className="text-lg font-bold text-amber-400 mt-1">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Current Cust</p>
+                        <p className="text-xl font-bold text-slate-900 mt-1">
                             <AnimatedNumber value={impact.monthlyCustomers} suffix="/mo" />
                         </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-base-content/5 text-center">
-                        <p className="text-xs text-base-content/50">Potential Customers</p>
-                        <p className="text-lg font-bold text-emerald-400 mt-1">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Potential Cust</p>
+                        <p className="text-xl font-bold text-emerald-600 mt-1">
                             <AnimatedNumber value={impact.potentialCustomers} suffix="/mo" />
                         </p>
                     </div>
-                    <div className="p-3 rounded-lg bg-base-content/5 text-center">
-                        <p className="text-xs text-base-content/50">Visibility Level</p>
-                        <p className={`text-lg font-bold mt-1 ${impact.visibilityMultiplier >= 100
-                                ? "text-emerald-400"
-                                : impact.visibilityMultiplier >= 60
-                                    ? "text-amber-400"
-                                    : "text-red-400"
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Visibility</p>
+                        <p className={`text-xl font-bold mt-1 ${impact.visibilityMultiplier >= 100
+                            ? "text-emerald-600"
+                            : impact.visibilityMultiplier >= 60
+                                ? "text-amber-500"
+                                : "text-red-500"
                             }`}>
                             {impact.visibilityMultiplier}%
                         </p>
@@ -161,11 +161,11 @@ export default function RevenueImpact({ audit }) {
                 </div>
 
                 {/* Explanation */}
-                <div className="mt-4 p-3 rounded-lg bg-base-content/5">
-                    <p className="text-xs text-base-content/40 leading-relaxed">
+                <div className="mt-5 p-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-500">
+                    <p className="text-xs leading-relaxed font-medium">
                         📊 Based on BrightLocal 2025 data: average GBP receives 1,260 monthly views.
-                        Top-optimized profiles get 50% more visibility and 5-8% conversion rates.
-                        Estimates use your current score ({audit.totalScore}/100), rating ({audit.averageRating?.toFixed(1) || "N/A"}★),
+                        Top profiles get 50% more visibility & 5-8% conversion rates.
+                        Estimates use your score ({audit.totalScore}/100), rating ({audit.averageRating?.toFixed(1) || "N/A"}★),
                         and review count ({audit.reviewCount || 0}).
                     </p>
                 </div>

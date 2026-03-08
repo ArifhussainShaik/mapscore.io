@@ -376,7 +376,7 @@ progress::-webkit-progress-value {
   z-index: 1;
 }
 
-.grain > * {
+.grain>* {
   position: relative;
   z-index: 2;
 }
@@ -395,23 +395,25 @@ progress::-webkit-progress-value {
 }
 
 /* ========================================
-   PDF / Print Styles
+   PDF / Print Styles (Unified Light Theme)
    ======================================== */
 
 .pdf-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 24px 16px 60px;
+  background: white;
 }
 
 .pdf-page {
-  background: #0d1117;
-  border: 1px solid #1f2937;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 40px;
   margin-bottom: 32px;
   position: relative;
   min-height: auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* Header */
@@ -421,7 +423,7 @@ progress::-webkit-progress-value {
   align-items: center;
   margin-bottom: 32px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .pdf-logo {
@@ -430,12 +432,12 @@ progress::-webkit-progress-value {
   gap: 8px;
   font-size: 20px;
   font-weight: 700;
-  color: white;
+  color: #111827;
 }
 
 .pdf-date {
   font-size: 13px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 /* Footer */
@@ -444,9 +446,9 @@ progress::-webkit-progress-value {
   justify-content: space-between;
   margin-top: 40px;
   padding-top: 16px;
-  border-top: 1px solid #1f2937;
+  border-top: 1px solid #e5e7eb;
   font-size: 11px;
-  color: #6b7280;
+  color: #9ca3af;
 }
 
 /* Business Info */
@@ -457,13 +459,13 @@ progress::-webkit-progress-value {
 .pdf-business-name {
   font-size: 28px;
   font-weight: 800;
-  color: white;
+  color: #111827;
   margin-bottom: 4px;
 }
 
 .pdf-business-address {
   font-size: 14px;
-  color: #9ca3af;
+  color: #6b7280;
   margin-bottom: 12px;
 }
 
@@ -474,9 +476,9 @@ progress::-webkit-progress-value {
 }
 
 .pdf-cat-primary {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -484,8 +486,8 @@ progress::-webkit-progress-value {
 }
 
 .pdf-cat-secondary {
-  background: rgba(31, 41, 55, 0.8);
-  color: #9ca3af;
+  background: #f3f4f6;
+  color: #4b5563;
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -498,8 +500,8 @@ progress::-webkit-progress-value {
   gap: 32px;
   margin-bottom: 36px;
   padding: 24px;
-  background: rgba(17, 24, 39, 0.5);
-  border: 1px solid #1f2937;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
 
@@ -513,6 +515,7 @@ progress::-webkit-progress-value {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: white;
 }
 
 .pdf-score-number {
@@ -546,7 +549,7 @@ progress::-webkit-progress-value {
 .pdf-grade-label {
   font-size: 20px;
   font-weight: 700;
-  color: white;
+  color: #111827;
 }
 
 .pdf-methodology {
@@ -563,8 +566,8 @@ progress::-webkit-progress-value {
 }
 
 .pdf-section-item {
-  background: rgba(17, 24, 39, 0.5);
-  border: 1px solid #1f2937;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 12px 16px;
 }
@@ -573,13 +576,14 @@ progress::-webkit-progress-value {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: #d1d5db;
+  color: #4b5563;
   margin-bottom: 8px;
+  font-weight: 600;
 }
 
 .pdf-bar-bg {
   height: 8px;
-  background: rgba(31, 41, 55, 0.8);
+  background: #e5e7eb;
   border-radius: 999px;
   overflow: hidden;
 }
@@ -594,7 +598,7 @@ progress::-webkit-progress-value {
 .pdf-section-title {
   font-size: 20px;
   font-weight: 700;
-  color: white;
+  color: #111827;
   margin-bottom: 16px;
 }
 
@@ -605,10 +609,11 @@ progress::-webkit-progress-value {
 }
 
 .pdf-issue {
-  background: rgba(17, 24, 39, 0.5);
-  border: 1px solid #1f2937;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 16px 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .pdf-issue-header {
@@ -622,19 +627,19 @@ progress::-webkit-progress-value {
 }
 
 .pdf-issue-severity[data-severity="critical"] {
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .pdf-issue-severity[data-severity="high"] {
-  color: #f97316;
+  color: #ea580c;
 }
 
 .pdf-issue-severity[data-severity="medium"] {
-  color: #f59e0b;
+  color: #d97706;
 }
 
 .pdf-issue-severity[data-severity="low"] {
-  color: #3b82f6;
+  color: #2563eb;
 }
 
 .pdf-issue-severity {
@@ -643,36 +648,47 @@ progress::-webkit-progress-value {
 
 .pdf-issue-section {
   color: #6b7280;
+  font-weight: 600;
 }
 
 .pdf-issue-time {
-  color: #6b7280;
   margin-left: auto;
+}
+
+/* Custom time badge added in page.js */
+.pdf-time-badge {
+  background: #f3f4f6;
+  color: #4b5563;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 .pdf-issue-name {
   font-size: 16px;
   font-weight: 700;
-  color: white;
+  color: #111827;
   margin-bottom: 4px;
 }
 
 .pdf-issue-desc {
   font-size: 13px;
-  color: #9ca3af;
+  color: #4b5563;
   margin-bottom: 0;
+  line-height: 1.5;
 }
 
 .pdf-how-to-fix {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #1f2937;
+  border-top: 1px solid #e5e7eb;
   font-size: 13px;
-  color: #d1d5db;
+  color: #4b5563;
 }
 
 .pdf-how-to-fix strong {
-  color: #10b981;
+  color: #059669;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -685,7 +701,7 @@ progress::-webkit-progress-value {
 
 .pdf-how-to-fix li {
   margin-bottom: 3px;
-  color: #9ca3af;
+  color: #4b5563;
   font-size: 12px;
 }
 
@@ -700,9 +716,10 @@ progress::-webkit-progress-value {
 .pdf-table th {
   text-align: left;
   padding: 10px 12px;
-  background: rgba(16, 185, 129, 0.08);
-  border-bottom: 1px solid #1f2937;
-  color: #10b981;
+  background: #f0fdf4;
+  border-bottom: 1px solid #e5e7eb;
+  border-top: 1px solid #e5e7eb;
+  color: #059669;
   font-weight: 600;
   font-size: 12px;
   text-transform: uppercase;
@@ -711,16 +728,17 @@ progress::-webkit-progress-value {
 
 .pdf-table td {
   padding: 10px 12px;
-  border-bottom: 1px solid #1f293780;
-  color: #d1d5db;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
 }
 
 .pdf-table-you {
-  background: rgba(16, 185, 129, 0.05);
+  background: #ecfdf5;
 }
 
 .pdf-table-you td {
-  color: white;
+  color: #111827;
+  font-weight: 600;
 }
 
 /* Action Plan */
@@ -731,7 +749,7 @@ progress::-webkit-progress-value {
 .pdf-action-label {
   font-size: 15px;
   font-weight: 700;
-  color: white;
+  color: #111827;
   margin-bottom: 10px;
 }
 
@@ -740,7 +758,7 @@ progress::-webkit-progress-value {
   align-items: flex-start;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .pdf-action-num {
@@ -749,8 +767,8 @@ progress::-webkit-progress-value {
   justify-content: center;
   min-width: 24px;
   height: 24px;
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  background: #ecfdf5;
+  color: #059669;
   border-radius: 50%;
   font-size: 12px;
   font-weight: 700;
@@ -758,7 +776,8 @@ progress::-webkit-progress-value {
 
 .pdf-action-text {
   font-size: 14px;
-  color: #d1d5db;
+  color: #111827;
+  font-weight: 600;
   margin-bottom: 2px;
 }
 
@@ -772,11 +791,11 @@ progress::-webkit-progress-value {
   margin-top: 32px;
   padding: 20px;
   text-align: center;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
   border-radius: 12px;
   font-size: 14px;
-  color: #9ca3af;
+  color: #4b5563;
 }
 
 /* === PRINT OVERRIDES === */
@@ -797,7 +816,7 @@ progress::-webkit-progress-value {
   /* Reset backgrounds for print */
   html,
   body {
-    background: #0d1117 !important;
+    background: white !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
@@ -807,6 +826,7 @@ progress::-webkit-progress-value {
     max-width: 100%;
     padding: 0;
     margin: 0;
+    background: white !important;
   }
 
   .pdf-page {
@@ -817,7 +837,7 @@ progress::-webkit-progress-value {
     border-radius: 0;
     min-height: auto;
     box-shadow: none;
-    background: #0d1117 !important;
+    background: white !important;
   }
 
   .pdf-page:last-child {
@@ -838,6 +858,7 @@ progress::-webkit-progress-value {
   .pdf-bar-fill,
   .pdf-grade-badge,
   .pdf-cat-primary,
+  .pdf-cat-secondary,
   .pdf-issue,
   .pdf-table th,
   .pdf-action-num,
@@ -845,7 +866,8 @@ progress::-webkit-progress-value {
   .severity-critical,
   .severity-high,
   .severity-medium,
-  .severity-low {
+  .severity-low,
+  .pdf-time-badge {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

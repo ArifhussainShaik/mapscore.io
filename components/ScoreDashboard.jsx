@@ -56,35 +56,31 @@ export default function ScoreDashboard({
         return <span className="text-5xl">{g}</span>;
     };
 
-    // Calculate generic status for sections based on their scores (if available)
-    const getStatusInfo = (score) => {
-        if (score >= 80) return { label: "STRONG", color: "text-green-600 bg-green-50" };
-        if (score >= 60) return { label: "FAIR", color: "text-amber-600 bg-amber-50" };
-        return { label: "NEEDS WORK", color: "text-orange-600 bg-orange-50" };
-    };
+    // Sections list for rendering bars
 
-    const visibilityStatus = getStatusInfo(sectionScores?.localSeo || sectionScores?.completeness || 75);
-    const reputationStatus = getStatusInfo(sectionScores?.reputation || 50);
-    const completenessStatus = getStatusInfo(sectionScores?.completeness || 65);
+    const sections = [
+        { id: "profile", name: "Profile Completeness", score: sectionScores?.profile || sectionScores?.completeness || 0, max: 32 },
+        { id: "reviews", name: "Reviews & Reputation", score: sectionScores?.reviews || sectionScores?.reputation || 0, max: 25 },
+        { id: "website", name: "Website Signals", score: sectionScores?.website || 0, max: 14 },
+        { id: "visual", name: "Visual Content", score: sectionScores?.visual || 0, max: 13 },
+        { id: "activity", name: "Activity & Posts", score: sectionScores?.activity || 0, max: 9 },
+        { id: "competitive", name: "Competitive Gap", score: sectionScores?.competitive || 0, max: 8 },
+    ];
 
     return (
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col h-full">
-
+        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
             {/* Header */}
-            <div className="flex justify-between items-start mb-8">
-                <h3 className="text-xl font-bold font-serif text-slate-900">Overall Health</h3>
-                <div
-                    className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold cursor-help hover:bg-slate-300 transition-colors"
-                    title="Score based on: Profile completeness (30%), Reviews & reputation (30%), Local SEO optimization (25%), and Website performance (15%)"
-                >
-                    i
+            <div className="flex justify-between items-start mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 className="text-xl font-bold font-serif text-slate-900">Overall Health Score</h3>
+                    <p className="text-sm text-slate-500 mt-1">Based on Google&apos;s top local ranking factors.</p>
                 </div>
             </div>
 
-            {/* Score Circle */}
-            <div className="flex flex-col items-center flex-grow">
-                <div className="relative mb-6">
-                    <svg width="160" height="160" viewBox="0 0 100 100" className="-rotate-90">
+            <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_1fr] gap-8 items-center">
+                {/* 1. Score Circle */}
+                <div className="flex flex-col items-center justify-center relative min-w-[180px]">
+                    <svg width="160" height="160" viewBox="0 0 100 100" className="-rotate-90 drop-shadow-sm">
                         <circle
                             cx="50"
                             cy="50"
@@ -96,7 +92,7 @@ export default function ScoreDashboard({
                             cx="50"
                             cy="50"
                             r="45"
-                            className="fill-none"
+                            className="fill-none drop-shadow-md"
                             strokeWidth="8"
                             stroke={color}
                             strokeDasharray={circumference}
@@ -111,34 +107,36 @@ export default function ScoreDashboard({
                     </div>
                 </div>
 
-                <h4 className="text-xl font-bold mb-3" style={{ color }}>{GRADE_LABELS[grade] || "Good Start"}</h4>
-                <p className="text-sm text-slate-500 text-center leading-relaxed max-w-[250px] mb-8">
-                    You&apos;re outperforming 65% of local competitors, but there&apos;s room to grow.
-                </p>
+                {/* 2. Top-Level Status */}
+                <div className="flex flex-col justify-center border-r-0 lg:border-r border-slate-100 pr-0 lg:pr-8 text-center md:text-left">
+                    <h4 className="text-2xl font-bold mb-2" style={{ color }}>{GRADE_LABELS[grade] || "Good Start"}</h4>
+                    <p className="text-slate-600 leading-relaxed mb-4">
+                        You&apos;re outperforming 65% of local competitors, but there&apos;s room to grow to hit the top 3 Maps pack.
+                    </p>
+                </div>
 
-                {/* Metrics List */}
-                <div className="w-full space-y-4 mt-auto">
-                    <div className="flex justify-between items-center py-1">
-                        <span className="text-sm text-slate-600">Visibility</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${visibilityStatus.color}`}>
-                            {visibilityStatus.label}
-                        </span>
-                    </div>
-                    <div className="flex justify-between items-center py-1">
-                        <span className="text-sm text-slate-600">Reputation</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${reputationStatus.color}`}>
-                            {reputationStatus.label}
-                        </span>
-                    </div>
-                    <div className="flex justify-between items-center py-1">
-                        <span className="text-sm text-slate-600">Completeness</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${completenessStatus.color}`}>
-                            {completenessStatus.label}
-                        </span>
-                    </div>
+                {/* 3. Section Breakdown Bars */}
+                <div className="w-full grid grid-cols-1 gap-3">
+                    {sections.map(section => {
+                        const pct = Math.round((section.score / section.max) * 100) || 0;
+                        const barColor = pct >= 75 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-400" : "bg-red-400";
+                        return (
+                            <div key={section.id} className="w-full">
+                                <div className="flex justify-between text-xs font-semibold mb-1">
+                                    <span className="text-slate-700">{section.name}</span>
+                                    <span className="text-slate-500">{section.score}/{section.max}</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full ${barColor} transition-all duration-1000 ease-out`}
+                                        style={{ width: `${pct}%` }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-
         </div>
     );
 }

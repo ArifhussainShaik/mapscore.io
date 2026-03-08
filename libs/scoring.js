@@ -10,7 +10,8 @@ export async function calculateScore(auditData) {
     const checkResults = [];
     const checkpointResults = [];
     const sectionScores = {};
-    let totalScore = 0;
+    let earnedPoints = 0;
+    let maxPossiblePoints = 0;
 
     for (const section of scoringRules.sections) {
         let sectionTotal = 0;
@@ -37,12 +38,20 @@ export async function calculateScore(auditData) {
             });
 
             if (check.type !== "flag") {
-                sectionTotal += result.score;
+                if (!result.isNA) {
+                    sectionTotal += result.score;
+                    maxPossiblePoints += check.max_points;
+                }
             }
         }
 
         sectionScores[section.id] = sectionTotal;
-        totalScore += sectionTotal;
+        earnedPoints += sectionTotal;
+    }
+
+    let totalScore = 0;
+    if (maxPossiblePoints > 0) {
+        totalScore = Math.round((earnedPoints / maxPossiblePoints) * 100);
     }
 
     const grade = getGrade(totalScore);
@@ -73,6 +82,7 @@ function evaluateCheck(check, data, sectionId) {
     let score = 0;
     let matchedRule = null;
     let passed = null;
+    let isNA = false;
 
     if (type === "flag") {
         // Evaluate zero-point flags
@@ -86,6 +96,7 @@ function evaluateCheck(check, data, sectionId) {
             matchedLabel: passed ? "Passed" : "Flagged",
             dataCitation: data_citation || "",
             type,
+            isNA: false,
         };
     }
 
@@ -241,7 +252,9 @@ function evaluateCheck(check, data, sectionId) {
 
         // ACTIVITY SIGNALS
         case "post_recency": {
-            if (data.lastPostDate) {
+            if (data.lastPostDate === undefined && data.posts === undefined && data.postFrequency === undefined) {
+                isNA = true;
+            } else if (data.lastPostDate) {
                 const daysSincePost = Math.floor(
                     (Date.now() - new Date(data.lastPostDate).getTime()) /
                     (1000 * 60 * 60 * 24)
@@ -254,7 +267,9 @@ function evaluateCheck(check, data, sectionId) {
         }
 
         case "post_frequency":
-            if (data.postFrequency === "weekly") score = 3;
+            if (data.lastPostDate === undefined && data.posts === undefined && data.postFrequency === undefined) {
+                isNA = true;
+            } else if (data.postFrequency === "weekly") score = 3;
             else if (data.postFrequency === "monthly") score = 2;
             else if (data.postFrequency === "rarely") score = 1;
             break;
@@ -365,6 +380,7 @@ function evaluateCheck(check, data, sectionId) {
         matchedLabel: matchedRule?.label || "",
         dataCitation: data_citation || "",
         type: "scored",
+        isNA,
     };
 }
 
