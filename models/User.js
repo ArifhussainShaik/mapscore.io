@@ -35,7 +35,7 @@ const userSchema = mongoose.Schema(
       creditsAdded: Number,
       expiryDate: Date,
       creditsRemaining: Number,
-      packageType: { type: String, enum: ["starter", "growth", "agency"] },
+      packageType: { type: String, enum: ["starter", "growth", "agency", "manual", "test", "lifetime"], required: true },
       transactionId: String
     }],
 
