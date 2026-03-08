@@ -12,11 +12,8 @@ const SCAN_STEPS = [
     { label: "Generating your audit report", icon: "📊" },
 ];
 
-// Minimum time before we can complete (so animation doesn't feel instant)
 const MIN_ANIMATION_MS = 5000;
-// Time per step when fast-forwarding after data arrives
 const FAST_STEP_MS = 400;
-// Time per step during normal slow progression
 const SLOW_STEP_MS = 2000;
 
 export default function ScanningProgress({ businessName, city, isDataReady, onComplete }) {
@@ -30,8 +27,6 @@ export default function ScanningProgress({ businessName, city, isDataReady, onCo
         if (completedRef.current) return;
 
         const totalSteps = SCAN_STEPS.length;
-
-        // Determine timing based on whether data is ready
         const stepDuration = isDataReady ? FAST_STEP_MS : SLOW_STEP_MS;
 
         const timer = setInterval(() => {
@@ -40,26 +35,19 @@ export default function ScanningProgress({ businessName, city, isDataReady, onCo
 
                 if (next >= totalSteps) {
                     clearInterval(timer);
-
-                    // Check if we should complete or wait
                     const elapsed = Date.now() - startTimeRef.current;
                     const hasMinTime = elapsed >= MIN_ANIMATION_MS;
 
                     if (isDataReady && hasMinTime) {
-                        // Data is ready and we've shown enough animation
                         if (!completedRef.current) {
                             completedRef.current = true;
                             setProgress(100);
                             setTimeout(() => onComplete?.(), 300);
                         }
                     }
-                    // If data isn't ready yet, we'll be stuck at last step
-                    // The other useEffect below handles that case
-
                     return totalSteps;
                 }
 
-                // Update progress
                 const pct = Math.round(((next + 1) / totalSteps) * (isDataReady ? 100 : 90));
                 setProgress(Math.min(pct, isDataReady ? 100 : 90));
 
@@ -70,8 +58,6 @@ export default function ScanningProgress({ businessName, city, isDataReady, onCo
         return () => clearInterval(timer);
     }, [isDataReady, onComplete]);
 
-    // Handle the case where data arrives after animation is at last step
-    // or where animation finishes before data
     useEffect(() => {
         if (completedRef.current) return;
 
@@ -89,46 +75,54 @@ export default function ScanningProgress({ businessName, city, isDataReady, onCo
         }
     }, [isDataReady, currentStep, onComplete]);
 
-    // Show waiting text if animation finished but data hasn't arrived
     useEffect(() => {
         if (currentStep >= SCAN_STEPS.length && !isDataReady) {
             setStatusText("Finalizing your report…");
-            // Keep progress at 95% to show we're almost done
             setProgress(95);
         } else {
             setStatusText("");
         }
     }, [currentStep, isDataReady]);
 
+    // Format business name to remove trailing address parts and truncate
+    const parsedName = (businessName || "your business").split(",")[0].trim();
+    const displayName = parsedName.length > 30 ? parsedName.slice(0, 30) + "..." : parsedName;
+
     return (
-        <div className="min-h-screen flex items-center justify-center p-8 bg-[var(--color-brand-dark)]">
-            <div className="glass-card p-8 md:p-12 max-w-lg w-full text-center">
-                {/* Animated scanner icon */}
-                <div className="relative w-24 h-24 mx-auto mb-8">
-                    <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping" />
-                    <div className="absolute inset-2 rounded-full bg-emerald-500/20 animate-pulse" />
-                    <div className="absolute inset-0 flex items-center justify-center text-4xl">
-                        🔍
+        <div className="min-h-screen flex items-center justify-center p-6 sm:p-8 bg-slate-950">
+            {/* Soft background glows */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl p-8 md:p-12 max-w-lg w-full relative overflow-hidden">
+                {/* Modern Radar/Loader Animation */}
+                <div className="relative w-28 h-28 mx-auto mb-10 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border-2 border-blue-500/20 border-t-blue-500 animate-[spin_3s_linear_infinite]" />
+                    <div className="absolute inset-2 rounded-full border-2 border-emerald-500/20 border-r-emerald-500 animate-[spin_4s_linear_infinite_reverse]" />
+                    <div className="absolute inset-4 rounded-full bg-blue-500/10 animate-pulse" />
+                    <div className="relative text-4xl transform hover:scale-110 transition-transform cursor-default">
+                        ⚡
                     </div>
                 </div>
 
-                <h2 className="text-xl font-bold text-base-content mb-2">
-                    Analyzing {businessName || "your business"}
-                </h2>
-                {city && (
-                    <p className="text-base-content/50 text-sm mb-6">in {city}</p>
-                )}
+                <div className="text-center mb-8">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 font-serif tracking-tight">
+                        Analyzing {displayName}
+                    </h2>
+                    {city && (
+                        <p className="text-slate-400 text-sm font-medium">in {city}</p>
+                    )}
+                </div>
 
-                {/* Progress bar */}
-                <div className="w-full bg-base-content/10 rounded-full h-2 mb-6 overflow-hidden">
+                {/* Smooth Gradient Progress Bar */}
+                <div className="w-full bg-slate-800 rounded-full h-1.5 mb-8 overflow-hidden">
                     <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500"
+                        className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 transition-all duration-700 ease-out"
                         style={{ width: `${progress}%` }}
                     />
                 </div>
 
-                {/* Current step */}
-                <div className="space-y-3">
+                {/* Step List with Clean States */}
+                <div className="space-y-2">
                     {SCAN_STEPS.map((step, i) => {
                         const isActive = i === currentStep;
                         const isDone = i < currentStep;
@@ -136,41 +130,49 @@ export default function ScanningProgress({ businessName, city, isDataReady, onCo
                         return (
                             <div
                                 key={i}
-                                className={`flex items-center gap-3 py-1.5 px-3 rounded-lg transition-all duration-300 ${isActive
-                                    ? "bg-emerald-500/10 text-emerald-400"
-                                    : isDone
-                                        ? "text-base-content/40"
-                                        : "text-base-content/20"
+                                className={`flex items-center gap-4 py-2 px-4 rounded-xl transition-all duration-300 ${isActive
+                                        ? "bg-blue-500/10 border-l-4 border-blue-500 shadow-[inset_0_0_20px_rgba(59,130,246,0.05)]"
+                                        : isDone
+                                            ? "border-l-4 border-transparent opacity-80"
+                                            : "border-l-4 border-transparent opacity-40"
                                     }`}
                             >
-                                <span className="w-5 h-5 flex items-center justify-center text-sm flex-shrink-0">
+                                <span className="w-6 h-6 flex items-center justify-center flex-shrink-0">
                                     {isDone ? (
-                                        <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                        </svg>
+                                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                            </svg>
+                                        </div>
                                     ) : isActive ? (
-                                        <span className="loading loading-spinner loading-xs text-emerald-400"></span>
+                                        <span className="loading loading-spinner loading-sm text-blue-400"></span>
                                     ) : (
-                                        <span className="text-xs">{step.icon}</span>
+                                        <span className="text-sm grayscale opacity-50">{step.icon}</span>
                                     )}
                                 </span>
-                                <span className="text-sm">{step.label}</span>
+                                <span className={`text-sm font-medium ${isActive ? "text-white animate-pulse" : isDone ? "text-slate-300" : "text-slate-500"
+                                    }`}>
+                                    {step.label}
+                                </span>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* Waiting status */}
-                {statusText ? (
-                    <p className="text-xs text-emerald-400/70 mt-6 animate-pulse">
-                        {statusText}
-                    </p>
-                ) : (
-                    <p className="text-xs text-base-content/30 mt-6">
-                        Estimated time: ~20 seconds
-                    </p>
-                )}
+                {/* Contextual Status Note */}
+                <div className="mt-8 text-center h-6">
+                    {statusText ? (
+                        <p className="text-sm text-blue-400 animate-pulse font-medium">
+                            {statusText}
+                        </p>
+                    ) : (
+                        <p className="text-sm text-slate-500">
+                            Estimated time: ~30 seconds
+                        </p>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
+
