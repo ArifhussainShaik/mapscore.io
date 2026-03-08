@@ -1,163 +1,87 @@
-/**
- * Dodo Payments Webhook Handler.
- *
- * Receives webhook events from Dodo Payments and updates user records
- * in MongoDB (subscription status, plan, access level).
- *
- * Events handled:
- *   - subscription.active   → Activate user subscription
- *   - subscription.cancelled → Downgrade user
- *   - payment.succeeded      → Log payment success
- *   - payment.failed         → Mark subscription as past_due
- *   - refund.succeeded       → Downgrade and log refund
- */
-
 import { NextResponse } from "next/server";
-import { verifyWebhookSignature, getPlanByProductId } from "@/libs/dodo";
-import connectMongo from "@/libs/mongoose";
+import crypto from "crypto";
+import { addCredits } from "@/libs/credits";
 import User from "@/models/User";
+import connectMongo from "@/libs/mongoose";
 
 export async function POST(req) {
     try {
-        const rawBody = await req.text();
+        const body = await req.text();
+        const signature = req.headers.get("dodo-signature");
+        const webhookSecret = process.env.DODO_WEBHOOK_SECRET;
 
-        // Verify webhook signature
-        let event;
-        try {
-            event = verifyWebhookSignature(rawBody, req.headers);
-        } catch (error) {
-            console.error("[Dodo Webhook] Signature verification failed:", error.message);
-            return NextResponse.json(
-                { error: "Invalid webhook signature" },
-                { status: 401 }
-            );
+        // 1. Verify Webhook Signature (Security)
+        if (!webhookSecret) {
+            console.error("Missing DODO_WEBHOOK_SECRET");
+            return NextResponse.json({ error: "Configuration Error" }, { status: 500 });
         }
 
-        const eventType = event.type || event.event_type;
-        const data = event.data || event;
+        const expectedSignature = crypto
+            .createHmac("sha256", webhookSecret)
+            .update(body)
+            .digest("hex");
 
-        console.log(`[Dodo Webhook] Received event: ${eventType}`);
-        console.log(`[Dodo Webhook] Data:`, JSON.stringify(data).slice(0, 500));
-
-        // Connect to MongoDB
-        await connectMongo();
-
-        switch (eventType) {
-            // ── Subscription activated ──
-            case "subscription.active":
-            case "subscription.created": {
-                const customerId = data.customer?.customer_id || data.customer_id;
-                const customerEmail = data.customer?.email || data.email;
-                const subscriptionId = data.subscription_id || data.id;
-                const productId = data.product_id;
-
-                // Determine plan from product ID
-                const plan = getPlanByProductId(productId);
-                const planName = plan?.name?.toLowerCase() || "pro";
-
-                // Find user by email or dodoCustomerId
-                let user = null;
-                if (customerEmail) {
-                    user = await User.findOne({ email: customerEmail });
-                }
-                if (!user && customerId) {
-                    user = await User.findOne({ dodoCustomerId: customerId });
-                }
-                // Try metadata user_id
-                if (!user && data.metadata?.user_id) {
-                    user = await User.findById(data.metadata.user_id);
-                }
-
-                if (user) {
-                    user.dodoCustomerId = customerId;
-                    user.dodoSubscriptionId = subscriptionId;
-                    user.plan = planName;
-                    user.subscriptionStatus = "active";
-                    user.hasAccess = true;
-                    await user.save();
-                    console.log(`[Dodo Webhook] User ${user.email} upgraded to ${planName}`);
-                } else {
-                    console.warn(`[Dodo Webhook] No user found for customer: ${customerEmail || customerId}`);
-                }
-                break;
-            }
-
-            // ── Subscription cancelled ──
-            case "subscription.cancelled":
-            case "subscription.canceled": {
-                const customerId = data.customer?.customer_id || data.customer_id;
-                const subscriptionId = data.subscription_id || data.id;
-
-                const user = await User.findOne({
-                    $or: [
-                        { dodoSubscriptionId: subscriptionId },
-                        { dodoCustomerId: customerId },
-                    ],
-                });
-
-                if (user) {
-                    user.plan = "free";
-                    user.subscriptionStatus = "cancelled";
-                    user.hasAccess = false;
-                    await user.save();
-                    console.log(`[Dodo Webhook] User ${user.email} downgraded to free`);
-                }
-                break;
-            }
-
-            // ── Payment succeeded ──
-            case "payment.succeeded": {
-                const customerEmail = data.customer?.email || data.email;
-                console.log(`[Dodo Webhook] Payment succeeded for ${customerEmail}`);
-                // Good place to trigger welcome email or record payment
-                break;
-            }
-
-            // ── Payment failed ──
-            case "payment.failed": {
-                const customerId = data.customer?.customer_id || data.customer_id;
-                const subscriptionId = data.subscription_id;
-
-                const user = await User.findOne({
-                    $or: [
-                        { dodoSubscriptionId: subscriptionId },
-                        { dodoCustomerId: customerId },
-                    ],
-                });
-
-                if (user) {
-                    user.subscriptionStatus = "past_due";
-                    await user.save();
-                    console.log(`[Dodo Webhook] Payment failed for ${user.email} — marked past_due`);
-                    // TODO: Send dunning email via Resend
-                }
-                break;
-            }
-
-            // ── Refund ──
-            case "refund.succeeded": {
-                const customerId = data.customer?.customer_id || data.customer_id;
-
-                const user = await User.findOne({ dodoCustomerId: customerId });
-                if (user) {
-                    user.plan = "free";
-                    user.subscriptionStatus = "cancelled";
-                    user.hasAccess = false;
-                    await user.save();
-                    console.log(`[Dodo Webhook] Refund processed for ${user.email}`);
-                }
-                break;
-            }
-
-            default:
-                console.log(`[Dodo Webhook] Unhandled event type: ${eventType}`);
+        if (signature !== expectedSignature) {
+            console.error("Invalid Dodo webhook signature");
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        return NextResponse.json({ received: true });
+        const event = JSON.parse(body);
+        console.log(`[Dodo Webhook] Received Event: ${event.type}`);
+
+        // 2. Handle Payment Completed (Credit Addition)
+        if (event.type === "payment.completed") {
+            const data = event.data;
+            const customerEmail = data.customer?.email;
+
+            // Assume package type is passed via custom metadata or amount heuristically
+            // Here we map metadata if Dodo sends it, otherwise map by pricing heuristic
+            let packageType = data.metadata?.packageType;
+            let creditsToAdd = 0;
+
+            if (!packageType) {
+                // Heuristic fallback if Dodo checkout doesn't map metadata perfectly
+                const amount = data.amount; // assuming cents or standard depending on Dodo's API format
+                if (amount === 900 || amount === 9) { packageType = "starter"; creditsToAdd = 3; }
+                else if (amount === 1900 || amount === 19) { packageType = "growth"; creditsToAdd = 10; }
+                else if (amount === 4900 || amount === 49) { packageType = "agency"; creditsToAdd = 30; }
+                else {
+                    console.error(`Unknown payment amount for credit pack: ${amount}`);
+                    return NextResponse.json({ status: "ignored" });
+                }
+            } else {
+                // Explicit mapping
+                if (packageType === "starter") creditsToAdd = 3;
+                else if (packageType === "growth") creditsToAdd = 10;
+                else if (packageType === "agency") creditsToAdd = 30;
+            }
+
+            if (customerEmail && creditsToAdd > 0) {
+                await connectMongo();
+                let user = await User.findOne({ email: customerEmail.toLowerCase() });
+
+                // Fast-track user creation if they checked out before creating an account
+                if (!user) {
+                    user = await User.create({
+                        email: customerEmail.toLowerCase(),
+                        name: data.customer?.name || "LocalScore User",
+                        dodo_customer_id: data.customer?.id,
+                        credits: 0
+                    });
+                }
+
+                await addCredits(user._id, creditsToAdd, packageType, data.id);
+                console.log(`[Dodo Webhook] Successfully added ${creditsToAdd} credits to ${customerEmail}`);
+            }
+        }
+
+        // Return 200 OK immediately to acknowledge receipt and prevent Dodo retries
+        return NextResponse.json({ status: "success" }, { status: 200 });
+
     } catch (error) {
-        console.error("[Dodo Webhook] Error:", error);
+        console.error("[Dodo Webhook] Error processing event:", error);
         return NextResponse.json(
-            { error: "Webhook processing failed" },
+            { error: "Webhook handler failed" },
             { status: 500 }
         );
     }

@@ -30,14 +30,16 @@ const userSchema = mongoose.Schema(
     dodo_customer_id: String,
 
     // Credit purchases (for expiry tracking)
-    credit_purchases: [{
-      amount: Number,
-      remaining: Number,
-      purchased_at: Date,
-      expires_at: Date,
-      package: String,
-      price_paid: Number
+    creditHistory: [{
+      purchaseDate: Date,
+      creditsAdded: Number,
+      expiryDate: Date,
+      creditsRemaining: Number,
+      packageType: { type: String, enum: ["starter", "growth", "agency"] },
+      transactionId: String
     }],
+
+    creditsUsed: { type: Number, default: 0 },
 
     // Stats
     total_audits_run: { type: Number, default: 0 },

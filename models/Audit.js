@@ -64,6 +64,11 @@ const auditSchema = mongoose.Schema(
         status: { type: String, enum: ["pending", "processing", "completed", "failed"], default: "pending" },
         _errorMessage: { type: String },
 
+        // Paywall Unlock
+        isUnlocked: { type: Boolean, default: false },
+        unlockedAt: { type: Date },
+        unlockedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
         // Industry Benchmark mapping
         industry: { type: String },
         benchmark_industry: { type: String },
