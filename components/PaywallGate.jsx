@@ -8,9 +8,10 @@ import { IS_TESTING_MODE } from "@/libs/config";
 export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false }) {
     const router = useRouter();
     const [isUnlocking, setIsUnlocking] = useState(false);
+    const [localUnlocked, setLocalUnlocked] = useState(isUnlocked);
 
     // If unlocked or there's no feature to gate, render normally.
-    if (isUnlocked || IS_TESTING_MODE) {
+    if (localUnlocked || IS_TESTING_MODE) {
         return <>{children}</>;
     }
 
@@ -24,8 +25,14 @@ export default function PaywallGate({ children, auditId, availableCredits = 0, i
 
             if (res.ok && data.success) {
                 toast.success("Audit unlocked successfully!");
-                // Force a hard refresh to re-fetch the server component state
-                router.refresh();
+                setLocalUnlocked(true);
+                setIsUnlocking(false);
+                // Try to clear cached locked state from session storage
+                try {
+                    sessionStorage.removeItem(`audit_db_${auditId}`);
+                } catch (e) {
+                    console.warn("Could not clear session storage after unlock");
+                }
             } else {
                 if (data.code === "NO_CREDITS") {
                     toast.error("You don't have enough credits.");

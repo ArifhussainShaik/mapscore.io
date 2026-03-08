@@ -142,7 +142,7 @@ export default function AuditPage() {
         }
 
         loadAudit();
-    }, [id, businessName, city, placeId, isDbLoad, loadFullAuditById, saveAuditData]);
+    }, [id, businessName, city, placeId, isDbLoad, loadFullAuditById, saveAuditData, fetchLatestCredits]);
 
     // Polling logic when a job is in queue
     useEffect(() => {
