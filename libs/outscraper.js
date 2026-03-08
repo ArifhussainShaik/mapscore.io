@@ -49,6 +49,7 @@ export async function getFullBusinessData(query, placeId = null) {
             headers: {
                 "X-API-KEY": apiKey,
             },
+            cache: "no-store",
             signal: AbortSignal.timeout(30000),
         });
 
@@ -208,6 +209,9 @@ function mapOutscraperToAuditData(place) {
         _outscraper: true,
         _servicesChecked: servicesChecked,
         _descriptionChecked: place.description != null, // only checked if API returned a value
+
+        // Explicitly clear Products since Outscraper does not return it
+        products: null,
     };
 }
 
@@ -291,9 +295,14 @@ function estimatePostFrequency(postsCount) {
 function parseLastPostDate(posts) {
     if (!posts) return null;
     if (Array.isArray(posts) && posts.length > 0) {
-        // Posts may have a date/time field
+        // Posts may have a date/time field. Outscraper posts arrays sometimes return Unix seconds.
         const dates = posts
-            .map(p => p.post_datetime || p.date || p.timestamp)
+            .map(p => {
+                let d = p.post_datetime || p.date || p.timestamp;
+                // If it's a 10-digit timestamp (seconds), convert to ms
+                if (typeof d === 'number' && d < 10000000000) d = d * 1000;
+                return d;
+            })
             .filter(Boolean)
             .sort()
             .reverse();

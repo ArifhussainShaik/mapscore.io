@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { IS_TESTING_MODE } from "@/libs/config";
 
 export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false }) {
     const router = useRouter();
     const [isUnlocking, setIsUnlocking] = useState(false);
 
     // If unlocked or there's no feature to gate, render normally.
-    if (isUnlocked) {
+    if (isUnlocked || IS_TESTING_MODE) {
         return <>{children}</>;
     }
 

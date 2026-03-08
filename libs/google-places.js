@@ -61,6 +61,7 @@ export async function getPlaceDetails(placeId) {
             "X-Goog-FieldMask": fieldMask,
             "Content-Type": "application/json",
         },
+        cache: "no-store",
         signal: AbortSignal.timeout(15000),
     });
 

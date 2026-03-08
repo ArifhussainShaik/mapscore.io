@@ -21,3 +21,9 @@ If we encounter a complex bug and successfully resolve it together, you must ask
 ## 5. The Strict Approval Gate (NO AUTO-CODING)
 You are strictly forbidden from writing, modifying, creating, or deleting any codebase files until I explicitly reply with the exact word: "APPROVED". 
 When I ask for an implementation plan, an audit, or a strategy, you must output it strictly as standard chat text. You must completely disable your file-modification tools until the "APPROVED" command is given. Violating this rule risks destabilizing the production environment.
+
+## 6. CHANGELOG PROTOCOL
+1. At START of every session: Read `.ai-context/CHANGELOG.md` and `.ai-context/master-architecture.md`
+2. During session: Log all changes to `.ai-context/SESSION-LOG.md`
+3. At END of session: Merge SESSION-LOG.md into CHANGELOG.md (newest entry at top)
+4. After ANY bug fix: Document what was wrong, what fixed it, and which files changed

@@ -1,0 +1,1010 @@
+Fetching raw Outscraper data for Place ID: 209 NYC Dental New York...
+
+================ FULL RAW JSON RESPONSE ================
+
+{
+  "data": [
+    [
+      {
+        "about": {
+          "Accessibility": {
+            "Wheelchair accessible entrance": true,
+            "Wheelchair accessible restroom": true
+          },
+          "Amenities": {
+            "Gender-neutral restroom": true,
+            "Restroom": true
+          },
+          "Offerings": {
+            "Cosmetic dentistry": true,
+            "Emergency services": true,
+            "Pediatric care": true,
+            "Sedation dentistry": true
+          },
+          "Parking": {
+            "Paid street parking": true
+          },
+          "Payments": {
+            "Credit cards": true,
+            "Debit cards": true,
+            "NFC mobile payments": true,
+            "Payment plans": true
+          },
+          "Planning": {
+            "Appointment required": true,
+            "Appointments recommended": true
+          },
+          "Service options": {
+            "Language assistance": "Cantonese, English, Hindi, Korean, Mandarin, Russian, Spanish",
+            "Onsite services": true
+          }
+        },
+        "address": "209 E 56th St 1st floor, New York, NY 10022",
+        "area_service": false,
+        "booking_appointment_link": "https://nyc.identalcloud.com/209NYCDental/Patient/_practice/1/Appointment",
+        "business_status": "OPERATIONAL",
+        "category": "Dentist",
+        "cid": "2850600632550464023",
+        "city": "New York",
+        "country": "United States of America",
+        "country_code": "US",
+        "county": "Manhattan",
+        "description": null,
+        "google_id": "0x89c258e446e4e16f:0x278f5e2c13ac9a17",
+        "h3": "892a100d6abffff",
+        "kgmid": "/g/1thqbs3j",
+        "latitude": 40.7594146,
+        "located_google_id": null,
+        "located_in": null,
+        "location_link": "https://www.google.com/maps/place/209+NYC+Dental/@40.7594146,-73.9671025,14z/data=!4m8!1m2!2m1!1s209+NYC+Dental!3m4!1s0x89c258e446e4e16f:0x278f5e2c13ac9a17!8m2!3d40.7594146!4d-73.9671025",
+        "location_reviews_link": "https://www.google.com/maps/place/209+NYC+Dental/@40.7594146,-73.9671025,13.99z/data=!4m16!1m7!3m6!1s0x89c258e446e4e16f:0x278f5e2c13ac9a17!2s209+NYC+Dental!8m2!3d40.7594146!4d-73.9671025!16s%2Fg%2F11ckvg1dmb!3m7!1s0x89c258e446e4e16f:0x278f5e2c13ac9a17!8m2!3d40.7594146!4d-73.9671025!9m1!1b1!16s%2Fg%2F11ckvg1dmb?entry=ttu",
+        "logo": "https://lh5.googleusercontent.com/-Obrjm6sGKIw/AAAAAAAAAAI/AAAAAAAAAAA/cROBqfF-67o/s44-p-k-no-ns-nd/photo.jpg",
+        "longitude": -73.9671025,
+        "menu_link": "/url?q=https://www.209nycdental.com/services/&opi=79508299&sa=U&ved=0ahUKEwjA8uiVr4-TAxXOR2wGHReUEbYQqRkIHigQ&usg=AOvVaw1SwFPxosN0VTpQcER4cDvI",
+        "name": "209 NYC Dental",
+        "name_for_emails": "209 Nyc Dental",
+        "order_links": [
+          "https://nyc.identalcloud.com/209NYCDental/Patient/_practice/1/Appointment"
+        ],
+        "other_hours": null,
+        "owner_id": "100910876228276948508",
+        "owner_link": "https://www.google.com/maps/contrib/100910876228276948508",
+        "owner_title": "209 NYC Dental",
+        "phone": "+1 212-355-2290",
+        "photo": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqi-jZKXqm7LnDRKGgml4yBCXI08D32AgHJ4GPD1rt-eRJeXuz6hg-RLIhUhISIobgR9CQNAjWb6zbbzOrItMM8b2BKHjJePdgVXvwqDZmYRGamzfu5haXEMmac4X0_ciCYaNOzyUCIVOzu=w800-h500-k-no",
+        "photos_count": 138,
+        "place_id": "ChIJb-HkRuRYwokRF5qsEyxejyc",
+        "plus_code": "87G8Q25M+Q5",
+        "popular_times": [
+          {
+            "day": 7,
+            "day_text": "Sunday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 8,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 9,
+                "percentage": 27,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 38,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 52,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 47,
+                "time": "12p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 52,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 44,
+                "time": "12p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 16,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 17,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 18,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 1,
+            "day_text": "Monday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 25,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 41,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 47,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 50,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 61,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 63,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 63,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 61,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 72,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 16,
+                "percentage": 52,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 17,
+                "percentage": 50,
+                "time": "3p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 18,
+                "percentage": 36,
+                "time": "6p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 2,
+            "day_text": "Tuesday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 27,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 41,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 41,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 50,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 58,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 69,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 75,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 72,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 63,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 16,
+                "percentage": 58,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 17,
+                "percentage": 58,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 18,
+                "percentage": 50,
+                "time": "6p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 3,
+            "day_text": "Wednesday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 33,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 47,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 69,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 69,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 77,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 83,
+                "time": "12p",
+                "title": "Usually as busy as it gets"
+              },
+              {
+                "hour": 13,
+                "percentage": 91,
+                "time": "12p",
+                "title": "Usually as busy as it gets"
+              },
+              {
+                "hour": 14,
+                "percentage": 100,
+                "time": "12p",
+                "title": "Usually as busy as it gets"
+              },
+              {
+                "hour": 15,
+                "percentage": 86,
+                "time": "3p",
+                "title": "Usually as busy as it gets"
+              },
+              {
+                "hour": 16,
+                "percentage": 58,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 17,
+                "percentage": 41,
+                "time": "3p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 18,
+                "percentage": 38,
+                "time": "6p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 4,
+            "day_text": "Thursday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 30,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 44,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 52,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 44,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 52,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 47,
+                "time": "12p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 58,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 61,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 61,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 16,
+                "percentage": 55,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 17,
+                "percentage": 44,
+                "time": "3p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 18,
+                "percentage": 33,
+                "time": "6p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 5,
+            "day_text": "Friday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 33,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 36,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 44,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 50,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 55,
+                "time": "9a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 55,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 63,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 58,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 58,
+                "time": "3p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 16,
+                "percentage": 41,
+                "time": "3p",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 17,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 18,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          },
+          {
+            "day": 6,
+            "day_text": "Saturday",
+            "popular_times": [
+              {
+                "hour": 6,
+                "percentage": 0,
+                "time": "6a",
+                "title": ""
+              },
+              {
+                "hour": 7,
+                "percentage": 41,
+                "time": "6a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 8,
+                "percentage": 58,
+                "time": "6a",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 9,
+                "percentage": 50,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 10,
+                "percentage": 47,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 11,
+                "percentage": 47,
+                "time": "9a",
+                "title": "Usually not too busy"
+              },
+              {
+                "hour": 12,
+                "percentage": 58,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 13,
+                "percentage": 55,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 14,
+                "percentage": 52,
+                "time": "12p",
+                "title": "Usually a little busy"
+              },
+              {
+                "hour": 15,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 16,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 17,
+                "percentage": 0,
+                "time": "3p",
+                "title": ""
+              },
+              {
+                "hour": 18,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 19,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 20,
+                "percentage": 0,
+                "time": "6p",
+                "title": ""
+              },
+              {
+                "hour": 21,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 22,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              },
+              {
+                "hour": 23,
+                "percentage": 0,
+                "time": "9p",
+                "title": ""
+              }
+            ]
+          }
+        ],
+        "postal_code": "10022",
+        "posts": [
+          {
+            "body": "Rain or Snow, We are OPEN Today & Everyday for Urgent Dental Care in NYC! *Including Monday, February 23, 2026",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipOvWQZbZziL2fTmKTvQoszls9c9SgksZoDPnLHR=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEJWfp7a-k8ud_QE&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1771793809
+          },
+          {
+            "body": "Sometimes, the gums cover more of the teeth than people realize. A gum lift can change that, making the smile look more balanced. It’s a minor procedure with a big visual difference.\n\nOur blog talks about the top reasons patients choose a gum lift, what recovery feels like, and how our team keeps the process comfortable.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipPe_o4dma8R7MHADddbuLWmhz14-sXvuL0gm_sy=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEJHM5-Hy45n1Iw&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1768391993
+          },
+          {
+            "body": "Ever wonder what separates a gingivectomy from a gingivoplasty?\nBoth reshape your gums, but for very different reasons. One removes damaged tissue to fight infection; the other sculpts healthy gums for a smoother, balanced look.\nThink of it as the difference between repair and refinement. Our latest blog from 209 NYC Dental breaks it all down: when each is needed, what recovery feels like, and how our specialists ensure comfort at every step.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipPlC3f_8o1v2wd4nl_YW0aztum0opbPnC8XhlC9=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEJrByuOq0-v1RQ&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1767787175
+          },
+          {
+            "body": "Many patients ask, “When is it too late for bone and gum grafting?” The honest answer is… it depends. Bone and gum tissue can often be rebuilt, but timing matters.\n\nOur blog walks through the things dentists look for. That includes: how much support remains, the health of surrounding teeth, and what treatments may still work. It’s a good read if you’ve been unsure or nervous to ask.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipMHVtYC1nOLwSK2_y6jtqnpbrxML5LOlXkC7myK=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEMi6x6DH8quJ3AE&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1766506824
+          },
+          {
+            "body": "Tooth decay doesn’t show up all at once. It starts small. Tiny soft spots, sensitivity, and little hints that most people shrug off.\n\nOur newest blog gets into how decay forms and what helps slow it down or stop it. Nothing complicated. Just clear steps and what to watch for. If you’ve ever wondered when a “small” problem becomes a real one, this explains it well.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipNFHKfSfuXtFtVjPT9vmRb_YO20pg-EiVZNLYW6=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEKf9jujOv--nkQE&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1766058890
+          },
+          {
+            "body": "Even one or two missing teeth can throw off everyday routines. Chewing is now harder. Smiling feels different. Full and partial dentures are an affordable way to restore what you lost and make things feel steady again. We shape them carefully. They feel comfortable and blend in with your natural teeth.\n\nMost people adapt much faster than they think. If you have been considering dentures, the process might be more straightforward than you imagine.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipOo1Z81wjzIXroq6kA4qv17Ekjs_PlmOk-WsaM6=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEM-q5Or50P2lEA&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1765455364
+          },
+          {
+            "body": "A lot of people wait until something hurts, but good dental care can prevent it from happening in the first place Brushing and flossing help, sure, but cleanings catch the things you can’t see.\n\nAt 209 NYC Dental, our team checks for early signs of gum issues, tiny cavities, and changes you may not notice at home. It’s simple care that keeps long-term problems away.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipMIpXD3fJPLJGA5ZLi9r8Ylq8scEulxQ-m-E4Z8=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEO_x0uCznaOoKA&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1764850287
+          },
+          {
+            "body": "Sometimes, the secret to a balanced smile isn’t your teeth; it’s your gums.\n\nGum contouring gently reshapes excess tissue for a more proportionate look. The results? A confident smile that’s as natural as it looks.\n\nAt 209 NYC Dental, precision meets artistry. Our experts use gentle techniques and modern tools to ensure comfort and stunning results. We will transform subtle details to reveal your best smile.\n",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipMaTI_768FBxs_g_QOsnFifpVgw4PXMi4sZ-4c9=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEIzR2-Ly0Nj5iAE&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1764354127
+          },
+          {
+            "body": "A cracked or weakened tooth doesn’t mean it’s lost.\n\nDental crowns at 209 NYC Dental act like armor in protecting your teeth. They also restore its natural look and strength. We use advanced materials that match color, shape, and shine, so your crown feels like it’s always been there.\n\nPreserve what’s yours and restore what’s needed so you can smile without hesitation.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipNNyoHbv8Mf0w-VlYGCKPSA1MmEGxjR1bwYHFhm=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKELuZxbKmjobVPA&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1763638786
+          },
+          {
+            "body": "There’s a strange feeling when a tooth goes missing. The balance shifts. The smile feels off. A dental bridge brings that balance back. It restores shape, function, and comfort.\n\nAt 209 NYC Dental, our dental bridges are crafted to fit your mouth as if your tooth had never been gone. They are a strong, smooth, and natural option. You’ll feel confident to start smiling like yourself again.",
+            "image": "https://lh3.googleusercontent.com/geougc/AF1QipPVZ8nWHJ3heEtwmFffQUE2zvg1GMybNCMRqvTV=h400-no",
+            "link": "https://search.google.com/local/posts?q=209+NYC+Dental&ludocid=2850600632550464023&lpsid=CIHM0ogKEOiWhKepr4T4fw&source=sh/x/loc/post&lsig=AB86z5UzXL3c6HpccpHqSjPiZ-nN",
+            "timestamp": 1763032474
+          }
+        ],
+        "prices": null,
+        "query": "209 NYC Dental New York",
+        "range": null,
+        "rating": 4.9,
+        "reservation_links": null,
+        "reviews": 1779,
+        "reviews_id": "2850600632550464023",
+        "reviews_link": "https://search.google.com/local/reviews?placeid=ChIJb-HkRuRYwokRF5qsEyxejyc&q=*&authuser=0&hl=en&gl=US",
+        "reviews_per_score": {
+          "1": 37,
+          "2": 7,
+          "3": 12,
+          "4": 63,
+          "5": 1660
+        },
+        "reviews_tags": [
+          "root canal",
+          "friendly staff",
+          "wisdom teeth removal",
+          "periodontist",
+          "hygienist",
+          "kind staff",
+          "cleanliness",
+          "implants",
+          "invisalign",
+          "clear explanations"
+        ],
+        "state": "New York",
+        "state_code": "NY",
+        "street": "209 E 56th St 1st floor",
+        "street_view": "https://lh3.googleusercontent.com/gps-cs-s/AHVAweqY-cVpAadctsCI78ilPbb7-Bsk4eS_okIb2KqlmEiINk_DC8oCR9ck_8C7NbMVoSVHUOzmTc546zzcHCCfuc2VKYt8YVzZyTol-Kqu83MsazjWMDpm16tJFQimv43nD59veVMIpw=w1600-h1000-k-no",
+        "subtypes": "Dentist, Cosmetic dentist, Dental hygienist, Dental implants provider, Denture care center, Emergency dental service, Orthodontist, Pediatric dentist, Periodontist, Sleep clinic",
+        "time_zone": "America/New_York",
+        "type": "Dentist",
+        "typical_time_spent": "People typically spend 45 min to 1.5 hr here",
+        "verified": true,
+        "website": "https://www.209nycdental.com/%3Futm_source%3Dgoogle%26utm_medium%3Dorganic%26utm_campaign%3Dgmb",
+        "working_hours": {
+          "Friday": [
+            "7:30AM-5PM"
+          ],
+          "Monday": [
+            "7:30AM-6:30PM"
+          ],
+          "Saturday": [
+            "7:30AM-3PM"
+          ],
+          "Sunday": [
+            "9AM-3PM"
+          ],
+          "Thursday": [
+            "7:30AM-6:30PM"
+          ],
+          "Tuesday": [
+            "7:30AM-6:30PM"
+          ],
+          "Wednesday": [
+            "7:30AM-6:30PM"
+          ]
+        },
+        "working_hours_csv_compatible": "Sunday,9AM,3PM|Monday,7:30AM,6:30PM|Tuesday,7:30AM,6:30PM|Wednesday,7:30AM,6:30PM|Thursday,7:30AM,6:30PM|Friday,7:30AM,5PM|Saturday,7:30AM,3PM"
+      }
+    ]
+  ],
+  "id": "a-67f4ce46-06b2-404a-ab55-8f4616e15e95",
+  "status": "Success"
+}
+
+========================================================
+

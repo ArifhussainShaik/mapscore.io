@@ -11,6 +11,7 @@ import SEOChecklist from "./SEOChecklist";
 import IndustryBenchmarks from "./IndustryBenchmarks";
 import CategoryInsights from "./CategoryInsights";
 import ProfileActivity from "./ProfileActivity";
+import { IS_TESTING_MODE } from "@/libs/config";
 
 export default function AuditReport({ audit, isPro = false }) {
     if (!audit) return null;
@@ -84,6 +85,16 @@ export default function AuditReport({ audit, isPro = false }) {
                             Beta
                         </span>
                     </div>
+
+                    {IS_TESTING_MODE && (
+                        <div className="bg-yellow-100 text-yellow-800 px-4 py-2 text-sm font-medium rounded-lg mb-4 flex items-center gap-2 border border-yellow-200">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Testing Mode - All features unlocked, no credits required
+                        </div>
+                    )}
+
                     <p className="text-slate-600 text-lg max-w-2xl">
                         We&apos;ve analyzed <strong className="text-slate-900 font-bold">&apos;{audit.businessName}&apos;</strong> against local competitors. Here is your health check.
                     </p>

@@ -12,6 +12,7 @@ import { checkRateLimit } from "@/libs/rate-limit";
 import { fetchAuditData, fetchCompetitors } from "@/libs/data-provider";
 import { calculateScore } from "@/libs/scoring";
 import { detectIssues, generateActionPlan } from "@/libs/issues";
+import { IS_TESTING_MODE } from "@/libs/config";
 
 // ✅ SECURITY: Input validation schema
 const auditRequestSchema = z.object({
@@ -59,6 +60,10 @@ export async function POST(req) {
 
         const { placeId, businessName, city } = validationResult.data;
 
+        if (IS_TESTING_MODE) {
+            console.log('[TESTING MODE] Running fresh audit - cache and credits disabled');
+        }
+
         // 1. Get user and validate credits
         await connectMongo();
         const session = await getServerSession(authOptions);
@@ -74,12 +79,14 @@ export async function POST(req) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        // ⚠️ TEMPORARY: Paywall disabled for testing — RE-ENABLE BEFORE GOING LIVE
-        // const { canRunAudit, deductCredit } = await import("@/libs/credits");
-        // if (!canRunAudit(user)) {
-        //     return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-        // }
-        // await deductCredit(user);
+        // ⚠️ ENFORCE PAYWALL ONLY IF NOT IN TESTING MODE
+        if (!IS_TESTING_MODE) {
+            const { canRunAudit, deductCredit } = await import("@/libs/credits");
+            if (!canRunAudit(user)) {
+                return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+            }
+            await deductCredit(user);
+        }
 
         // 2. Create pending audit in MongoDB
         const pendingAudit = await Audit.create({

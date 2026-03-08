@@ -15,6 +15,7 @@ export async function calculateScore(auditData) {
 
     for (const section of scoringRules.sections) {
         let sectionTotal = 0;
+        let sectionMaxPoints = 0;
 
         for (const check of section.checks) {
             const result = evaluateCheck(check, auditData, section.id);
@@ -40,10 +41,14 @@ export async function calculateScore(auditData) {
             if (check.type !== "flag") {
                 if (!result.isNA) {
                     sectionTotal += result.score;
+                    sectionMaxPoints += check.max_points;
                     maxPossiblePoints += check.max_points;
                 }
             }
         }
+
+        // Fix: Category score can NEVER exceed its maximum possible points
+        sectionTotal = Math.min(sectionTotal, sectionMaxPoints);
 
         sectionScores[section.id] = sectionTotal;
         earnedPoints += sectionTotal;
@@ -167,8 +172,9 @@ function evaluateCheck(check, data, sectionId) {
             break;
 
         case "products":
-            if (data.products?.length > 0) score = 1;
-            else score = 1;
+            if (data.products === null || data.products === undefined) isNA = true;
+            else if (data.products?.length > 0) score = 1;
+            else score = 0;
             break;
 
         case "service_description_quality":
