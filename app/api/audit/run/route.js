@@ -125,7 +125,7 @@ export async function POST(req) {
     } catch (error) {
         console.error("[Audit API] Run error:", error);
         return NextResponse.json(
-            { error: "Failed to initialize audit" },
+            { error: error.message || "Failed to initialize audit" },
             { status: 500 }
         );
     }
@@ -141,11 +141,16 @@ async function runAuditSync(auditId, placeId, businessName, city) {
         await Audit.findByIdAndUpdate(auditId, { status: "processing" });
 
         // Step 1: Fetch data (DataForSEO calls now run in parallel internally)
+        console.log(`[Audit API] Fetching data for "${businessName}" (city: ${city || 'auto-detect'})`);
         const { data: rawData, source: dataSource } = await fetchAuditData(
             businessName,
             city,
             placeId
         );
+
+        if (!rawData || !rawData.businessName) {
+            throw new Error(`Could not find business data for "${businessName}". Verify the business name is correct.`);
+        }
 
         // Step 2: Start competitor fetch AND scoring in parallel
         // Competitor fetch needs primaryCategory from audit data, so it starts here

@@ -40,8 +40,14 @@ export async function fetchAuditData(businessName, city, placeId) {
     }
 
     let source = "dataforseo";
+    // Use the full business name + address as keyword — DataForSEO needs this for accurate matching
     const keyword = businessName;
-    const locationCode = businessName.toLowerCase().includes('india') ? 2356 : 2840;
+    // Default to US (2840); only override for explicitly Indian businesses
+    const lowerKeyword = keyword.toLowerCase();
+    const locationCode = (lowerKeyword.includes('india') || lowerKeyword.includes('mumbai') ||
+        lowerKeyword.includes('delhi') || lowerKeyword.includes('bangalore') || lowerKeyword.includes('chennai') ||
+        lowerKeyword.includes('hyderabad') || lowerKeyword.includes('kolkata'))
+        ? 2356 : 2840;
 
     console.log(`[DataProvider] Fetching data for: "${keyword}" (location: ${locationCode === 2356 ? 'India' : 'US'})`);
     const startTime = Date.now();
