@@ -148,19 +148,31 @@ export function compareNAP(nap1, nap2) {
     // Normalize and compare phones
     const phone1 = normalizePhone(nap1.phone || '');
     const phone2 = normalizePhone(nap2.phone || '');
-    const phoneSimilarity = phone1 && phone2 ? (phone1 === phone2 ? 100 : 0) : 0;
 
-    if (phoneSimilarity === 0 && phone1 && phone2) {
-        issues.push(`Phone number mismatch: "${nap1.phone}" vs "${nap2.phone}"`);
+    // Only compare phones when BOTH sides have one — absence on website ≠ inconsistency
+    let phoneSimilarity = null;
+    if (phone1 && phone2) {
+        phoneSimilarity = phone1 === phone2 ? 100 : 0;
+        if (phoneSimilarity === 0) {
+            issues.push(`Phone number mismatch: "${nap1.phone}" vs "${nap2.phone}"`);
+        }
     }
 
-    // Calculate overall score (weighted average)
-    const weights = { name: 0.4, address: 0.4, phone: 0.2 };
-    const overallScore = Math.round(
-        nameSimilarity * weights.name +
-        addressSimilarity * weights.address +
-        phoneSimilarity * weights.phone
-    );
+    // Calculate overall score — exclude phone weight if phone wasn't comparable
+    let overallScore;
+    if (phoneSimilarity !== null) {
+        overallScore = Math.round(
+            nameSimilarity * 0.4 +
+            addressSimilarity * 0.4 +
+            phoneSimilarity * 0.2
+        );
+    } else {
+        // Redistribute phone weight evenly across name and address
+        overallScore = Math.round(
+            nameSimilarity * 0.5 +
+            addressSimilarity * 0.5
+        );
+    }
 
     // Consider consistent if overall score is 90% or higher
     const consistent = overallScore >= 90;

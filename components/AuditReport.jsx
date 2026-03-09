@@ -294,6 +294,7 @@ export default function AuditReport({ audit, isPro = false }) {
                             availableCredits={audit.availableCredits || 0}
                             isUnlocked={isUnlocked}
                             onUnlock={handleUnlock}
+                            secondary={true}
                         >
                             <div className="space-y-16">
                                 {/* Preview of premium features */}
