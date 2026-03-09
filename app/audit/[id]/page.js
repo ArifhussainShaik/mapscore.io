@@ -5,6 +5,7 @@ import { useSearchParams, useParams } from "next/navigation";
 import Link from "next/link";
 import AuditReport from "@/components/AuditReport";
 import ScanningProgress from "@/components/ScanningProgress";
+import { IS_TESTING_MODE } from "@/libs/config";
 
 // Check if a string looks like a MongoDB ObjectId
 function isMongoId(str) {
@@ -31,6 +32,7 @@ export default function AuditPage() {
     const [scanning, setScanning] = useState(!isDbLoad);
     const [auditData, setAuditData] = useState(null);
     const [isDataReady, setIsDataReady] = useState(false);
+    const [creditsReady, setCreditsReady] = useState(false);
     const [error, setError] = useState(null);
     const [pendingAuditId, setPendingAuditId] = useState(null);
 
@@ -55,13 +57,16 @@ export default function AuditPage() {
             if (!res.ok) throw new Error(`Failed to load full audit: ${res.status}`);
             const { audit } = await res.json();
             saveAuditData(audit, sessionKey);
+            // Credits come embedded in the DB response — no separate fetch needed
+            setCreditsReady(true);
         } catch (err) {
             setError(err.message);
             setIsDataReady(true);
+            setCreditsReady(true);
         }
     }, [saveAuditData]);
 
-    const fetchLatestCredits = useCallback(async (currentAuditData) => {
+    const fetchLatestCredits = useCallback(async () => {
         try {
             const res = await fetch("/api/user/credits");
             if (res.ok) {
@@ -70,6 +75,8 @@ export default function AuditPage() {
             }
         } catch (err) {
             console.error("Failed to fetch latest credits:", err);
+        } finally {
+            setCreditsReady(true);
         }
     }, []);
 
@@ -91,7 +98,7 @@ export default function AuditPage() {
                             setAuditData(parsed);
                             setIsDataReady(true);
                             if (isDbLoad) setScanning(false);
-                            // Even if cached, fetch fresh credits silently
+                            // Fetch fresh credits — hide paywall CTA until resolved to avoid "Buy Credits" flash
                             fetchLatestCredits();
                             return;
                         }
@@ -229,7 +236,7 @@ export default function AuditPage() {
                 </div>
             </div>
 
-            <AuditReport audit={auditData} isPro={false} />
+            <AuditReport audit={auditData} isPro={IS_TESTING_MODE || auditData?.isUnlocked || false} creditsReady={creditsReady} />
         </main>
     );
 }

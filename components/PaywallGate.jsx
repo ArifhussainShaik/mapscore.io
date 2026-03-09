@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { IS_TESTING_MODE } from "@/libs/config";
 
-export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false, onUnlock, secondary = false }) {
+export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false, onUnlock, secondary = false, creditsReady = true }) {
     const router = useRouter();
     const [isUnlocking, setIsUnlocking] = useState(false);
 
@@ -81,7 +81,12 @@ export default function PaywallGate({ children, auditId, availableCredits = 0, i
                             Unlock the full report to view the competitor comparison, revenue impact, and complete action plan.
                         </p>
 
-                        {availableCredits > 0 ? (
+                        {!creditsReady ? (
+                            // Credits still loading — show neutral spinner to avoid "Buy Credits" flash
+                            <button disabled className="btn btn-block bg-slate-900 text-white border-none rounded-xl font-bold shadow-lg opacity-60">
+                                <span className="loading loading-spinner loading-sm"></span>
+                            </button>
+                        ) : availableCredits > 0 ? (
                             <button
                                 onClick={handleUnlock}
                                 disabled={isUnlocking}
@@ -102,7 +107,7 @@ export default function PaywallGate({ children, auditId, availableCredits = 0, i
                             </button>
                         )}
 
-                        {availableCredits > 0 && (
+                        {creditsReady && availableCredits > 0 && (
                             <p className="text-xs text-slate-400 mt-4 font-medium uppercase tracking-widest">
                                 {availableCredits} Credits Available
                             </p>

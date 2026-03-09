@@ -14,7 +14,7 @@ import ProfileActivity from "./ProfileActivity";
 import { useState } from "react";
 import { IS_TESTING_MODE } from "@/libs/config";
 
-export default function AuditReport({ audit, isPro = false }) {
+export default function AuditReport({ audit, isPro = false, creditsReady = true }) {
     // Shared unlock state — both paywall gates read this so unlocking one unlocks all
     const [isUnlocked, setIsUnlocked] = useState(audit?.isUnlocked || false);
     const handleUnlock = () => setIsUnlocked(true);
@@ -224,6 +224,7 @@ export default function AuditReport({ audit, isPro = false }) {
                             availableCredits={audit.availableCredits || 0}
                             isUnlocked={isUnlocked}
                             onUnlock={handleUnlock}
+                            creditsReady={creditsReady}
                         >
                             <CompetitorTable
                                 auditData={audit}
@@ -295,6 +296,7 @@ export default function AuditReport({ audit, isPro = false }) {
                             isUnlocked={isUnlocked}
                             onUnlock={handleUnlock}
                             secondary={true}
+                            creditsReady={creditsReady}
                         >
                             <div className="space-y-16">
                                 {/* Preview of premium features */}

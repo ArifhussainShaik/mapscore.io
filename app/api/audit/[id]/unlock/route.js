@@ -1,18 +1,15 @@
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Audit from "@/models/Audit";
 import { getAvailableCredits, consumeCredit } from "@/libs/credits";
 import connectMongo from "@/libs/mongoose";
 
-// Use App Router dynamic route convention
 export async function POST(req, { params }) {
     console.log('[UNLOCK] === Starting unlock process ===');
 
     try {
         // 1. Session check
         const session = await getServerSession(authOptions);
-        console.log('[UNLOCK] Session:', session?.user?.email);
         if (!session) {
             return Response.json({ error: 'Not authenticated' }, { status: 401 });
         }
@@ -21,55 +18,57 @@ export async function POST(req, { params }) {
         await connectMongo();
         const User = (await import("@/models/User")).default;
         const user = await User.findOne({ email: session.user.email });
-        console.log('[UNLOCK] User found:', user?._id);
         if (!user) {
             return Response.json({ error: 'User not found' }, { status: 404 });
         }
 
-        // 3. Get audit
-        const { id } = await params;
-        const auditId = id;
-        console.log('[UNLOCK] Audit ID:', auditId);
-        const audit = await Audit.findById(auditId);
-        console.log('[UNLOCK] Audit found:', audit?._id);
+        // 3. Get audit — enforce ownership so users can't unlock each other's audits
+        const { id: auditId } = await params;
+        const audit = await Audit.findOne({ _id: auditId, userId: user._id });
         if (!audit) {
-            return Response.json({ error: 'Audit not found' }, { status: 404 });
+            return Response.json({ error: 'Audit not found or access denied' }, { status: 404 });
         }
 
-        // 4. Check if already unlocked
+        // 4. Already unlocked — idempotent, no credit needed
         if (audit.isUnlocked) {
-            console.log('[UNLOCK] Already unlocked');
             return Response.json({ success: true, alreadyUnlocked: true });
         }
 
         // 5. Check credits
         const availableCredits = await getAvailableCredits(user._id);
-        console.log('[UNLOCK] Available credits:', availableCredits);
         if (availableCredits < 1) {
-            return Response.json({ error: 'Insufficient credits' }, { status: 400 });
+            return Response.json({ error: 'Insufficient credits', code: 'NO_CREDITS' }, { status: 400 });
         }
 
-        // 6. Consume credit
-        console.log('[UNLOCK] Attempting to consume credit...');
+        // 6. Atomic guard — mark as unlocked only if it hasn't been unlocked yet.
+        //    This prevents a race condition where two rapid clicks both pass step 4
+        //    and both consume a credit.
+        const claimed = await Audit.findOneAndUpdate(
+            { _id: auditId, isUnlocked: false },
+            { $set: { isUnlocked: true, unlockedAt: new Date(), unlockedBy: user._id } },
+            { new: false } // return original doc — if null, someone else beat us to it
+        );
+
+        if (!claimed) {
+            // Another request already unlocked it between our check and now
+            return Response.json({ success: true, alreadyUnlocked: true });
+        }
+
+        // 7. Consume credit (after atomic lock is secured)
         const creditResult = await consumeCredit(user._id, 1, auditId);
-        console.log('[UNLOCK] Credit consumption result:', creditResult);
         if (!creditResult.success) {
+            // Roll back the unlock if credit deduction fails
+            await Audit.findByIdAndUpdate(auditId, {
+                $set: { isUnlocked: false, unlockedAt: null, unlockedBy: null }
+            });
             return Response.json({ error: creditResult.error || 'Credit deduction failed' }, { status: 400 });
         }
 
-        // 7. Mark audit as unlocked
-        console.log('[UNLOCK] Marking audit as unlocked...');
-        audit.isUnlocked = true;
-        audit.unlockedAt = new Date();
-        audit.unlockedBy = user._id;
-        await audit.save();
-        console.log('[UNLOCK] Audit saved successfully');
-
+        console.log('[UNLOCK] Success. Credits remaining:', creditResult.creditsRemaining);
         return Response.json({ success: true, creditsRemaining: creditResult.creditsRemaining });
 
     } catch (error) {
         console.error('[UNLOCK] ERROR:', error.message);
-        console.error('[UNLOCK] Stack:', error.stack);
         return Response.json({ error: error.message }, { status: 500 });
     }
 }

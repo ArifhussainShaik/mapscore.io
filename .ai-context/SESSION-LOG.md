@@ -91,8 +91,41 @@
 
 ---
 
+---
+
+## Session Extension — Critical Fixes (same date, later)
+
+### Root causes found via deep codebase audit (Explore agent)
+
+#### `app/audit/[id]/page.js`
+- **CRITICAL BUG FIXED:** `isPro={false}` was hardcoded on line 232. Users could never see premium content even after paying/unlocking. Fixed to `isPro={IS_TESTING_MODE || auditData?.isUnlocked || false}`. `audit.isUnlocked` is correctly set by the unlock API and returned by the GET endpoint.
+- **Testing mode fixed:** `IS_TESTING_MODE` now also bypasses `isPro` so testing works end-to-end.
+- **Credits flash fixed:** Added `creditsReady` state. DB loads set it immediately (credits come with the response). SessionStorage loads wait for `fetchLatestCredits()` to resolve before setting it. Passed through to AuditReport → PaywallGate.
+
+#### `app/api/audit/[id]/unlock/route.js`
+- **SECURITY FIX:** Added ownership check — `Audit.findOne({ _id: auditId, userId: user._id })`. Previously any authenticated user could unlock any audit ID (IDOR vulnerability).
+- **RACE CONDITION FIX:** Replaced check-then-act pattern with `Audit.findOneAndUpdate({ _id, isUnlocked: false }, ...)`. Two simultaneous unlock requests can no longer both consume a credit. If the atomic update returns null, the request returns `alreadyUnlocked: true`. Credit rollback added if `consumeCredit` fails after the atomic lock.
+
+#### `components/PaywallGate.jsx`
+- **Credits flash fix:** Added `creditsReady` prop. Shows a neutral spinner while credits load, preventing "Buy Credits" from flashing before credits are known.
+- **Secondary gate:** Added `secondary` prop (from previous session). Secondary gate shows "↑ Unlock above" nudge instead of a full unlock CTA.
+
+#### `components/AuditReport.jsx`
+- Accepts and threads `creditsReady` prop to both PaywallGate instances.
+
+### Decisions Made
+- `isPro` is derived purely from `audit.isUnlocked` (not a separate user role). Simple and correct for the pay-per-audit model.
+- Atomic unlock uses `findOneAndUpdate` with `{ isUnlocked: false }` condition — no separate transaction needed. Credit rollback handles the edge case where unlock succeeds but credit deduction fails.
+- `creditsReady=true` default in AuditReport/PaywallGate preserves backward compatibility for any other callers.
+
+### New Issues Still Open
+- NAP "Needs Attention + 100%" — nap-checker.js fix is on disk + .next cleared. Needs dev server restart to verify.
+- Sentiment keyword analysis has no negation handling (e.g. "not great" scores as positive). Low priority for now.
+- Benchmarks percentile returns 1st percentile for 0-value metrics — minor edge case.
+
 ## End of Session Checklist
-- [ ] Run a live audit to verify BUG-1 (competitors), BUG-2 (category name), BUG-7 (benchmarks)
+- [ ] Restart dev server and verify NAP shows "Unable to Verify" or correct status
+- [ ] Run a live audit on a NEW business to confirm isPro flows correctly after unlock
 - [ ] Add real `DODO_*_CHECKOUT_URL` values to `.env.local` and Vercel env vars
 - [ ] Merge this into CHANGELOG.md
 - [ ] Update master-architecture.md if needed
