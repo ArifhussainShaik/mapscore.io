@@ -31,7 +31,7 @@ export default function CompetitorTable({ competitors, auditData }) {
 
     // You Data
     const youName = auditData?.businessName || "Your Business";
-    const youScore = auditData?.totalScore || 72;
+    const youScore = auditData?.totalScore || 0;
     const youReviews = auditData?.reviewCount || 0;
     const youPhotos = auditData?.photoCount || 0;
     const youRating = auditData?.averageRating || 0;
@@ -46,18 +46,23 @@ export default function CompetitorTable({ competitors, auditData }) {
     // Standing color
     const standingColor = standing === 1 ? "text-emerald-600" : standing <= 2 ? "text-amber-500" : "text-red-500";
 
-    // Rival Data (First Competitor)
-    const rivalName = competitors[0]?.name || "Competitor 1";
-    const rivalReviews = competitors[0]?.reviewCount || 0;
-    const rivalRating = competitors[0]?.rating || 0;
-    const rivalPhotos = competitors[0]?.photoCount || 0;
+    // Bug B fix: Market Leader = competitor with most reviews, not just index [1]
+    const sorted = [...competitors].sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+    const leaderComp = sorted[0] || competitors[0];
+    const rivalComp = sorted[1] || sorted[0] || competitors[0];
+
+    // Rival Data
+    const rivalName = rivalComp?.name || "Competitor";
+    const rivalReviews = rivalComp?.reviewCount || 0;
+    const rivalRating = rivalComp?.rating || 0;
+    const rivalPhotos = rivalComp?.photoCount || 0;
     const moreReviewsRival = rivalReviews > youReviews ? rivalReviews - youReviews : 0;
 
-    // Leader Data (Second Competitor)
-    const leaderName = competitors[1]?.name || "Competitor 2";
-    const leaderReviews = competitors[1]?.reviewCount || 0;
-    const leaderRating = competitors[1]?.rating || 0;
-    const leaderPhotos = competitors[1]?.photoCount || 0;
+    // Leader Data
+    const leaderName = leaderComp?.name || "Market Leader";
+    const leaderReviews = leaderComp?.reviewCount || 0;
+    const leaderRating = leaderComp?.rating || 0;
+    const leaderPhotos = leaderComp?.photoCount || 0;
     const moreReviewsLeader = leaderReviews > youReviews ? leaderReviews - youReviews : 0;
     const photoMultiplier = youPhotos > 0 ? Math.round(leaderPhotos / youPhotos) : 0;
 
@@ -101,16 +106,17 @@ export default function CompetitorTable({ competitors, auditData }) {
                         YOU{standing ? ` • ${ordinal(standing)}` : ""}
                     </div>
                     <div className="flex flex-col items-center mb-6 mt-2">
-                        <div className="relative w-24 h-24 mb-4 flex items-center justify-center">
-                            <svg className="transform -rotate-90 w-24 h-24 whitespace-nowrap">
-                                <circle className="text-slate-100" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeWidth="8"></circle>
-                                <circle className="text-amber-500" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * youScore) / 100} strokeWidth="8"></circle>
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-3xl font-bold text-slate-900">{youScore}</span>
+                        {/* Bug A fix: show star rating (same metric as competitors), not audit score */}
+                        <div className="relative w-24 h-24 mb-4 flex items-center justify-center bg-amber-50 rounded-full">
+                            <div className="flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold text-slate-900">{youRating || "—"}</span>
+                                <span className="text-xs text-slate-500">rating</span>
                             </div>
                         </div>
-                        <span className={`font-bold text-xs tracking-wide uppercase px-3 py-1 rounded-full mb-3 ${youScore >= 80 ? 'text-emerald-600 bg-emerald-50' : youScore >= 60 ? 'text-amber-600 bg-amber-50' : 'text-red-600 bg-red-50'}`}>{youScore >= 80 ? 'Strong' : youScore >= 60 ? 'Needs Work' : 'Needs Attention'}</span>
+                        {/* Audit score shown as a small secondary badge */}
+                        <span className={`font-bold text-xs tracking-wide uppercase px-3 py-1 rounded-full mb-3 ${youScore >= 80 ? 'text-emerald-600 bg-emerald-50' : youScore >= 60 ? 'text-amber-600 bg-amber-50' : 'text-red-600 bg-red-50'}`}>
+                            {youScore}/100 MapScore
+                        </span>
                         <h3 className="text-xl font-bold text-slate-900 max-w-[200px] truncate" title={youName}>{youName}</h3>
                         <p className="text-sm text-slate-500 truncate" title={auditData?.address}>
                             {auditData?.address?.split(",")[0] || "Your Address"}
