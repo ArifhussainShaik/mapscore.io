@@ -166,42 +166,110 @@ export async function getBusinessDetails(businessName, city, placeId) {
 }
 
 // ─────────────────────────────────────────────
-// 3. Get competitors via Map Pack search rankings
+// 3. Get competitors via Google Maps
 // ─────────────────────────────────────────────
 
 /**
- * Find top competitors from actual Google Map Pack search results.
- * Uses the /search endpoint which returns the real map pack,
- * NOT the /maps endpoint which returns proximity-based results.
+ * Map suburbs to their metro area for better search results.
+ * If a suburb search returns 0 results, we fall back to the metro area.
+ */
+const METRO_AREAS = {
+    // Dallas-Fort Worth
+    'garland': 'Dallas, TX', 'plano': 'Dallas, TX', 'frisco': 'Dallas, TX',
+    'mckinney': 'Dallas, TX', 'irving': 'Dallas, TX', 'arlington': 'Dallas, TX',
+    'coppell': 'Dallas, TX', 'carrollton': 'Dallas, TX', 'richardson': 'Dallas, TX',
+    'mesquite': 'Dallas, TX', 'lewisville': 'Dallas, TX', 'denton': 'Dallas, TX',
+    'flower mound': 'Dallas, TX', 'allen': 'Dallas, TX', 'wylie': 'Dallas, TX',
+    'fort worth': 'Dallas, TX', 'grand prairie': 'Dallas, TX',
+    // Houston
+    'sugar land': 'Houston, TX', 'katy': 'Houston, TX', 'pearland': 'Houston, TX',
+    'the woodlands': 'Houston, TX', 'pasadena': 'Houston, TX', 'league city': 'Houston, TX',
+    'missouri city': 'Houston, TX', 'cypress': 'Houston, TX', 'spring': 'Houston, TX',
+    // Los Angeles
+    'long beach': 'Los Angeles, CA', 'santa monica': 'Los Angeles, CA',
+    'glendale': 'Los Angeles, CA', 'burbank': 'Los Angeles, CA',
+    'huntington beach': 'Los Angeles, CA', 'irvine': 'Los Angeles, CA',
+    'anaheim': 'Los Angeles, CA', 'costa mesa': 'Los Angeles, CA',
+    'torrance': 'Los Angeles, CA', 'pasadena': 'Los Angeles, CA',
+    // Chicago
+    'naperville': 'Chicago, IL', 'aurora': 'Chicago, IL', 'joliet': 'Chicago, IL',
+    'elgin': 'Chicago, IL', 'evanston': 'Chicago, IL', 'schaumburg': 'Chicago, IL',
+    // Phoenix
+    'scottsdale': 'Phoenix, AZ', 'tempe': 'Phoenix, AZ', 'mesa': 'Phoenix, AZ',
+    'chandler': 'Phoenix, AZ', 'gilbert': 'Phoenix, AZ', 'glendale': 'Phoenix, AZ',
+    // Atlanta
+    'marietta': 'Atlanta, GA', 'roswell': 'Atlanta, GA', 'alpharetta': 'Atlanta, GA',
+    'decatur': 'Atlanta, GA', 'sandy springs': 'Atlanta, GA',
+    // San Francisco Bay Area
+    'oakland': 'San Francisco, CA', 'san jose': 'San Francisco, CA',
+    'fremont': 'San Francisco, CA', 'sunnyvale': 'San Francisco, CA',
+    'palo alto': 'San Francisco, CA', 'mountain view': 'San Francisco, CA',
+    // Miami
+    'hialeah': 'Miami, FL', 'coral gables': 'Miami, FL', 'fort lauderdale': 'Miami, FL',
+    'hollywood': 'Miami, FL', 'pembroke pines': 'Miami, FL',
+    // New York
+    'jersey city': 'New York, NY', 'yonkers': 'New York, NY',
+    'white plains': 'New York, NY', 'stamford': 'New York, NY',
+};
+
+function getMetroArea(city) {
+    if (!city) return null;
+    const cityLower = city.toLowerCase().split(',')[0].trim();
+    return METRO_AREAS[cityLower] || null;
+}
+
+/**
+ * Find top competitors from Google Maps results.
+ * Tries the given city first; if 0 results, falls back to metro area.
  *
- * @param {string} category - Business primary category (e.g., "Auto repair shop")
+ * @param {string} category - Business primary category
  * @param {string} city - City/location
- * @param {string} [excludeName] - Business name to exclude from results
+ * @param {string} [excludeName] - Business name to exclude
  * @returns {Promise<{ competitors: Array, searchQueries: string[] }>}
  */
 export async function getCompetitors(category, city, excludeName = "") {
-    // Build multiple search queries to find real map pack competitors
+    // First try with the original city
+    let result = await searchCompetitors(category, city, excludeName);
+
+    // If no results, try metro area fallback
+    if (result.competitors.length === 0) {
+        const metroArea = getMetroArea(city);
+        if (metroArea && metroArea !== city) {
+            console.log(`[Serper] No results in "${city}", trying metro area: "${metroArea}"`);
+            result = await searchCompetitors(category, metroArea, excludeName);
+            result.searchQueries = result.searchQueries.map(q => `${q} (metro fallback from ${city})`);
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Internal: search for competitors using multiple queries.
+ */
+async function searchCompetitors(category, city, excludeName) {
     const searchQueries = [
         `${category} ${city}`,
         `${category} near me ${city}`,
         `best ${category} ${city}`,
     ];
 
-    console.log(`[Serper] Searching map pack with ${searchQueries.length} queries for "${category}" in "${city}"`);
+    console.log(`[Serper] Searching with ${searchQueries.length} queries for "${category}" in "${city}"`);
 
     const allPlaces = [];
 
     for (const query of searchQueries) {
         try {
-            const data = await serperFetch("/search", {
+            const data = await serperFetch("/maps", {
                 q: query,
-                num: 5,
+                num: 10,
             });
 
-            // The /search endpoint returns a "places" array = the map pack
-            const places = data.places || [];
+            // Log raw response for debugging
+            console.log(`[Serper] Raw response for "${query}":`, JSON.stringify(data).slice(0, 500));
 
-            console.log(`[Serper] Query "${query}" returned ${places.length} map pack results`);
+            const places = data.places || [];
+            console.log(`[Serper] Query "${query}" returned ${places.length} map results`);
 
             for (const place of places.slice(0, 5)) {
                 allPlaces.push({
@@ -211,6 +279,7 @@ export async function getCompetitors(category, city, excludeName = "") {
                     rating: place.rating || 0,
                     address: place.address || "",
                     cid: place.cid || "",
+                    photoCount: place.thumbnailUrl ? 20 : 0,
                     position: place.position || 0,
                     query,
                 });
@@ -233,7 +302,6 @@ export async function getCompetitors(category, city, excludeName = "") {
         if (competitorMap.has(key)) {
             const existing = competitorMap.get(key);
             existing.appearanceCount++;
-            // Keep the better data (more reviews, etc.)
             if (place.reviewCount > existing.reviewCount) {
                 existing.reviewCount = place.reviewCount;
             }
@@ -248,7 +316,7 @@ export async function getCompetitors(category, city, excludeName = "") {
                 rating: place.rating,
                 address: place.address,
                 cid: place.cid,
-                photoCount: 20,  // Estimate — Serper doesn't return this
+                photoCount: place.photoCount || 20,
                 postActivity: "unknown",
                 appearanceCount: 1,
             });
