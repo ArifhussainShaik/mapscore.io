@@ -223,7 +223,14 @@ export function checkNAPConsistency(gbpData, websiteData = null, otherSources = 
     let message = 'Your NAP is perfectly consistent across all sources.';
     const recommendations = [];
 
-    if (overallConsistency < 90) {
+    if (!websiteData && otherSources.length === 0) {
+        // No data to compare against — can't verify
+        status = 'unverified';
+        message = 'Could not verify NAP consistency. No website contact data or other sources found to compare against.';
+        recommendations.push('Add structured contact information (JSON-LD schema) to your website');
+        recommendations.push('Include Name, Address, Phone in your website footer and contact page');
+        overallConsistency = null;
+    } else if (overallConsistency < 90) {
         status = 'critical';
         message = 'Critical NAP inconsistencies detected! This is hurting your local SEO.';
         recommendations.push('Update all listings to match your Google Business Profile exactly');
@@ -235,11 +242,6 @@ export function checkNAPConsistency(gbpData, websiteData = null, otherSources = 
         message = 'Minor NAP inconsistencies found. Consider standardizing.';
         recommendations.push('Review and standardize NAP across all platforms');
         recommendations.push('Update your website to match GBP exactly');
-    } else if (!websiteData) {
-        status = 'warning';
-        message = 'Could not verify website NAP. Ensure your contact info is on your website.';
-        recommendations.push('Add clear contact information to your website');
-        recommendations.push('Include NAP in website footer and contact page');
     }
 
     return {

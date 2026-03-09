@@ -38,23 +38,27 @@ export default function NAPChecker({ audit }) {
 
     const statusColor =
         consistencyReport.status === 'excellent' ? 'green' :
-        consistencyReport.status === 'warning' ? 'amber' :
-        'red';
+            consistencyReport.status === 'warning' ? 'amber' :
+                consistencyReport.status === 'unverified' ? 'slate' :
+                    'red';
 
     const statusBgColor =
         consistencyReport.status === 'excellent' ? 'bg-green-50' :
-        consistencyReport.status === 'warning' ? 'bg-amber-50' :
-        'bg-red-50';
+            consistencyReport.status === 'warning' ? 'bg-amber-50' :
+                consistencyReport.status === 'unverified' ? 'bg-slate-50' :
+                    'bg-red-50';
 
     const statusTextColor =
         consistencyReport.status === 'excellent' ? 'text-green-700' :
-        consistencyReport.status === 'warning' ? 'text-amber-700' :
-        'text-red-700';
+            consistencyReport.status === 'warning' ? 'text-amber-700' :
+                consistencyReport.status === 'unverified' ? 'text-slate-500' :
+                    'text-red-700';
 
     const statusIcon =
         consistencyReport.status === 'excellent' ? '✓' :
-        consistencyReport.status === 'warning' ? '⚠' :
-        '✗';
+            consistencyReport.status === 'warning' ? '⚠' :
+                consistencyReport.status === 'unverified' ? '?' :
+                    '✗';
 
     return (
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100">
@@ -75,27 +79,30 @@ export default function NAPChecker({ audit }) {
                             <span className="text-2xl">{statusIcon}</span>
                             <span className={`text-lg font-bold ${statusTextColor}`}>
                                 {consistencyReport.status === 'excellent' ? 'Excellent' :
-                                 consistencyReport.status === 'warning' ? 'Needs Attention' :
-                                 'Critical Issues'}
+                                    consistencyReport.status === 'warning' ? 'Needs Attention' :
+                                        consistencyReport.status === 'unverified' ? 'Unable to Verify' :
+                                            'Critical Issues'}
                             </span>
                         </div>
                         <p className="text-sm text-slate-700">{consistencyReport.message}</p>
                     </div>
                     <div className="text-right">
                         <div className={`text-4xl font-black ${statusTextColor}`}>
-                            {consistencyReport.consistencyScore}%
+                            {consistencyReport.consistencyScore != null ? `${consistencyReport.consistencyScore}%` : 'N/A'}
                         </div>
                         <p className="text-xs text-slate-500 mt-1">Consistency</p>
                     </div>
                 </div>
 
-                {/* Progress bar */}
-                <div className="w-full bg-white/50 rounded-full h-2 mt-4">
-                    <div
-                        className={`h-2 rounded-full transition-all duration-700 bg-${statusColor}-500`}
-                        style={{ width: `${consistencyReport.consistencyScore}%` }}
-                    />
-                </div>
+                {/* Progress bar — only show if we have a score */}
+                {consistencyReport.consistencyScore != null && (
+                    <div className="w-full bg-white/50 rounded-full h-2 mt-4">
+                        <div
+                            className={`h-2 rounded-full transition-all duration-700 bg-${statusColor}-500`}
+                            style={{ width: `${consistencyReport.consistencyScore}%` }}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Current NAP Data */}
@@ -132,34 +139,30 @@ export default function NAPChecker({ audit }) {
                                     <span className="text-xs font-semibold text-slate-600">
                                         {comp.source1} vs {comp.source2}
                                     </span>
-                                    <span className={`text-xs font-bold ${
-                                        comp.consistent ? 'text-green-600' : 'text-red-600'
-                                    }`}>
+                                    <span className={`text-xs font-bold ${comp.consistent ? 'text-green-600' : 'text-red-600'
+                                        }`}>
                                         {comp.overallScore}% match
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
                                         <span className="text-slate-500">Name:</span>
-                                        <span className={`ml-1 font-semibold ${
-                                            comp.nameSimilarity >= 90 ? 'text-green-600' : 'text-red-600'
-                                        }`}>
+                                        <span className={`ml-1 font-semibold ${comp.nameSimilarity >= 90 ? 'text-green-600' : 'text-red-600'
+                                            }`}>
                                             {comp.nameSimilarity}%
                                         </span>
                                     </div>
                                     <div>
                                         <span className="text-slate-500">Address:</span>
-                                        <span className={`ml-1 font-semibold ${
-                                            comp.addressSimilarity >= 85 ? 'text-green-600' : 'text-red-600'
-                                        }`}>
+                                        <span className={`ml-1 font-semibold ${comp.addressSimilarity >= 85 ? 'text-green-600' : 'text-red-600'
+                                            }`}>
                                             {comp.addressSimilarity}%
                                         </span>
                                     </div>
                                     <div>
                                         <span className="text-slate-500">Phone:</span>
-                                        <span className={`ml-1 font-semibold ${
-                                            comp.phoneSimilarity >= 90 ? 'text-green-600' : 'text-red-600'
-                                        }`}>
+                                        <span className={`ml-1 font-semibold ${comp.phoneSimilarity >= 90 ? 'text-green-600' : 'text-red-600'
+                                            }`}>
                                             {comp.phoneSimilarity}%
                                         </span>
                                     </div>
@@ -179,9 +182,8 @@ export default function NAPChecker({ audit }) {
                     <ul className="space-y-2">
                         {consistencyReport.issues.map((issue, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm">
-                                <span className={`mt-0.5 ${
-                                    consistencyReport.status === 'excellent' ? 'text-green-500' : 'text-red-500'
-                                }`}>
+                                <span className={`mt-0.5 ${consistencyReport.status === 'excellent' ? 'text-green-500' : 'text-red-500'
+                                    }`}>
                                     {consistencyReport.status === 'excellent' ? '✓' : '•'}
                                 </span>
                                 <span className="text-slate-700">{issue}</span>

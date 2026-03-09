@@ -9,6 +9,21 @@ export default function RevenueImpact({ audit }) {
 
     // 1. Calculate Competitor Average Reviews
     const competitors = audit.competitors || [];
+
+    // Don't render if no competitor data — would show misleading $0
+    if (competitors.length === 0) {
+        return (
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-bold uppercase tracking-wider w-max mb-4">
+                    Revenue Leak
+                </span>
+                <h3 className="text-xl font-bold text-slate-700 mb-2 font-serif">Revenue Impact Unavailable</h3>
+                <p className="text-sm text-slate-500">
+                    Competitor data could not be retrieved for your area. Re-run the audit to calculate your estimated revenue impact.
+                </p>
+            </div>
+        );
+    }
     let avgCompetitorReviews = 0;
 
     if (competitors.length > 0) {

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 export default function ReviewSentiment({ audit }) {
     const [sentiment, setSentiment] = useState(null);
     const [insights, setInsights] = useState(null);
+    const [isEstimated, setIsEstimated] = useState(false);
 
     useEffect(() => {
         if (!audit) return;
@@ -14,11 +15,13 @@ export default function ReviewSentiment({ audit }) {
             const analysis = analyzeBulkReviews(audit.reviews);
             setSentiment(analysis);
             setInsights(getSentimentInsights(analysis));
+            setIsEstimated(false);
         } else if (audit.averageRating && audit.reviewCount) {
             // Fallback to estimation from rating
             const estimation = estimateSentimentFromRating(audit.averageRating, audit.reviewCount);
             setSentiment(estimation);
             setInsights(getSentimentInsights({ ...estimation, totalReviews: audit.reviewCount }));
+            setIsEstimated(true);
         }
     }, [audit]);
 
@@ -30,7 +33,14 @@ export default function ReviewSentiment({ audit }) {
 
     return (
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col h-full">
-            <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">Review Sentiment</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold font-serif text-slate-900">Review Sentiment</h3>
+                {isEstimated && (
+                    <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-full">
+                        Estimated · {audit.averageRating}★ avg
+                    </span>
+                )}
+            </div>
 
             {insights && (
                 <p className="text-sm text-slate-600 mb-6">{insights.message}</p>

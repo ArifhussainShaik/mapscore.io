@@ -5,13 +5,12 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { IS_TESTING_MODE } from "@/libs/config";
 
-export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false }) {
+export default function PaywallGate({ children, auditId, availableCredits = 0, isUnlocked = false, onUnlock }) {
     const router = useRouter();
     const [isUnlocking, setIsUnlocking] = useState(false);
-    const [localUnlocked, setLocalUnlocked] = useState(isUnlocked);
 
     // If unlocked or there's no feature to gate, render normally.
-    if (localUnlocked || IS_TESTING_MODE) {
+    if (isUnlocked || IS_TESTING_MODE) {
         return <>{children}</>;
     }
 
@@ -25,7 +24,8 @@ export default function PaywallGate({ children, auditId, availableCredits = 0, i
 
             if (res.ok && data.success) {
                 toast.success("Audit unlocked successfully!");
-                setLocalUnlocked(true);
+                // Notify parent so all gates unlock simultaneously
+                if (onUnlock) onUnlock();
                 setIsUnlocking(false);
                 // Try to clear cached locked state from session storage
                 try {

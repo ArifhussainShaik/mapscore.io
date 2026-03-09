@@ -226,9 +226,9 @@ async function runAuditSync(auditId, placeId, businessName, city) {
         else auditUpdate.postsPerMonth = 0;
 
         const validFrequencies = ["weekly", "monthly", "rarely", "never", "unknown"];
-        if (!validFrequencies.includes(auditUpdate.postFrequency)) {
-            auditUpdate.postFrequency = "unknown";
-        }
+        auditUpdate.postFrequency = validFrequencies.includes(rawData.postFrequency)
+            ? rawData.postFrequency
+            : "unknown";
 
         if (rawData.competitors?.length > 0) {
             for (const comp of rawData.competitors) {

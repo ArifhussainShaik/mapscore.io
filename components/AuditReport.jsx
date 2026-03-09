@@ -11,9 +11,14 @@ import SEOChecklist from "./SEOChecklist";
 import IndustryBenchmarks from "./IndustryBenchmarks";
 import CategoryInsights from "./CategoryInsights";
 import ProfileActivity from "./ProfileActivity";
+import { useState } from "react";
 import { IS_TESTING_MODE } from "@/libs/config";
 
 export default function AuditReport({ audit, isPro = false }) {
+    // Shared unlock state — both paywall gates read this so unlocking one unlocks all
+    const [isUnlocked, setIsUnlocked] = useState(audit?.isUnlocked || false);
+    const handleUnlock = () => setIsUnlocked(true);
+
     if (!audit) return null;
 
     // Grab all issues and sort by severity to get top 5
@@ -217,7 +222,8 @@ export default function AuditReport({ audit, isPro = false }) {
                             title="Unlock Neighborhood Standings"
                             auditId={audit.id || audit._id}
                             availableCredits={audit.availableCredits || 0}
-                            isUnlocked={audit.isUnlocked}
+                            isUnlocked={isUnlocked}
+                            onUnlock={handleUnlock}
                         >
                             <CompetitorTable
                                 auditData={audit}
@@ -286,7 +292,8 @@ export default function AuditReport({ audit, isPro = false }) {
                             title="Unlock Premium Features"
                             auditId={audit.id || audit._id}
                             availableCredits={audit.availableCredits || 0}
-                            isUnlocked={audit.isUnlocked}
+                            isUnlocked={isUnlocked}
+                            onUnlock={handleUnlock}
                         >
                             <div className="space-y-16">
                                 {/* Preview of premium features */}

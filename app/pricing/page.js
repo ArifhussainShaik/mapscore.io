@@ -15,9 +15,9 @@ export default async function PricingPage() {
         currentBalance = await getAvailableCredits(session.user.id);
     }
 
-    const DODO_STARTER_URL = process.env.DODO_STARTER_CHECKOUT_URL || "#";
-    const DODO_GROWTH_URL = process.env.DODO_GROWTH_CHECKOUT_URL || "#";
-    const DODO_AGENCY_URL = process.env.DODO_AGENCY_CHECKOUT_URL || "#";
+    const DODO_STARTER_URL = process.env.DODO_STARTER_CHECKOUT_URL || null;
+    const DODO_GROWTH_URL = process.env.DODO_GROWTH_CHECKOUT_URL || null;
+    const DODO_AGENCY_URL = process.env.DODO_AGENCY_CHECKOUT_URL || null;
 
     // Reusable UI Features component
     const PackFeatures = () => (
@@ -86,10 +86,11 @@ export default async function PricingPage() {
                         </div>
 
                         <a
-                            href={session ? `${DODO_STARTER_URL}?sub=${session.user.email}` : "/login"}
-                            className="btn btn-block bg-slate-900 hover:bg-slate-800 text-white border-none rounded-xl font-bold mt-auto"
+                            href={!session ? "/login" : DODO_STARTER_URL ? `${DODO_STARTER_URL}?sub=${session.user.email}` : undefined}
+                            aria-disabled={session && !DODO_STARTER_URL}
+                            className={`btn btn-block bg-slate-900 hover:bg-slate-800 text-white border-none rounded-xl font-bold mt-auto ${session && !DODO_STARTER_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
-                            {session ? "Buy 3 Credits" : "Login to Buy"}
+                            {!session ? "Login to Buy" : DODO_STARTER_URL ? "Buy 3 Credits" : "Coming Soon"}
                         </a>
                     </div>
 
@@ -118,10 +119,11 @@ export default async function PricingPage() {
                         </div>
 
                         <a
-                            href={session ? `${DODO_GROWTH_URL}?sub=${session.user.email}` : "/login"}
-                            className="btn btn-block bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-xl font-bold text-lg mt-auto shadow-lg shadow-emerald-500/30"
+                            href={!session ? "/login" : DODO_GROWTH_URL ? `${DODO_GROWTH_URL}?sub=${session.user.email}` : undefined}
+                            aria-disabled={session && !DODO_GROWTH_URL}
+                            className={`btn btn-block bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-xl font-bold text-lg mt-auto shadow-lg shadow-emerald-500/30 ${session && !DODO_GROWTH_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
-                            {session ? "Buy 10 Credits" : "Login to Buy"}
+                            {!session ? "Login to Buy" : DODO_GROWTH_URL ? "Buy 10 Credits" : "Coming Soon"}
                         </a>
                     </div>
 
@@ -147,10 +149,11 @@ export default async function PricingPage() {
                         </div>
 
                         <a
-                            href={session ? `${DODO_AGENCY_URL}?sub=${session.user.email}` : "/login"}
-                            className="btn btn-block bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 rounded-xl font-bold mt-auto"
+                            href={!session ? "/login" : DODO_AGENCY_URL ? `${DODO_AGENCY_URL}?sub=${session.user.email}` : undefined}
+                            aria-disabled={session && !DODO_AGENCY_URL}
+                            className={`btn btn-block bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 rounded-xl font-bold mt-auto ${session && !DODO_AGENCY_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
-                            {session ? "Buy 30 Credits" : "Login to Buy"}
+                            {!session ? "Login to Buy" : DODO_AGENCY_URL ? "Buy 30 Credits" : "Coming Soon"}
                         </a>
                     </div>
 
