@@ -27,7 +27,7 @@ export default function LandingPage() {
             <a href="#pricing" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Pricing</a>
             <ButtonSignin text="Sign in" extraStyle="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors bg-transparent border-0 p-0 min-h-0 h-auto" />
             <Link href="#search" className="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 border-0">
-              Get Started
+              Audit My Profile
             </Link>
           </div>
         </nav>
@@ -55,12 +55,12 @@ export default function LandingPage() {
 
             {/* Heading — staggered entrance */}
             <h1 className="text-5xl md:text-7xl font-bold font-serif text-slate-900 leading-[1.1] tracking-tight mb-6 opacity-0 animate-[slide-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.25s_forwards]">
-              Find out how your Google<br />Business Profile really<br />performs
+              Your Google profile is quietly<br />losing you customers.
             </h1>
 
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed mb-12 opacity-0 animate-[slide-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.4s_forwards]">
-              Get a free, instant audit with actionable tips to attract more local<br className="hidden md:block" />
-              customers. No signup required.
+              See exactly which ones — and why. We scan 50+ ranking factors and hand<br className="hidden md:block" />
+              you a prioritized fix list. Free, no signup.
             </p>
 
             {/* Search Box Area — delayed entrance */}
@@ -124,7 +124,7 @@ export default function LandingPage() {
               <h2 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 mb-4">
                 Your audit in 3 simple steps
               </h2>
-              <p className="text-slate-600 mb-20">No technical skills needed. Takes 30 seconds.</p>
+              <p className="text-slate-600 mb-20">No technical skills needed. A deep scan of 50+ factors, not a quick guess.</p>
             </ScrollReveal>
 
             <div className="relative">
@@ -320,7 +320,7 @@ export default function LandingPage() {
                 {
                   icon: "📸",
                   title: "Not enough photos",
-                  desc: "Businesses with 20+ photos get significantly more direction requests. Most profiles we audit have fewer than 10.",
+                  desc: "Profiles with 20+ photos get more calls and direction requests. We count yours and show you the exact gap to close.",
                   offset: "md:mt-12",
                 },
                 {
@@ -338,6 +338,71 @@ export default function LandingPage() {
                       <p className="text-slate-600 leading-relaxed">
                         {t.desc}
                       </p>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== FOUNDER + TESTIMONIALS (rule 15 founder, rule 29 proof) ===== */}
+        <section className="py-24 px-6 border-t border-slate-200/50">
+          <div className="max-w-6xl mx-auto">
+
+            {/* Founder note + video slot */}
+            <ScrollReveal>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center mb-20">
+                {/* TODO(founder): replace this placeholder with a 60-90s Loom of you
+                    walking through a real audit. A founder face beats any feature list. */}
+                <div className="relative aspect-video rounded-3xl bg-[#2C2B29] flex items-center justify-center overflow-hidden">
+                  <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
+                    <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                  </div>
+                  <span className="absolute bottom-4 left-4 text-xs font-medium text-slate-300">Founder walkthrough — coming soon</span>
+                </div>
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">
+                    Why I built LocalScore
+                  </h2>
+                  {/* TODO(founder): rewrite in your own voice — rule 9, copy only you could write */}
+                  <p className="text-slate-600 leading-relaxed mb-4">
+                    I watched good local businesses lose customers to worse competitors —
+                    not because their service was bad, but because their Google profile was.
+                    Missing photos. Wrong hours. Reviews left hanging.
+                  </p>
+                  <p className="text-slate-600 leading-relaxed">
+                    So I built the tool I wished they had: one honest score, and the exact
+                    list of fixes — in plain English, no agency retainer.
+                  </p>
+                  <p className="mt-6 font-serif font-bold text-slate-900">— Arif, founder</p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Testimonial placeholders — TODO: swap for real quotes before paid traffic */}
+            <ScrollReveal>
+              <h2 className="text-2xl font-bold font-serif text-slate-900 mb-10 text-center">
+                What owners say after their audit
+              </h2>
+            </ScrollReveal>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              {[
+                { quote: "Add a real customer quote here — what changed after they fixed their profile.", name: "Owner name", biz: "Business · City" },
+                { quote: "A second testimonial. Specific numbers (more calls, more reviews) hit hardest.", name: "Owner name", biz: "Business · City" },
+                { quote: "A third. Beta tester or friend is fine to start — collect proof before traffic.", name: "Owner name", biz: "Business · City" },
+              ].map((t, i) => (
+                <ScrollReveal key={i} delay={i + 1}>
+                  <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 h-full flex flex-col">
+                    <div className="flex gap-1 mb-4 text-amber-400">
+                      {[...Array(5)].map((_, s) => (
+                        <svg key={s} className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.05 2.93c.3-.92 1.6-.92 1.9 0l1.4 4.31a1 1 0 00.95.69h4.53c.97 0 1.37 1.24.59 1.81l-3.67 2.67a1 1 0 00-.36 1.12l1.4 4.31c.3.92-.75 1.69-1.54 1.12l-3.66-2.67a1 1 0 00-1.18 0l-3.66 2.67c-.79.57-1.84-.2-1.54-1.12l1.4-4.31a1 1 0 00-.36-1.12L2.07 9.75c-.78-.57-.38-1.81.59-1.81h4.53a1 1 0 00.95-.69l1.4-4.31z" /></svg>
+                      ))}
+                    </div>
+                    <p className="text-slate-600 leading-relaxed flex-grow">&ldquo;{t.quote}&rdquo;</p>
+                    <div className="mt-6">
+                      <p className="font-bold text-slate-900 text-sm">{t.name}</p>
+                      <p className="text-slate-500 text-sm">{t.biz}</p>
                     </div>
                   </div>
                 </ScrollReveal>
@@ -365,7 +430,7 @@ export default function LandingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                Free audit — no signup required — results in 30 seconds
+                Free audit — no signup required — full 50+ factor scan
               </div>
             </div>
           </section>
@@ -382,7 +447,8 @@ export default function LandingPage() {
                 <span className="text-lg font-bold text-white font-serif">LocalScore</span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed max-w-xs">
-                Helping local businesses dominate their neighborhood on Google Maps.
+                Every day your profile sits unoptimized, a competitor takes the call.
+                LocalScore shows you the fixes — before they do.
               </p>
             </div>
 
@@ -414,7 +480,7 @@ export default function LandingPage() {
 
           <div className="max-w-7xl mx-auto pt-8 border-t border-slate-700 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
             <p>© {new Date().getFullYear()} LocalScore. All rights reserved.</p>
-            <p className="mt-2 md:mt-0">Made with care for local businesses</p>
+            <p className="mt-2 md:mt-0">Know an owner flying blind on Google? Send them their score.</p>
           </div>
         </footer>
       </main>
