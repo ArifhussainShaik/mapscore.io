@@ -7,8 +7,9 @@ export const authOptions = {
     adapter: MongoDBAdapter(clientPromise, { databaseName: "Localscore" }),
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            // Accept either naming so a Vercel/.env mismatch can't silently break OAuth.
+            clientId: process.env.GOOGLE_ID || process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET,
         }),
     ],
     callbacks: {
