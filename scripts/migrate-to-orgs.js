@@ -2,9 +2,9 @@
  * Backfill: create an Organization per User, migrate SavedProfile → Location,
  * and stamp existing Audits with orgId.
  *
- * Usage:
- *   node scripts/migrate-to-orgs.js --dry-run
- *   node scripts/migrate-to-orgs.js
+ * Usage (run via vite-node so the "@/" path alias resolves — plain `node` can't):
+ *   npx vite-node -c vitest.config.js scripts/migrate-to-orgs.js -- --dry-run
+ *   npx vite-node -c vitest.config.js scripts/migrate-to-orgs.js
  *
  * Idempotent: re-running will not duplicate orgs or locations (keyed by
  * ownerUserId and by orgId+googlePlaceId).
