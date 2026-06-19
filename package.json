@@ -7,7 +7,9 @@
     "build": "next build",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.1",
@@ -42,7 +44,9 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@types/react": "19.2.14",
     "daisyui": "^5.0.50",
+    "mongodb-memory-server": "^11.2.0",
     "postcss": "^8.4.49",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.0.0",
+    "vitest": "^4.1.9"
   }
 }
