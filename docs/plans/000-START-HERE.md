@@ -19,6 +19,7 @@ Pivot of Mapscore (single-shot GBP audit tool) → multi-tenant **agency platfor
 
 | Order | Plan file | Pillar |
 |---|---|---|
+| 0 (∥) | `2026-06-19-phase0-UX-design-system.md` | Design system, app shell, rank-color, onboarding (run parallel to B1, before C1) |
 | 1 | `2026-06-19-phase1-B1-multitenancy.md` | Org → Location, tenant scoping, quota, dashboard |
 | 2 | `2026-06-19-phase1-B2-billing.md` | Per-location Dodo subscriptions + quota |
 | 3 | `2026-06-19-phase2-C1-grid-tracking.md` | Geo-grid rank tracking + heatmap (headline) |
@@ -28,7 +29,7 @@ Pivot of Mapscore (single-shot GBP audit tool) → multi-tenant **agency platfor
 | 7 | `2026-06-19-phase5-F-prospecting.md` | Prospecting + compliant outreach |
 | 8 | `2026-06-19-phase6-G-ai-visibility.md` | AI Recommendation Monitor (GEO) |
 
-**Build order is forced** (everything hangs off the `Location` entity from B1): B1 → B2 → C1 → C2 → E → D → F → G.
+**Build order is forced** (everything hangs off the `Location` entity from B1): **Phase 0 (UX) ∥ B1** → B2 → C1 → C2 → E → D → F → G. Phase 0 has no B1 dependency (except its last task touches B1's LocationManager) and **must land before C1** so the heatmap + all screens use the shared design system and `libs/rankColor.js`.
 
 ## How to resume
 
@@ -47,7 +48,7 @@ Pivot of Mapscore (single-shot GBP audit tool) → multi-tenant **agency platfor
 
 - **Apply for Google Business Profile API access NOW** — long-lead gate for Pillar D (posts/scheduler). D ships in draft mode until approved.
 - **Confirm final pricing tier numbers** before B2.
-- **UI/UX:** plans include *functional* UI (DaisyUI dashboard pages/components) but there is **no dedicated UX/design-system/flows plan**. Consider adding one (frontend-design) before or alongside C1, since the heatmap + dashboards are the product's face.
+- **UI/UX:** ✅ addressed — Phase 0 UX/design-system plan written (`2026-06-19-phase0-UX-design-system.md`) from 5-agent competitor + best-practice research. Includes tokens, custom DaisyUI theme, app shell, colorblind-safe rank ramp, white-label report structure, onboarding/CTA standards. Run it parallel to B1, before C1. A `docs/DESIGN-GUIDELINES.md` reference is its first task.
 - Audit model field names referenced in C2/E (`reviewCount`, `averageRating`, etc.) must be reconciled against the real `models/Audit.js` at build.
 
 ## Uncommitted / TODO
