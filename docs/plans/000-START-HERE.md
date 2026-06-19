@@ -12,8 +12,14 @@ Pivot of Mapscore (single-shot GBP audit tool) → multi-tenant **agency platfor
 ## Current state
 
 - **Existing app:** Next.js 15 + MongoDB (Mongoose) + NextAuth v4 + Dodo Payments. Audit engine (Pillar A) is built and mostly launch-ready. Billing is currently **credit-based** (to be replaced by per-location subscriptions in B2).
-- **Planning: COMPLETE.** PRD + 8 phase plans written. **No implementation code written yet** for the new pillars.
-- **Test infra:** none yet (Vitest + mongodb-memory-server is set up in B1 Task 1).
+- **Planning: COMPLETE.** PRD + 8 phase plans written.
+- **Build progress:** ✅ **Phase 0 (UX/design system) + B1 (multi-tenancy) DONE** — merged to `main` 2026-06-19. Next: **B2 (billing)** → C1.
+- **Test infra:** ✅ Vitest + mongodb-memory-server live (`npm test`, 22 tests green).
+
+### Carry-overs before B2 / next session
+- `npm run build` **compiles clean** but page-data collection fails: `MONGODB_URI` is **empty** in `.env.local` (pre-existing — trips `libs/mongo.js`). Set a real URI to finish `npm run build`, run the migration **dry-run** (`node scripts/migrate-to-orgs.js --dry-run`), and do the manual UI smoke (`/dashboard/locations`).
+- Phase 0 Task 8 **dashboard activation checklist deferred to C1** (needs the `GridScan` model).
+- `/dashboard` now wrapped in the sidebar `AppShell` — give it a visual pass against the existing audit page.
 
 ## Plans (all in `docs/plans/`)
 
