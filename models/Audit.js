@@ -7,6 +7,16 @@ const auditSchema = mongoose.Schema(
             type: String,
             index: true,
         },
+        orgId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Organization",
+            index: true,
+        },
+        locationId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Location",
+            index: true,
+        },
         // Business info
         businessName: { type: String, required: true },
         businessAddress: { type: String },

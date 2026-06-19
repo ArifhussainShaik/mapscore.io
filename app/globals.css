@@ -1,8 +1,47 @@
 @import "tailwindcss";
 
-@plugin "daisyui" {
-  themes: light --default;
+@plugin "daisyui";
+
+/* Custom premium theme — de-defaulted (no daisy purple, depth, or noise). */
+@plugin "daisyui/theme" {
+  name: "agency";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #FFFFFF;       /* card surface */
+  --color-base-200: #FAFAFA;       /* page bg */
+  --color-base-300: #E4E4E7;       /* borders */
+  --color-base-content: #18181B;   /* text */
+
+  --color-primary: #4F46E5;        --color-primary-content: #FFFFFF;
+  --color-neutral: #27272A;        --color-neutral-content: #FAFAFA;
+  --color-success: #16A34A;        --color-success-content: #FFFFFF;
+  --color-warning: #D97706;        --color-warning-content: #FFFFFF;
+  --color-error:   #DC2626;        --color-error-content:   #FFFFFF;
+  --color-info:    #2563EB;        --color-info-content:    #FFFFFF;
+
+  --radius-selector: 9999px;
+  --radius-field: 6px;
+  --radius-box: 8px;
+  --border: 1px;
+
+  --depth: 0;   /* removes fake 3D — critical */
+  --noise: 0;   /* removes texture — critical */
 }
+
+/* Optional polished dark theme (a premium signal competitors lack). */
+@plugin "daisyui/theme" {
+  name: "agency-dark";
+  color-scheme: dark;
+  --color-base-100: #18181B;
+  --color-base-200: #09090B;
+  --color-base-300: #27272A;
+  --color-base-content: #FAFAFA;
+  --color-primary: #6366F1;        --color-primary-content: #FFFFFF;
+  --depth: 0; --noise: 0;
+}
+
+body { font-feature-settings: "tnum" 1, "cv11" 1; } /* tabular numbers */
 
 @theme {
   --font-sans: var(--font-sans);
