@@ -13,7 +13,7 @@ Pivot of Mapscore (single-shot GBP audit tool) → multi-tenant **agency platfor
 
 - **Existing app:** Next.js 15 + MongoDB (Mongoose) + NextAuth v4 + Dodo Payments. Audit engine (Pillar A) is built and mostly launch-ready. Billing is currently **credit-based** (to be replaced by per-location subscriptions in B2).
 - **Planning: COMPLETE.** PRD + 8 phase plans written.
-- **Build progress:** ✅ **Phase 0 + B1 + B2 + C1 + C2 + E DONE** — all merged to `main` (E merged 2026-06-20, 62 tests green). Next: **D (AI posts/scheduler/reviews — GATED on Google Business Profile API approval)**.
+- **Build progress:** ✅ **Phase 0 + B1 + B2 + C1 + C2 + E + D DONE** — all merged to `main` (D merged 2026-06-20, 72 tests green). D shipped in **draft mode**: OAuth + publish (gbpClient, gbp routes, publish-posts cron) are gated, need Google Business Profile API approval + token-refresh before going live. Next: **F (prospecting + compliant outreach)**.
 - **Test infra:** ✅ Vitest + mongodb-memory-server live (`npm test`, 22 tests green).
 
 ### Carry-overs before B2 / next session
