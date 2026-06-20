@@ -157,6 +157,43 @@ export function verifyWebhookSignature(rawBody, headers) {
 }
 
 // ─────────────────────────────────────────────
+// Subscriptions (Per-Location Plans)
+// ─────────────────────────────────────────────
+
+/**
+ * Create a Dodo subscription for an organization.
+ * Stamps metadata.orgId so the webhook can link the subscription back.
+ *
+ * @param {{orgId:string, userId:string, productId:string, email:string}} args
+ * @returns {Promise<{checkoutUrl:string, subscriptionId:string}>}
+ */
+export async function createSubscription({ orgId, userId, productId, email }) {
+    const client = getClient();
+
+    if (!client) {
+        console.warn("[Dodo] Not configured — returning mock subscription link");
+        return {
+            checkoutUrl: `${process.env.DODO_PAYMENTS_RETURN_URL || "http://localhost:3000/dashboard"}?mock=1`,
+            subscriptionId: `sub_mock_${Date.now()}`,
+        };
+    }
+
+    const sub = await client.subscriptions.create({
+        billing: { city: "", country: "US", state: "", street: "", zipcode: "" },
+        customer: { email, name: "" },
+        product_id: productId,
+        quantity: 1,
+        return_url: process.env.DODO_PAYMENTS_RETURN_URL || "http://localhost:3000/dashboard/billing",
+        metadata: { orgId, userId },
+    });
+
+    return {
+        checkoutUrl: sub.payment_link || sub.url || "",
+        subscriptionId: sub.subscription_id || sub.id || "",
+    };
+}
+
+// ─────────────────────────────────────────────
 // Plan Helpers (unchanged)
 // ─────────────────────────────────────────────
 
