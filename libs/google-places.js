@@ -85,6 +85,40 @@ export async function getPlaceDetails(placeId) {
 }
 
 /**
+ * Resolve a Google Place ID to its {lat,lng} coordinate.
+ * Uses the Places API (New) details endpoint with a minimal `location` field mask.
+ *
+ * @param {string} placeId - Google Place ID (e.g., "ChIJ...")
+ * @returns {Promise<{lat:number,lng:number}|null>} coordinate, or null if unresolved/unconfigured
+ */
+export async function geocodePlaceId(placeId) {
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey || !placeId) return null;
+
+    const response = await fetch(`${PLACES_API_URL}/${placeId}`, {
+        method: "GET",
+        headers: {
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask": "location",
+            "Content-Type": "application/json",
+        },
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+        console.error(`[GooglePlaces] geocode error (${response.status}) for placeId: ${placeId}`);
+        return null;
+    }
+
+    const place = await response.json();
+    const loc = place?.location;
+    return loc && typeof loc.latitude === "number"
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+}
+
+/**
  * Map Google Places API response to our audit data schema.
  */
 function mapPlaceToAuditData(place, placeId) {
