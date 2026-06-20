@@ -6,6 +6,7 @@ import Location from "@/models/Location";
 import GridScan from "@/models/GridScan";
 import { getCurrentOrg } from "@/libs/tenant";
 import RankGrid from "@/components/RankGrid";
+import GapReport from "@/components/GapReport";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,10 @@ export default async function LocationDetail({ params }) {
       <RankGrid
         locationId={String(location._id)}
         scans={JSON.parse(JSON.stringify(latestByKeyword))}
+      />
+      <GapReport
+        locationId={String(location._id)}
+        keyword={location.tracking?.keywords?.[0]}
       />
     </main>
   );

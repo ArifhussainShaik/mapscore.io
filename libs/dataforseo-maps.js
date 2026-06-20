@@ -40,3 +40,44 @@ export async function scanGrid({ keyword, points, targetPlaceId, locationCode = 
   }
   return ranked;
 }
+
+/**
+ * Fetch the top local-pack listings at a coordinate for a keyword.
+ * @param {{keyword:string, lat:number, lng:number, limit?:number, locationCode?:number}} args
+ * @returns {Promise<Array<{placeId,name,rank,reviewCount,rating,photoCount,category,website}>>}
+ */
+export async function getLocalPack({ keyword, lat, lng, limit = 3, locationCode = 2840 }) {
+  if (!isDataForSEOConfigured()) {
+    return Array.from({ length: limit }, (_, i) => ({
+      placeId: `mock_${i + 1}`,
+      name: `Competitor ${i + 1}`,
+      rank: i + 1,
+      reviewCount: 200 - i * 40,
+      rating: 4.7 - i * 0.1,
+      photoCount: 60 - i * 10,
+      category: "Plumber",
+      website: `https://competitor${i + 1}.example`,
+    }));
+  }
+
+  const posted = await dataforseoFetch(MAPS_POST, [
+    { keyword, location_coordinate: `${lat},${lng},14z`, language_code: "en", location_code: locationCode },
+  ]);
+  const id = posted?.tasks?.[0]?.id;
+  const result = id ? await pollForTask(id, MAPS_GET) : null;
+  const items = result?.tasks?.[0]?.result?.[0]?.items || [];
+
+  return items
+    .filter((it) => it.type === "maps_search" || it.rank_absolute)
+    .slice(0, limit)
+    .map((it) => ({
+      placeId: it.place_id || it.cid,
+      name: it.title,
+      rank: it.rank_absolute,
+      reviewCount: it.rating?.votes_count ?? 0,
+      rating: it.rating?.value ?? null,
+      photoCount: it.photos_count ?? 0,
+      category: it.category || "",
+      website: it.url || it.domain || "",
+    }));
+}
