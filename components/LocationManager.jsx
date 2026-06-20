@@ -21,7 +21,14 @@ export default function LocationManager({ initialLocations, quota }) {
       });
       const data = await res.json();
       if (res.status === 402) {
-        toast.error("Location quota reached — upgrade to add more.");
+        toast((t) => (
+          <span>
+            Location quota reached.{" "}
+            <a className="link link-primary" href="/dashboard/billing" onClick={() => toast.dismiss(t.id)}>
+              Upgrade
+            </a>
+          </span>
+        ));
         return;
       }
       if (!res.ok) throw new Error(data.error || "Failed");
