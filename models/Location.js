@@ -16,6 +16,11 @@ const locationSchema = mongoose.Schema(
     address: String,
     website: String,
 
+    geo: {
+      lat: { type: Number, default: null },
+      lng: { type: Number, default: null },
+    },
+
     managed: { type: Boolean, default: false }, // GBP OAuth connected — features gated, not billing
     latestAuditId: { type: mongoose.Schema.Types.ObjectId, ref: "Audit" },
 
