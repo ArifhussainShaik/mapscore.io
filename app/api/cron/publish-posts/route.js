@@ -14,20 +14,27 @@ export async function GET(req) {
   await connectMongo();
   const due = await Post.find({ status: "scheduled", scheduledFor: { $lte: new Date() } });
   let published = 0;
+  let failed = 0;
   for (const post of due) {
-    const location = await Location.findById(post.locationId);
-    if (!location) continue;
-    const result = await publishPost(location, post);
-    if (result.published) {
-      post.status = "published";
-      post.publishedAt = new Date();
-      post.gbpResult = result.result;
-      published++;
-    } else if (!result.draftOnly) {
-      post.status = "failed";
-      post.gbpResult = { error: result.error };
+    // Isolate each post: one failure must not abort the rest of the batch.
+    try {
+      const location = await Location.findById(post.locationId);
+      if (!location) continue;
+      const result = await publishPost(location, post);
+      if (result.published) {
+        post.status = "published";
+        post.publishedAt = new Date();
+        post.gbpResult = result.result;
+        published++;
+      } else if (!result.draftOnly) {
+        post.status = "failed";
+        post.gbpResult = { error: result.error };
+      }
+      await post.save();
+    } catch (err) {
+      failed++;
+      console.error("[publish-posts] failed for post", String(post._id), err?.message);
     }
-    await post.save();
   }
-  return NextResponse.json({ published });
+  return NextResponse.json({ published, failed });
 }
