@@ -15,6 +15,7 @@ const locationSchema = mongoose.Schema(
     businessName: { type: String, required: true },
     address: String,
     website: String,
+    reportRecipientEmail: { type: String, default: null },
 
     geo: {
       lat: { type: Number, default: null },
