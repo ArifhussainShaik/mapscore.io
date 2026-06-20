@@ -7,6 +7,26 @@
  *   - Integrates with pagespeed.js results
  */
 
+import { checkWebsite as runWebsiteChecks } from "@/libs/pagespeed";
+
+/**
+ * Thin wrapper over pagespeed's checkWebsite that returns the compact signal
+ * shape used by competitor capture / gap analysis.
+ *
+ * @param {string} url
+ * @param {Object} [businessData]
+ * @returns {Promise<{https:boolean|null, loads:boolean|null, mobile:boolean|null, pagespeed:number|null}>}
+ */
+export async function checkWebsite(url, businessData = {}) {
+  const r = await runWebsiteChecks(url, businessData);
+  return {
+    https: r?.httpsValid ?? null,
+    loads: r?.websiteLoads ?? null,
+    mobile: r?.mobileFriendly ?? r?.mobileResponsive ?? null,
+    pagespeed: r?.mobileScore ?? null,
+  };
+}
+
 /**
  * Check for JSON-LD LocalBusiness schema markup on a page.
  *
