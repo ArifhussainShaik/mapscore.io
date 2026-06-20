@@ -5,8 +5,10 @@ import connectMongo from "@/libs/mongoose";
 import Location from "@/models/Location";
 import GridScan from "@/models/GridScan";
 import { getCurrentOrg } from "@/libs/tenant";
+import AiVisibilityCheck from "@/models/AiVisibilityCheck";
 import RankGrid from "@/components/RankGrid";
 import GapReport from "@/components/GapReport";
+import AiVisibility from "@/components/AiVisibility";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +30,15 @@ export default async function LocationDetail({ params }) {
     latestByKeyword.push(s);
   }
 
+  const aiAll = await AiVisibilityCheck.find({ locationId: id }).sort({ createdAt: -1 }).lean();
+  const aiSeen = new Set();
+  const aiLatest = [];
+  for (const c of aiAll) {
+    if (aiSeen.has(c.model)) continue;
+    aiSeen.add(c.model);
+    aiLatest.push(c);
+  }
+
   return (
     <main className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-1">{location.businessName}</h1>
@@ -39,6 +50,10 @@ export default async function LocationDetail({ params }) {
       <GapReport
         locationId={String(location._id)}
         keyword={location.tracking?.keywords?.[0]}
+      />
+      <AiVisibility
+        locationId={String(location._id)}
+        initial={JSON.parse(JSON.stringify(aiLatest))}
       />
     </main>
   );
