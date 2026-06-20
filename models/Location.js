@@ -23,6 +23,13 @@ const locationSchema = mongoose.Schema(
     },
 
     managed: { type: Boolean, default: false }, // GBP OAuth connected — features gated, not billing
+    gbpOAuth: {
+      accessToken: String,
+      refreshToken: String,
+      expiry: Date,
+      accountId: String,            // accounts/{id}
+      locationResourceName: String, // locations/{id}
+    },
     latestAuditId: { type: mongoose.Schema.Types.ObjectId, ref: "Audit" },
 
     tracking: {
