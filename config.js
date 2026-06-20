@@ -45,6 +45,13 @@ const config = {
         ],
       },
     ],
+    // Per-location agency subscription tiers (B2). Quota enforced via libs/billing.js.
+    subscriptionPlans: [
+      { key: "solo", name: "Solo", price: 29, locationQuota: 1, productId: process.env.DODO_PRODUCT_SOLO || "prd_test_solo" },
+      { key: "starter", name: "Starter", price: 50, locationQuota: 3, productId: process.env.DODO_PRODUCT_STARTER_SUB || "prd_test_starter_sub" },
+      { key: "agency", name: "Agency", price: 99, locationQuota: 10, productId: process.env.DODO_PRODUCT_AGENCY_SUB || "prd_test_agency_sub" },
+      { key: "scale", name: "Scale", price: 199, locationQuota: 25, productId: process.env.DODO_PRODUCT_SCALE_SUB || "prd_test_scale_sub" },
+    ],
   },
   aws: {
     bucket: "bucket-name",
