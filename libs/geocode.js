@@ -1,4 +1,4 @@
-import { geocodePlaceId } from "@/libs/google-places";
+import { geocodePlaceId, geocodeText } from "@/libs/google-places";
 
 /**
  * Ensure a location has {lat,lng}. Geocodes by googlePlaceId once, then persists.
@@ -15,5 +15,16 @@ export async function ensureLocationGeo(location) {
   if (!coords) throw new Error("Geocoding failed");
   location.geo = { lat: coords.lat, lng: coords.lng };
   await location.save();
+  return coords;
+}
+
+/**
+ * Geocode a free-text area ("City, State") to {lat,lng}.
+ * @param {string} area
+ * @returns {Promise<{lat:number,lng:number}>}
+ */
+export async function geocodeArea(area) {
+  const coords = await geocodeText(area);
+  if (!coords) throw new Error("Area geocoding failed");
   return coords;
 }

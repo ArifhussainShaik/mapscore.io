@@ -119,6 +119,38 @@ export async function geocodePlaceId(placeId) {
 }
 
 /**
+ * Geocode a free-text query (e.g. "Newark, NJ") to its {lat,lng} coordinate
+ * using the Google Geocoding API.
+ * Mirrors the geocodePlaceId pattern: returns null when unconfigured/unresolved.
+ *
+ * @param {string} query - free-text address or area
+ * @returns {Promise<{lat:number,lng:number}|null>}
+ */
+export async function geocodeText(query) {
+    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
+    if (!apiKey || !query) return null;
+
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&key=${apiKey}`;
+
+    const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+        console.error(`[GooglePlaces] geocodeText error (${response.status}) for query: ${query}`);
+        return null;
+    }
+
+    const data = await response.json();
+    const loc = data?.results?.[0]?.geometry?.location;
+    return loc && typeof loc.lat === "number"
+        ? { lat: loc.lat, lng: loc.lng }
+        : null;
+}
+
+/**
  * Map Google Places API response to our audit data schema.
  */
 function mapPlaceToAuditData(place, placeId) {
