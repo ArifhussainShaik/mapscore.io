@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import BuyCreditsModal from "@/components/BuyCreditsModal";
@@ -107,7 +107,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard icon={MapPin} label="Total Audits" value={audits.length} sub="all locations" />
-        <MetricCard icon={LayoutDashboard} label="Average Score" value={avgScore || "—"} sub="across all audits" />
+        <MetricCard icon={LayoutDashboard} label="Average Score" value={audits.length > 0 ? avgScore : "—"} sub="across all audits" />
         <MetricCard icon={RefreshCw} label="Latest Grade" value={audits[0]?.grade || "—"} sub={audits[0]?.businessName || ""} />
         <MetricCard icon={AlertTriangle} label="Needs Attention" value={needsAttention} sub="score below 60" />
       </div>
