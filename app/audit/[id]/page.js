@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams, useParams } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import AuditReport from "@/components/AuditReport";
 import ScanningProgress from "@/components/ScanningProgress";
@@ -22,6 +23,7 @@ function getSessionKey(id, placeId, businessName) {
 export default function AuditPage() {
     const params = useParams();
     const id = params?.id || "";
+    const { status: authStatus } = useSession();
     const searchParams = useSearchParams();
     const businessName = searchParams.get("business") || "";
     const city = searchParams.get("city") || "";
@@ -81,10 +83,21 @@ export default function AuditPage() {
     }, []);
 
     useEffect(() => {
+        // Wait for NextAuth to resolve the session before deciding what to do.
+        if (authStatus === "loading") return;
         if (fetchStartedRef.current) return;
         fetchStartedRef.current = true;
 
         const sessionKey = getSessionKey(id, placeId, businessName);
+
+        // Redirect anonymous visitors to sign-in, then return to this audit URL.
+        const redirectToSignIn = () => {
+            const callbackUrl =
+                typeof window !== "undefined"
+                    ? window.location.pathname + window.location.search
+                    : `/audit/${id}`;
+            signIn("google", { callbackUrl });
+        };
 
         async function loadAudit() {
             try {
@@ -113,6 +126,13 @@ export default function AuditPage() {
                 }
 
                 // ── Priority 3: Run fresh audit (Queue or Sync) ──
+                // Running an audit requires an authenticated session + credits.
+                if (authStatus !== "authenticated") {
+                    console.log("[Audit] Not signed in — redirecting to sign-in");
+                    redirectToSignIn();
+                    return;
+                }
+
                 console.log(`[Audit] Running fresh audit for: ${businessName}`);
                 const response = await fetch("/api/audit/run", {
                     method: "POST",
@@ -125,6 +145,13 @@ export default function AuditPage() {
                 });
 
                 const data = await response.json().catch(() => ({}));
+
+                if (response.status === 401) {
+                    // Session expired/invalid between the client check and the request.
+                    console.log("[Audit] Server returned 401 — redirecting to sign-in");
+                    redirectToSignIn();
+                    return;
+                }
 
                 if (!response.ok) {
                     throw new Error(data.error || `Audit initialization failed: ${response.status}`);
@@ -149,7 +176,7 @@ export default function AuditPage() {
         }
 
         loadAudit();
-    }, [id, businessName, city, placeId, isDbLoad, loadFullAuditById, saveAuditData, fetchLatestCredits]);
+    }, [id, businessName, city, placeId, isDbLoad, authStatus, loadFullAuditById, saveAuditData, fetchLatestCredits]);
 
     // Polling logic when a job is in queue
     useEffect(() => {
