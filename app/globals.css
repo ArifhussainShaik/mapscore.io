@@ -51,6 +51,7 @@ body { font-feature-settings: "tnum" 1, "cv11" 1; } /* tabular numbers */
   --color-brand-bg: #09090B;        /* zinc-950 app background */
   --color-brand-card: #18181B;      /* zinc-900 */
   --color-brand-border: #27272A;    /* zinc-800 */
+  --color-brand-dark: #09090B;      /* alias to dark base */
   --color-brand-primary: #6366F1;   /* indigo-500 */
   --color-brand-primary-light: #818CF8;
 
