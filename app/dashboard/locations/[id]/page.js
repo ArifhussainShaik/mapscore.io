@@ -3,14 +3,18 @@ import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectMongo from "@/libs/mongoose";
 import Location from "@/models/Location";
+import Audit from "@/models/Audit";
 import GridScan from "@/models/GridScan";
-import { getCurrentOrg } from "@/libs/tenant";
+import CompetitorSnapshot from "@/models/CompetitorSnapshot";
+import Post from "@/models/Post";
+import Report from "@/models/Report";
 import AiVisibilityCheck from "@/models/AiVisibilityCheck";
-import RankGrid from "@/components/RankGrid";
-import GapReport from "@/components/GapReport";
-import AiVisibility from "@/components/AiVisibility";
+import { getCurrentOrg } from "@/libs/tenant";
+import LocationDetailTabs from "@/components/dashboard/LocationDetailTabs";
 
 export const dynamic = "force-dynamic";
+
+const ser = (v) => JSON.parse(JSON.stringify(v));
 
 export default async function LocationDetail({ params }) {
   const session = await getServerSession(authOptions);
@@ -21,40 +25,31 @@ export default async function LocationDetail({ params }) {
   const location = await Location.findOne({ _id: id, orgId: org._id }).lean();
   if (!location) notFound();
 
+  const audit = location.latestAuditId ? await Audit.findById(location.latestAuditId).lean() : null;
+
   const all = await GridScan.find({ locationId: id }).sort({ createdAt: -1 }).lean();
-  const latestByKeyword = [];
   const seen = new Set();
-  for (const s of all) {
-    if (seen.has(s.keyword)) continue;
-    seen.add(s.keyword);
-    latestByKeyword.push(s);
-  }
+  const scans = [];
+  for (const s of all) { if (!seen.has(s.keyword)) { seen.add(s.keyword); scans.push(s); } }
+
+  const snapshot = await CompetitorSnapshot.findOne({ locationId: id }).sort({ createdAt: -1 }).lean();
+  const posts = await Post.find({ locationId: id }).sort({ createdAt: -1 }).lean();
+  const reports = await Report.find({ locationId: id }).sort({ createdAt: -1 }).limit(24).lean();
 
   const aiAll = await AiVisibilityCheck.find({ locationId: id }).sort({ createdAt: -1 }).lean();
   const aiSeen = new Set();
-  const aiLatest = [];
-  for (const c of aiAll) {
-    if (aiSeen.has(c.model)) continue;
-    aiSeen.add(c.model);
-    aiLatest.push(c);
-  }
+  const aiChecks = [];
+  for (const c of aiAll) { if (!aiSeen.has(c.model)) { aiSeen.add(c.model); aiChecks.push(c); } }
 
   return (
-    <main className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-1">{location.businessName}</h1>
-      <p className="opacity-60 mb-6">{location.address}</p>
-      <RankGrid
-        locationId={String(location._id)}
-        scans={JSON.parse(JSON.stringify(latestByKeyword))}
-      />
-      <GapReport
-        locationId={String(location._id)}
-        keyword={location.tracking?.keywords?.[0]}
-      />
-      <AiVisibility
-        locationId={String(location._id)}
-        initial={JSON.parse(JSON.stringify(aiLatest))}
-      />
-    </main>
+    <LocationDetailTabs
+      location={ser(location)}
+      audit={ser(audit)}
+      scans={ser(scans)}
+      snapshot={ser(snapshot)}
+      posts={ser(posts)}
+      reports={ser(reports)}
+      aiChecks={ser(aiChecks)}
+    />
   );
 }
