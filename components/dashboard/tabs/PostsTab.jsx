@@ -42,6 +42,7 @@ export default function PostsTab({ locationId, initialPosts }) {
       });
       if (!res.ok) throw new Error("Failed to generate post");
       const data = await res.json();
+      if (!data?.post) throw new Error("Invalid response from server");
       setPosts((prev) => [data.post, ...prev]);
       toast.success("Post generated successfully");
     } catch (err) {
