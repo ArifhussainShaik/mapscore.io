@@ -127,15 +127,15 @@ export default function SearchBar({ variant = "hero" }) {
         <form onSubmit={handleSubmit} className={`w-full ${isHero ? "max-w-3xl mx-auto" : "max-w-xl"}`}>
             <div
                 className={`flex flex-col sm:flex-row items-center ${isHero
-                    ? "bg-white p-2 rounded-full w-full mx-auto shadow-sm border border-slate-100"
-                    : "p-2 rounded-xl bg-base-200/50 border border-base-content/10 gap-3"
+                    ? "bg-zinc-900/80 p-2 rounded-full w-full mx-auto shadow-lg border border-zinc-700/60"
+                    : "p-2 rounded-xl bg-zinc-800/50 border border-zinc-700 gap-3"
                     }`}
             >
                 {/* Business Name Input with Autocomplete */}
                 <div className="flex-1 relative w-full" ref={wrapperRef}>
                     {isHero ? (
                         <svg
-                            className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-600 z-10"
+                            className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-400 z-10"
                             fill="currentColor"
                             viewBox="0 0 24 24"
                         >
@@ -159,7 +159,7 @@ export default function SearchBar({ variant = "hero" }) {
 
                     {/* Searching spinner */}
                     {isSearching && (
-                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 loading loading-spinner loading-xs z-10 ${isHero ? "text-blue-600" : "text-emerald-400"}`} />
+                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 loading loading-spinner loading-xs z-10 ${isHero ? "text-indigo-400" : "text-emerald-400"}`} />
                     )}
 
                     <input
@@ -173,8 +173,8 @@ export default function SearchBar({ variant = "hero" }) {
                         }}
                         autoComplete="off"
                         className={`w-full focus:outline-none transition-colors ${isHero
-                            ? "h-14 bg-transparent border-0 text-slate-800 placeholder-slate-400 pl-14 pr-12 text-base font-medium"
-                            : "input input-bordered h-12 bg-transparent border-base-content/10 focus:border-emerald-500 pl-10 pr-10"
+                            ? "h-14 bg-transparent border-0 text-zinc-100 placeholder-zinc-500 pl-14 pr-12 text-base font-medium"
+                            : "input input-bordered h-12 bg-transparent border-zinc-700 focus:border-emerald-500 pl-10 pr-10 text-zinc-100 placeholder-zinc-500"
                             }`}
                         required
                     />
@@ -190,7 +190,7 @@ export default function SearchBar({ variant = "hero" }) {
                                 setSuggestions([]);
                                 setShowSuggestions(false);
                             }}
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 p-1 transition-colors ${isHero ? "text-slate-400 hover:text-slate-600" : "text-base-content/40 hover:text-base-content/80"}`}
+                            className={`absolute right-4 top-1/2 -translate-y-1/2 z-10 p-1 transition-colors ${isHero ? "text-zinc-500 hover:text-zinc-300" : "text-zinc-500 hover:text-zinc-300"}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
@@ -200,7 +200,7 @@ export default function SearchBar({ variant = "hero" }) {
 
                     {/* Suggestions Dropdown */}
                     {showSuggestions && suggestions.length > 0 && (
-                        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-[#111827] border border-base-content/10 rounded-xl shadow-2xl overflow-hidden">
+                        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden">
                             {suggestions.map((suggestion, index) => (
                                 <button
                                     key={suggestion.placeId}
@@ -208,26 +208,26 @@ export default function SearchBar({ variant = "hero" }) {
                                     onClick={() => handleSelectSuggestion(suggestion)}
                                     className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors
                                         ${index === activeIndex
-                                            ? "bg-emerald-500/10 border-l-2 border-emerald-400"
-                                            : "hover:bg-base-content/5 border-l-2 border-transparent"
+                                            ? "bg-indigo-500/15 border-l-2 border-indigo-400"
+                                            : "hover:bg-zinc-800 border-l-2 border-transparent"
                                         }
-                                        ${index < suggestions.length - 1 ? "border-b border-base-content/5" : ""}
+                                        ${index < suggestions.length - 1 ? "border-b border-zinc-800" : ""}
                                     `}
                                 >
-                                    <span className="text-emerald-400 mt-0 flex-shrink-0">📍</span>
+                                    <span className="text-indigo-400 mt-0 flex-shrink-0">📍</span>
                                     <div className="min-w-0 flex items-center gap-2">
-                                        <p className="text-sm font-semibold text-white truncate">
+                                        <p className="text-sm font-semibold text-zinc-200 truncate">
                                             {suggestion.name}
                                         </p>
                                         {suggestion.address && (
-                                            <p className="text-xs text-base-content/60 truncate">
+                                            <p className="text-xs text-zinc-500 truncate">
                                                 — {suggestion.address}
                                             </p>
                                         )}
                                     </div>
                                 </button>
                             ))}
-                            <div className="px-4 py-2 text-[10px] text-base-content/30 bg-base-content/3 flex items-center gap-1">
+                            <div className="px-4 py-2 text-[10px] text-zinc-600 bg-zinc-800/50 flex items-center gap-1">
                                 <span>Powered by Google</span>
                             </div>
                         </div>
@@ -235,8 +235,8 @@ export default function SearchBar({ variant = "hero" }) {
 
                     {/* No results state */}
                     {showSuggestions && suggestions.length === 0 && businessName.length >= 3 && !isSearching && (
-                        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-[#111827] border border-base-content/10 rounded-xl shadow-2xl p-4 text-center">
-                            <p className="text-sm text-base-content/50">
+                        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl p-4 text-center">
+                            <p className="text-sm text-zinc-500">
                                 No businesses found on Google Maps. Please refine your search.
                             </p>
                         </div>
@@ -247,7 +247,7 @@ export default function SearchBar({ variant = "hero" }) {
                     type="submit"
                     disabled={isLoading || !placeId}
                     className={`font-bold flex items-center justify-center whitespace-nowrap transition-colors disabled:opacity-50 ${isHero
-                        ? "h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 text-sm sm:text-base w-full sm:w-auto"
+                        ? "h-14 bg-indigo-500 hover:bg-indigo-400 text-white rounded-full px-8 text-sm sm:text-base w-full sm:w-auto"
                         : "btn btn-brand px-6"
                         }`}
                 >

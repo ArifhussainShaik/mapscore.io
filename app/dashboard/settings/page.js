@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectMongo from "@/libs/mongoose";
 import { getCurrentOrg } from "@/libs/tenant";
+import User from "@/models/User";
 import SettingsForm from "@/components/dashboard/SettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,29 @@ export default async function SettingsPage() {
   await connectMongo();
   const org = await getCurrentOrg(session);
 
+  // Enrich members with User name/email/image
+  const rawMembers = org.members || [];
+  const memberIds = rawMembers.map((m) => m.userId).filter(Boolean);
+  const userDocs = memberIds.length
+    ? await User.find({ _id: { $in: memberIds } }).select("name email image").lean()
+    : [];
+  const userMap = {};
+  for (const u of userDocs) {
+    userMap[String(u._id)] = u;
+  }
+  const members = rawMembers.map((m) => {
+    const uid = String(m.userId || "");
+    const u = userMap[uid] || null;
+    return {
+      role: m.role || null,
+      addedAt: m.addedAt ? String(m.addedAt) : null,
+      userId: uid,
+      name: u ? (u.name || null) : null,
+      email: u ? (u.email || null) : null,
+      image: u ? (u.image || null) : null,
+    };
+  });
+
   return (
     <div className="max-w-3xl mx-auto p-6">
       <header className="mb-6">
@@ -22,7 +46,10 @@ export default async function SettingsPage() {
           Manage your organization, branding, team, and notification preferences
         </p>
       </header>
-      <SettingsForm initialOrg={JSON.parse(JSON.stringify(org))} />
+      <SettingsForm
+        initialOrg={JSON.parse(JSON.stringify(org))}
+        members={members}
+      />
     </div>
   );
 }

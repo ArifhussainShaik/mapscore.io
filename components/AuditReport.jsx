@@ -14,12 +14,38 @@ import ProfileActivity from "./ProfileActivity";
 import { useState } from "react";
 import { IS_TESTING_MODE } from "@/libs/config";
 
-export default function AuditReport({ audit, isPro = false, creditsReady = true }) {
+export default function AuditReport({ audit, isPro = false, creditsReady = true, pdf = false }) {
     // Shared unlock state — both paywall gates read this so unlocking one unlocks all
     const [isUnlocked, setIsUnlocked] = useState(audit?.isUnlocked || false);
     const handleUnlock = () => setIsUnlocked(true);
 
     if (!audit) return null;
+
+    // Class helpers — pdf=true preserves original light classes; pdf=false uses dark theme
+    const cx = {
+        outerBg:       pdf ? "bg-[#F4F2EB]"                                           : "bg-zinc-950",
+        headingPrimary: pdf ? "text-slate-900"                                          : "text-zinc-100",
+        headingBody:   pdf ? "text-slate-600"                                           : "text-zinc-400",
+        textMuted:     pdf ? "text-slate-500"                                           : "text-zinc-400",
+        textBody:      pdf ? "text-slate-700"                                           : "text-zinc-200",
+        card:          pdf ? "bg-white rounded-3xl border border-slate-100 shadow-sm"   : "bg-zinc-900/60 rounded-3xl border border-zinc-800/60",
+        cardNoBorder:  pdf ? "bg-white rounded-3xl border border-slate-100 shadow-sm"   : "bg-zinc-900/60 rounded-3xl border border-zinc-800/60",
+        labelCaps:     pdf ? "text-slate-400"                                           : "text-zinc-500",
+        avatarBg:      pdf ? "bg-slate-100 text-slate-600"                              : "bg-zinc-800 text-zinc-300",
+        avatarText:    pdf ? "text-slate-600"                                           : "text-zinc-300",
+        betaBadge:     pdf ? "bg-blue-100 text-blue-700"                                : "bg-indigo-500/20 text-indigo-300",
+        emptyCard:     pdf ? "bg-white rounded-3xl border border-slate-100 text-slate-500" : "bg-zinc-900/60 rounded-3xl border border-zinc-800/60 text-zinc-500",
+        passCard:      pdf ? "bg-white rounded-3xl border border-slate-100 shadow-sm border-l-[6px] border-l-green-500 grid gap-3" : "bg-zinc-900/60 rounded-3xl border border-zinc-800/60 border-l-[6px] border-l-green-500 grid gap-3",
+        checkIcon:     pdf ? "bg-green-50 text-green-500"                               : "bg-green-900/30 text-green-400",
+        divider:       pdf ? "border-slate-300/50"                                      : "border-zinc-800/50",
+        footerText:    pdf ? "text-slate-500"                                           : "text-zinc-600",
+        sectionHeading: pdf ? "text-2xl font-bold font-serif text-slate-900 flex items-center gap-2 mb-4" : "text-2xl font-bold font-serif text-zinc-100 flex items-center gap-2 mb-4",
+        h2Premium:     pdf ? "text-3xl font-bold font-serif text-slate-900 mb-2"        : "text-3xl font-bold font-serif text-zinc-100 mb-2",
+        h3Premium:     pdf ? "text-2xl font-bold font-serif text-slate-900 mb-4"        : "text-2xl font-bold font-serif text-zinc-100 mb-4",
+        h3PremiumSm:   pdf ? "text-xl font-bold font-serif text-slate-900 mb-4"         : "text-xl font-bold font-serif text-zinc-100 mb-4",
+        h1:            pdf ? "text-4xl md:text-5xl font-bold font-serif text-slate-900 tracking-tight" : "text-4xl md:text-5xl font-bold font-serif text-zinc-100 tracking-tight",
+        strongText:    pdf ? "text-slate-900 font-bold"                                 : "text-zinc-100 font-bold",
+    };
 
     // Grab all issues and sort by severity to get top 5
     const allIssues = (audit.issues || []).sort((a, b) => {
@@ -78,15 +104,15 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
     }
 
     return (
-        <div className="bg-[#F4F2EB] min-h-screen py-16 px-6 font-sans">
+        <div className={`${cx.outerBg} min-h-screen py-16 px-6 font-sans`}>
             <div className="max-w-6xl mx-auto">
                 {/* Header Sequence */}
                 <div className="mb-12">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-                        <h1 className="text-4xl md:text-5xl font-bold font-serif text-slate-900 tracking-tight">
+                        <h1 className={cx.h1}>
                             Your Audit Report
                         </h1>
-                        <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded self-start">
+                        <span className={`px-2.5 py-1 ${cx.betaBadge} text-xs font-bold uppercase tracking-wider rounded self-start`}>
                             Beta
                         </span>
                     </div>
@@ -100,8 +126,8 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                         </div>
                     )}
 
-                    <p className="text-slate-600 text-lg max-w-2xl">
-                        We&apos;ve analyzed <strong className="text-slate-900 font-bold">&apos;{audit.businessName}&apos;</strong> against local competitors. Here is your health check.
+                    <p className={`${cx.headingBody} text-lg max-w-2xl`}>
+                        We&apos;ve analyzed <strong className={cx.strongText}>&apos;{audit.businessName}&apos;</strong> against local competitors. Here is your health check.
                     </p>
                 </div>
 
@@ -120,22 +146,22 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                     <div className="flex flex-col gap-6">
                         {/* Competitor Quick Stats - Real Data */}
                         {audit.competitors && audit.competitors.length > 0 && (
-                            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hidden lg:block">
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Top Competitors</h4>
+                            <div className={`${cx.card} p-6 hidden lg:block`}>
+                                <h4 className={`text-[10px] font-bold uppercase tracking-widest ${cx.labelCaps} mb-4`}>Top Competitors</h4>
                                 <div className="space-y-4">
                                     {audit.competitors.slice(0, 2).map((comp, idx) => {
                                         const initials = comp.name?.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
                                         return (
                                             <div key={idx} className="flex justify-between items-center">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">
+                                                    <div className={`w-8 h-8 rounded-full ${cx.avatarBg} font-bold text-xs flex items-center justify-center`}>
                                                         {initials}
                                                     </div>
-                                                    <span className="text-sm font-semibold text-slate-900 truncate max-w-[150px]">{comp.name}</span>
+                                                    <span className={`text-sm font-semibold ${cx.headingPrimary} truncate max-w-[150px]`}>{comp.name}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-slate-500">⭐ {comp.rating || 'N/A'}</span>
-                                                    <span className="text-xs text-slate-500">({comp.reviewCount || 0})</span>
+                                                    <span className={`text-xs ${cx.textMuted}`}>&#x2B50; {comp.rating || 'N/A'}</span>
+                                                    <span className={`text-xs ${cx.textMuted}`}>({comp.reviewCount || 0})</span>
                                                 </div>
                                             </div>
                                         );
@@ -149,7 +175,7 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                     <div className="flex flex-col gap-8">
                         {/* Critical Issues */}
                         <div>
-                            <h2 className="text-2xl font-bold font-serif text-slate-900 flex items-center gap-2 mb-4">
+                            <h2 className={cx.sectionHeading}>
                                 <span className="w-3 h-3 rounded-full bg-red-500"></span>
                                 Critical Issues ({criticalIssues.length})
                             </h2>
@@ -159,7 +185,7 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                                         <IssueCard key={issue.id || i} issue={issue} defaultExpanded={i === 0} />
                                     ))
                                 ) : (
-                                    <div className="bg-white rounded-3xl p-6 border border-slate-100 text-slate-500">
+                                    <div className={`${cx.emptyCard} p-6`}>
                                         No critical issues found.
                                     </div>
                                 )}
@@ -169,9 +195,9 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                         {/* Warnings */}
                         {(warningIssues.length > 0 || opportunityIssues.length > 0) && (
                             <div>
-                                <h2 className="text-2xl font-bold font-serif text-slate-900 flex items-center gap-2 mb-4">
+                                <h2 className={cx.sectionHeading}>
                                     <span className="w-3 h-3 rounded-full bg-amber-500"></span>
-                                    Warnings & Opportunities ({warningIssues.length + opportunityIssues.length})
+                                    Warnings &amp; Opportunities ({warningIssues.length + opportunityIssues.length})
                                 </h2>
                                 <div className="space-y-4">
                                     {[...warningIssues, ...opportunityIssues].map((issue, i) => (
@@ -183,19 +209,19 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
 
                         {/* Looking Good */}
                         <div>
-                            <h2 className="text-2xl font-bold font-serif text-slate-900 flex items-center gap-2 mb-4">
+                            <h2 className={cx.sectionHeading}>
                                 <span className="w-3 h-3 rounded-full bg-green-500"></span>
                                 Looking Good ({passedChecks.length})
                             </h2>
-                            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm border-l-[6px] border-l-green-500 grid gap-3">
+                            <div className={`${cx.passCard} p-6`}>
                                 {passedChecks.map((check, i) => (
                                     <div key={i} className="flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-green-50 text-green-500 flex items-center justify-center shrink-0">
+                                        <div className={`w-6 h-6 rounded-full ${cx.checkIcon} flex items-center justify-center shrink-0`}>
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-700">{check}</span>
+                                        <span className={`text-sm font-semibold ${cx.textBody}`}>{check}</span>
                                     </div>
                                 ))}
                             </div>
@@ -239,10 +265,10 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                     <>
                         {/* Revenue Impact - PREMIUM FEATURE #2 */}
                         <div className="mt-16">
-                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                            <h2 className={cx.h2Premium}>
                                 Revenue Impact Analysis
                             </h2>
-                            <p className="text-slate-600 mb-6">
+                            <p className={`${cx.headingBody} mb-6`}>
                                 Understand the financial impact of your current profile performance
                             </p>
                             <RevenueImpact audit={audit} />
@@ -250,10 +276,10 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
 
                         {/* Review Sentiment - PREMIUM FEATURE #1 */}
                         <div className="mt-16">
-                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                            <h2 className={cx.h2Premium}>
                                 Customer Sentiment Analysis
                             </h2>
-                            <p className="text-slate-600 mb-6">
+                            <p className={`${cx.headingBody} mb-6`}>
                                 Deep dive into how customers feel about your business
                             </p>
                             <ReviewSentiment audit={audit} />
@@ -261,10 +287,10 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
 
                         {/* Premium Features Grid: NAP, SEO Checklist, Benchmarks */}
                         <div className="mt-16">
-                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                            <h2 className={cx.h2Premium}>
                                 Advanced Diagnostics
                             </h2>
-                            <p className="text-slate-600 mb-6">
+                            <p className={`${cx.headingBody} mb-6`}>
                                 Technical SEO analysis and industry comparisons
                             </p>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -278,10 +304,10 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
 
                         {/* Industry Benchmarks - PREMIUM FEATURE #5 */}
                         <div className="mt-16">
-                            <h2 className="text-3xl font-bold font-serif text-slate-900 mb-2">
+                            <h2 className={cx.h2Premium}>
                                 Industry Benchmarks
                             </h2>
-                            <p className="text-slate-600 mb-6">
+                            <p className={`${cx.headingBody} mb-6`}>
                                 See how you stack up against competitors in your industry
                             </p>
                             <IndustryBenchmarks audit={audit} />
@@ -301,33 +327,33 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                             <div className="space-y-16">
                                 {/* Preview of premium features */}
                                 <div>
-                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                    <h3 className={cx.h3Premium}>
                                         Revenue Impact Analysis
                                     </h3>
                                     <RevenueImpact audit={audit} />
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                    <h3 className={cx.h3Premium}>
                                         Review Sentiment Analysis
                                     </h3>
                                     <ReviewSentiment audit={audit} />
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div>
-                                        <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">
+                                        <h3 className={cx.h3PremiumSm}>
                                             NAP Consistency
                                         </h3>
                                         <NAPChecker audit={audit} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold font-serif text-slate-900 mb-4">
+                                        <h3 className={cx.h3PremiumSm}>
                                             SEO Checklist
                                         </h3>
                                         <SEOChecklist audit={audit} />
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold font-serif text-slate-900 mb-4">
+                                    <h3 className={cx.h3Premium}>
                                         Industry Benchmarks
                                     </h3>
                                     <IndustryBenchmarks audit={audit} />
@@ -338,9 +364,9 @@ export default function AuditReport({ audit, isPro = false, creditsReady = true 
                 )}
 
                 {/* Bottom Footer Area */}
-                <div className="mt-24 pt-8 border-t border-slate-300/50 text-center">
-                    <p className="text-xs text-slate-500">
-                        © {new Date().getFullYear()} LocalScore Analytics. All rights reserved.
+                <div className={`mt-24 pt-8 border-t ${cx.divider} text-center`}>
+                    <p className={`text-xs ${cx.footerText}`}>
+                        &copy; {new Date().getFullYear()} LocalScore Analytics. All rights reserved.
                     </p>
                 </div>
             </div>
