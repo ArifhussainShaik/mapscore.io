@@ -25,6 +25,17 @@ const organizationSchema = mongoose.Schema(
       logoUrl: String,
       primaryColor: String,
       reportDomain: String,
+      accentColor: String,
+    },
+
+    timezone: { type: String, default: "UTC" },
+
+    notificationPrefs: {
+      weeklySummary: { type: Boolean, default: true },
+      scoreChanges: { type: Boolean, default: true },
+      newReviews: { type: Boolean, default: true },
+      reportGeneration: { type: Boolean, default: true },
+      billingReminders: { type: Boolean, default: true },
     },
 
     // Billing (real enforcement arrives in B2; defaults model the free tier)

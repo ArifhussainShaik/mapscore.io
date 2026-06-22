@@ -34,6 +34,10 @@ const reportSchema = mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true } }
 );
 
+reportSchema.virtual("status").get(function () {
+  return this.emailedAt ? "sent" : "generated";
+});
+
 reportSchema.pre("validate", function (next) {
   if (!this.shareToken) this.shareToken = crypto.randomBytes(12).toString("hex");
   next();
