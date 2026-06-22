@@ -47,17 +47,17 @@ body { font-feature-settings: "tnum" 1, "cv11" 1; } /* tabular numbers */
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
 
-  /* Brand colors */
-  --color-brand-emerald: #2563eb;
-  --color-brand-cyan: #3b82f6;
-  --color-brand-dark: #f4f2eb;
-  --color-brand-card: #ffffff;
-  --color-brand-border: #e5e5e5;
+  /* Brand colors (dark) */
+  --color-brand-bg: #09090B;        /* zinc-950 app background */
+  --color-brand-card: #18181B;      /* zinc-900 */
+  --color-brand-border: #27272A;    /* zinc-800 */
+  --color-brand-primary: #6366F1;   /* indigo-500 */
+  --color-brand-primary-light: #818CF8;
 
   /* Score colors */
-  --color-score-a: #10b981;
-  --color-score-b: #3b82f6;
-  --color-score-c: #f59e0b;
+  --color-score-a: #22c55e;
+  --color-score-b: #4ade80;
+  --color-score-c: #eab308;
   --color-score-d: #f97316;
   --color-score-f: #ef4444;
 
@@ -229,7 +229,8 @@ body { font-feature-settings: "tnum" 1, "cv11" 1; } /* tabular numbers */
 html,
 body {
   scroll-behavior: smooth !important;
-  background-color: var(--color-brand-dark);
+  background-color: #09090B;
+  color: #FAFAFA;
 }
 
 progress::-webkit-progress-value {
