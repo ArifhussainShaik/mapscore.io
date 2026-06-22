@@ -32,9 +32,9 @@ export const metadata = getSEOTags({
 
 const TOS = () => {
   return (
-    <main className="max-w-xl mx-auto">
+    <main className="max-w-xl mx-auto min-h-screen bg-zinc-950 text-zinc-100">
       <div className="p-5">
-        <Link href="/" className="btn btn-ghost">
+        <Link href="/" className="btn btn-ghost text-zinc-400 hover:text-zinc-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
@@ -49,12 +49,12 @@ const TOS = () => {
           </svg>
           Back
         </Link>
-        <h1 className="text-3xl font-extrabold pb-6">
+        <h1 className="text-3xl font-extrabold pb-6 text-zinc-100">
           Terms and Conditions for {config.appName}
         </h1>
 
         <pre
-          className="leading-relaxed whitespace-pre-wrap"
+          className="leading-relaxed whitespace-pre-wrap text-zinc-400"
           style={{ fontFamily: "sans-serif" }}
         >
           {`Last Updated: February 15, 2026
