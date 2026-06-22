@@ -21,7 +21,7 @@ export default async function PricingPage() {
 
     // Reusable UI Features component
     const PackFeatures = () => (
-        <ul className="space-y-4 mb-8 text-left text-sm text-slate-700">
+        <ul className="space-y-4 mb-8 text-left text-sm text-zinc-400">
             {[
                 "100-Point Audit Report",
                 "Competitor Comparison Table",
@@ -42,22 +42,22 @@ export default async function PricingPage() {
     );
 
     return (
-        <div className="bg-[#F4F2EB] min-h-screen py-20 px-6 font-sans">
+        <div className="bg-zinc-950 min-h-screen py-20 px-6 font-sans">
             <div className="max-w-7xl mx-auto text-center">
                 {/* Header */}
-                <h1 className="text-4xl md:text-5xl font-black font-serif text-slate-900 mb-4 tracking-tight">
+                <h1 className="text-4xl md:text-5xl font-black font-serif text-zinc-100 mb-4 tracking-tight">
                     Simple, pay-as-you-go pricing.
                 </h1>
-                <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
+                <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">
                     Buy audit credits now, use them anytime. 1 Credit = 1 Full Audit Unlock.
                 </p>
 
                 {/* Logged in state */}
                 {session && (
-                    <div className="mb-12 inline-flex items-center gap-3 px-6 py-3 bg-white rounded-full border border-slate-200 shadow-sm">
+                    <div className="mb-12 inline-flex items-center gap-3 px-6 py-3 bg-zinc-900 rounded-full border border-zinc-800 shadow-sm">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span className="font-medium text-slate-700">Your current balance:</span>
-                        <span className="font-bold text-lg text-slate-900">{currentBalance} Credits</span>
+                        <span className="font-medium text-zinc-300">Your current balance:</span>
+                        <span className="font-bold text-lg text-zinc-100">{currentBalance} Credits</span>
                     </div>
                 )}
 
@@ -65,20 +65,20 @@ export default async function PricingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
 
                     {/* Starter Pack */}
-                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative flex flex-col h-full text-left">
+                    <div className="bg-zinc-900/60 rounded-3xl p-8 border border-zinc-800/60 relative flex flex-col h-full text-left">
                         <div className="mb-6">
-                            <h3 className="text-2xl font-bold font-serif tracking-tight text-slate-900">Starter Pack</h3>
-                            <p className="text-slate-500 text-sm mt-1">Perfect for solo freelancers.</p>
+                            <h3 className="text-2xl font-bold font-serif tracking-tight text-zinc-100">Starter Pack</h3>
+                            <p className="text-zinc-500 text-sm mt-1">Perfect for solo freelancers.</p>
                         </div>
                         <div className="mb-4">
-                            <span className="text-5xl font-black text-slate-900 tracking-tight">$9</span>
-                            <span className="text-slate-500 font-medium"> / pack</span>
+                            <span className="text-5xl font-black text-zinc-100 tracking-tight">$9</span>
+                            <span className="text-zinc-500 font-medium"> / pack</span>
                         </div>
                         <div className="mb-8">
-                            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 font-bold text-xs uppercase tracking-wider rounded-lg border border-blue-100 mb-2">
+                            <span className="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-400 font-bold text-xs uppercase tracking-wider rounded-lg border border-indigo-500/20 mb-2">
                                 3 Credits
                             </span>
-                            <p className="text-sm font-semibold text-slate-500">Only $3.00 per audit</p>
+                            <p className="text-sm font-semibold text-zinc-500">Only $3.00 per audit</p>
                         </div>
 
                         <div className="flex-grow">
@@ -88,30 +88,30 @@ export default async function PricingPage() {
                         <a
                             href={!session ? "/login" : DODO_STARTER_URL ? `${DODO_STARTER_URL}?sub=${session.user.email}` : undefined}
                             aria-disabled={session && !DODO_STARTER_URL}
-                            className={`btn btn-block bg-slate-900 hover:bg-slate-800 text-white border-none rounded-xl font-bold mt-auto ${session && !DODO_STARTER_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                            className={`btn btn-block bg-zinc-700 hover:bg-zinc-600 text-zinc-100 border-none rounded-xl font-bold mt-auto ${session && !DODO_STARTER_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
                             {!session ? "Login to Buy" : DODO_STARTER_URL ? "Buy 3 Credits" : "Coming Soon"}
                         </a>
                     </div>
 
                     {/* Growth Pack (Highlighted) */}
-                    <div className="bg-white rounded-3xl p-8 border-2 border-slate-900 shadow-2xl relative flex flex-col h-[105%] z-10 text-left transform md:-translate-y-4">
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+                    <div className="bg-zinc-900 rounded-3xl p-8 border-2 border-indigo-500 shadow-2xl shadow-indigo-500/10 relative flex flex-col h-[105%] z-10 text-left transform md:-translate-y-4">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-indigo-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
                             Most Popular
                         </div>
                         <div className="mb-6">
-                            <h3 className="text-2xl font-bold font-serif tracking-tight text-slate-900">Growth Pack</h3>
-                            <p className="text-slate-500 text-sm mt-1">Best value for growing agencies.</p>
+                            <h3 className="text-2xl font-bold font-serif tracking-tight text-zinc-100">Growth Pack</h3>
+                            <p className="text-zinc-500 text-sm mt-1">Best value for growing agencies.</p>
                         </div>
                         <div className="mb-4">
-                            <span className="text-5xl font-black text-slate-900 tracking-tight">$19</span>
-                            <span className="text-slate-500 font-medium"> / pack</span>
+                            <span className="text-5xl font-black text-zinc-100 tracking-tight">$19</span>
+                            <span className="text-zinc-500 font-medium"> / pack</span>
                         </div>
                         <div className="mb-8">
-                            <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs uppercase tracking-wider rounded-lg border border-emerald-100 mb-2">
+                            <span className="inline-block px-3 py-1 bg-emerald-500/10 text-emerald-400 font-bold text-xs uppercase tracking-wider rounded-lg border border-emerald-500/20 mb-2">
                                 10 Credits
                             </span>
-                            <p className="text-sm font-semibold text-emerald-600">Only $1.90 per audit</p>
+                            <p className="text-sm font-semibold text-emerald-400">Only $1.90 per audit</p>
                         </div>
 
                         <div className="flex-grow">
@@ -121,27 +121,27 @@ export default async function PricingPage() {
                         <a
                             href={!session ? "/login" : DODO_GROWTH_URL ? `${DODO_GROWTH_URL}?sub=${session.user.email}` : undefined}
                             aria-disabled={session && !DODO_GROWTH_URL}
-                            className={`btn btn-block bg-emerald-500 hover:bg-emerald-600 text-white border-none rounded-xl font-bold text-lg mt-auto shadow-lg shadow-emerald-500/30 ${session && !DODO_GROWTH_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                            className={`btn btn-block bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-xl font-bold text-lg mt-auto shadow-lg shadow-indigo-500/30 ${session && !DODO_GROWTH_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
                             {!session ? "Login to Buy" : DODO_GROWTH_URL ? "Buy 10 Credits" : "Coming Soon"}
                         </a>
                     </div>
 
                     {/* Agency Pack */}
-                    <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative flex flex-col h-full text-left">
+                    <div className="bg-zinc-900/60 rounded-3xl p-8 border border-zinc-800/60 relative flex flex-col h-full text-left">
                         <div className="mb-6">
-                            <h3 className="text-2xl font-bold font-serif tracking-tight text-slate-900">Agency Pack</h3>
-                            <p className="text-slate-500 text-sm mt-1">For high-volume prospecting.</p>
+                            <h3 className="text-2xl font-bold font-serif tracking-tight text-zinc-100">Agency Pack</h3>
+                            <p className="text-zinc-500 text-sm mt-1">For high-volume prospecting.</p>
                         </div>
                         <div className="mb-4">
-                            <span className="text-5xl font-black text-slate-900 tracking-tight">$49</span>
-                            <span className="text-slate-500 font-medium"> / pack</span>
+                            <span className="text-5xl font-black text-zinc-100 tracking-tight">$49</span>
+                            <span className="text-zinc-500 font-medium"> / pack</span>
                         </div>
                         <div className="mb-8">
-                            <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 font-bold text-xs uppercase tracking-wider rounded-lg border border-purple-100 mb-2">
+                            <span className="inline-block px-3 py-1 bg-purple-500/10 text-purple-400 font-bold text-xs uppercase tracking-wider rounded-lg border border-purple-500/20 mb-2">
                                 30 Credits
                             </span>
-                            <p className="text-sm font-semibold text-slate-500">Only $1.63 per audit</p>
+                            <p className="text-sm font-semibold text-zinc-500">Only $1.63 per audit</p>
                         </div>
 
                         <div className="flex-grow">
@@ -151,7 +151,7 @@ export default async function PricingPage() {
                         <a
                             href={!session ? "/login" : DODO_AGENCY_URL ? `${DODO_AGENCY_URL}?sub=${session.user.email}` : undefined}
                             aria-disabled={session && !DODO_AGENCY_URL}
-                            className={`btn btn-block bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 rounded-xl font-bold mt-auto ${session && !DODO_AGENCY_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+                            className={`btn btn-block bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 rounded-xl font-bold mt-auto ${session && !DODO_AGENCY_URL ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
                         >
                             {!session ? "Login to Buy" : DODO_AGENCY_URL ? "Buy 30 Credits" : "Coming Soon"}
                         </a>
@@ -161,19 +161,19 @@ export default async function PricingPage() {
 
                 {/* FAQ Section */}
                 <div className="max-w-3xl mx-auto mt-24 text-left">
-                    <h3 className="text-3xl font-bold font-serif text-slate-900 mb-8 tracking-tight text-center">Frequently Asked Questions</h3>
+                    <h3 className="text-3xl font-bold font-serif text-zinc-100 mb-8 tracking-tight text-center">Frequently Asked Questions</h3>
                     <div className="space-y-6">
-                        <div className="bg-white p-6 rounded-2xl border border-slate-100">
-                            <h4 className="font-bold text-slate-900 mb-2">Do credits expire?</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">Yes. All purchased credits are valid for exactly one year (365 days) from the date of purchase. We use a &quot;First In, First Out&quot; (FIFO) system, meaning the oldest credits in your account are automatically used first.</p>
+                        <div className="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800/60">
+                            <h4 className="font-bold text-zinc-100 mb-2">Do credits expire?</h4>
+                            <p className="text-zinc-400 text-sm leading-relaxed">Yes. All purchased credits are valid for exactly one year (365 days) from the date of purchase. We use a &quot;First In, First Out&quot; (FIFO) system, meaning the oldest credits in your account are automatically used first.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-100">
-                            <h4 className="font-bold text-slate-900 mb-2">What does &quot;1 Credit&quot; actually unlock?</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">A single credit permanently unlocks a full, 100-point LocalScore audit report. This grants you unlimited access to view that specific business&apos;s competitor comparison table, revenue impact calculator, PDF export feature, and priority action plan. Free preview reports cost 0 credits.</p>
+                        <div className="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800/60">
+                            <h4 className="font-bold text-zinc-100 mb-2">What does &quot;1 Credit&quot; actually unlock?</h4>
+                            <p className="text-zinc-400 text-sm leading-relaxed">A single credit permanently unlocks a full, 100-point LocalScore audit report. This grants you unlimited access to view that specific business&apos;s competitor comparison table, revenue impact calculator, PDF export feature, and priority action plan. Free preview reports cost 0 credits.</p>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl border border-slate-100">
-                            <h4 className="font-bold text-slate-900 mb-2">Is this a monthly subscription?</h4>
-                            <p className="text-slate-600 text-sm leading-relaxed">No. We operate purely on a Pay-As-You-Go model. You will only be billed once for the pack you select. There are no recurring monthly charges or hidden fees.</p>
+                        <div className="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800/60">
+                            <h4 className="font-bold text-zinc-100 mb-2">Is this a monthly subscription?</h4>
+                            <p className="text-zinc-400 text-sm leading-relaxed">No. We operate purely on a Pay-As-You-Go model. You will only be billed once for the pack you select. There are no recurring monthly charges or hidden fees.</p>
                         </div>
                     </div>
                 </div>

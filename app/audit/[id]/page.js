@@ -227,22 +227,21 @@ export default function AuditPage() {
 
     if (error) {
         return (
-            <main className="min-h-screen bg-[var(--color-brand-dark)] flex items-center justify-center px-4">
-                <div className="glass-card p-8 max-w-md w-full text-center">
-                    <span className="text-5xl mb-4 block">⚠️</span>
-                    <h1 className="text-xl font-bold text-white mb-2">Audit Failed</h1>
-                    <p className="text-base-content/50 text-sm mb-6">{error}</p>
-                    <Link href="/" className="btn btn-brand btn-sm">← Try Again</Link>
+            <main className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+                <div className="bg-zinc-900/70 backdrop-blur-sm border border-zinc-800/60 rounded-2xl p-8 max-w-md w-full text-center">
+                    <h1 className="text-xl font-bold text-zinc-100 mb-2">Audit Failed</h1>
+                    <p className="text-zinc-500 text-sm mb-6">{error}</p>
+                    <Link href="/" className="btn btn-brand btn-sm">Try Again</Link>
                 </div>
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen bg-[var(--color-brand-dark)] py-8 px-4">
+        <main className="min-h-screen bg-zinc-950 py-8 px-4">
             {/* Top bar */}
             <div className="max-w-5xl mx-auto mb-8 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors">
+                <Link href="/" className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
@@ -251,14 +250,14 @@ export default function AuditPage() {
                 <div className="flex items-center gap-3">
                     {auditData?.dataSource && !auditData.dataSource.includes("mock") && (
                         <span className="badge badge-sm bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
-                            ✓ Live Data
+                            Live Data
                         </span>
                     )}
-                    <span className="text-xs text-base-content/40">
+                    <span className="text-xs text-zinc-500">
                         Scanned {new Date(auditData?.createdAt).toLocaleDateString()}
                     </span>
-                    <Link href={`/audit/${auditData?.id || auditData?._id}/pdf`} className="btn btn-sm btn-outline border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
-                        📥 Download PDF
+                    <Link href={`/audit/${auditData?.id || auditData?._id}/pdf`} className="btn btn-sm btn-outline border-zinc-700 text-zinc-400 hover:bg-zinc-800">
+                        Download PDF
                     </Link>
                 </div>
             </div>
