@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
+import { Plus, Trash2 } from "lucide-react";
 import EmptyState from "@/components/ui/EmptyState";
 
 export default function LocationManager({ initialLocations, quota }) {
@@ -24,7 +26,7 @@ export default function LocationManager({ initialLocations, quota }) {
         toast((t) => (
           <span>
             Location quota reached.{" "}
-            <a className="link link-primary" href="/dashboard/billing" onClick={() => toast.dismiss(t.id)}>
+            <a className="underline text-indigo-400" href="/dashboard/billing" onClick={() => toast.dismiss(t.id)}>
               Upgrade
             </a>
           </span>
@@ -60,17 +62,22 @@ export default function LocationManager({ initialLocations, quota }) {
 
   return (
     <div>
+      {/* Add form */}
       <form onSubmit={addLocation} className="flex gap-2 mb-6">
         <input
           id="first-location-input"
-          className="input input-bordered flex-1"
+          className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2 text-[13px] text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50"
           placeholder="Business name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           disabled={busy || atQuota}
         />
-        <button className="btn btn-primary" disabled={busy || atQuota}>
-          {busy ? "Adding…" : atQuota ? "Quota reached" : "Add location"}
+        <button
+          type="submit"
+          className="px-3 py-1.5 text-[12px] bg-indigo-500 text-white rounded-lg hover:bg-indigo-400 disabled:opacity-50"
+          disabled={busy || atQuota}
+        >
+          {busy ? "Adding..." : atQuota ? "Quota reached" : "Add location"}
         </button>
       </form>
 
@@ -81,7 +88,7 @@ export default function LocationManager({ initialLocations, quota }) {
           description="Track local rankings, audits, and competitors for a business location."
           action={
             <button
-              className="btn btn-primary h-12 px-6"
+              className="px-4 py-2 text-[13px] bg-indigo-500 text-white rounded-lg hover:bg-indigo-400 disabled:opacity-50"
               disabled={busy || atQuota}
               onClick={() => document.getElementById("first-location-input")?.focus()}
             >
@@ -90,30 +97,75 @@ export default function LocationManager({ initialLocations, quota }) {
           }
           secondary={
             <button
-              className="btn btn-ghost"
+              className="px-4 py-2 text-[13px] text-zinc-400 hover:text-zinc-200 disabled:opacity-50"
               disabled={busy || atQuota}
               onClick={() => createLocation("Sample Coffee Co.")}
             >
-              {busy ? "Adding…" : "Try a sample location"}
+              {busy ? "Adding..." : "Try a sample location"}
             </button>
           }
         />
       ) : (
-        <ul className="divide-y">
-          {locations.map((loc) => (
-            <li key={loc.id || loc._id} className="flex items-center justify-between py-3">
-              <div>
-                <p className="font-medium">{loc.businessName}</p>
-                <p className="text-sm opacity-60">
-                  {loc.tracking?.keywords?.length || 0} keywords · {loc.status}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {locations.map((loc) => {
+            const locId = loc.id || loc._id;
+            const isActive = loc.status === "active";
+            return (
+              <div
+                key={locId}
+                className="bg-zinc-900/60 border border-zinc-800/60 rounded-xl p-5 flex flex-col gap-3"
+              >
+                {/* Header row: status dot + name + delete */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span
+                      className={`w-2 h-2 rounded-full flex-shrink-0 mt-[3px] ${
+                        isActive ? "bg-emerald-500" : "bg-zinc-600"
+                      }`}
+                    />
+                    <Link
+                      href={`/dashboard/locations/${locId}`}
+                      className="text-zinc-100 font-semibold hover:text-indigo-400 truncate text-[14px] leading-snug"
+                    >
+                      {loc.businessName}
+                    </Link>
+                  </div>
+                  <button
+                    onClick={() => removeLocation(locId)}
+                    className="flex-shrink-0 text-zinc-500 hover:text-red-400 transition-colors"
+                    aria-label={`Delete ${loc.businessName}`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+
+                {/* Address */}
+                {loc.address && (
+                  <p className="text-[12px] text-zinc-500 truncate">{loc.address}</p>
+                )}
+
+                {/* Keywords + status */}
+                <p className="text-[11px] text-zinc-500">
+                  {loc.tracking?.keywords?.length || 0} keywords &middot; {loc.status}
                 </p>
+
+                {/* Score placeholder — score not yet populated in location objects */}
+                <p className="text-[13px] text-zinc-600 font-mono">&#8212;</p>
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={() => removeLocation(loc.id || loc._id)}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+
+          {/* Dashed "Add location" card */}
+          <button
+            type="button"
+            onClick={() => document.getElementById("first-location-input")?.focus()}
+            disabled={atQuota}
+            className="border border-dashed border-zinc-700 rounded-xl p-5 flex items-center justify-center gap-2 text-zinc-500 hover:text-indigo-400 hover:border-indigo-500/50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Plus size={16} />
+            <span className="text-[13px]">Add location</span>
+          </button>
+        </div>
       )}
     </div>
   );

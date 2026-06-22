@@ -18,10 +18,10 @@ export default async function LocationsPage() {
   const locationsUsed = locations.filter((l) => l.status === "active").length;
 
   return (
-    <main className="max-w-4xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <header className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Locations</h1>
-        <span className="badge badge-neutral">
+        <h1 className="text-xl font-bold text-zinc-100">All Locations</h1>
+        <span className="text-[12px] text-zinc-400">
           {locationsUsed} / {org.locationQuota} used
         </span>
       </header>
@@ -29,6 +29,6 @@ export default async function LocationsPage() {
         initialLocations={JSON.parse(JSON.stringify(locations))}
         quota={org.locationQuota}
       />
-    </main>
+    </div>
   );
 }
