@@ -16,7 +16,7 @@ async function loadPlan() {
     const org = await getCurrentOrg(session);
     const used = await Location.countDocuments({ orgId: org._id, status: { $ne: "paused" } });
     return { name: org.plan || "free", quota: org.locationQuota || 1, used };
-  } catch { return null; }
+  } catch (err) { console.error("[AppShell] loadPlan failed:", err); return null; }
 }
 
 export default async function AppShell({ children }) {

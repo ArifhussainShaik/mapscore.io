@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import BuyCreditsModal from "@/components/BuyCreditsModal";
@@ -11,6 +12,7 @@ import ScoreBadge from "@/components/dashboard/ScoreBadge";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [audits, setAudits] = useState([]);
   const [isLoadingAudits, setIsLoadingAudits] = useState(true);
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
@@ -158,7 +160,7 @@ export default function Dashboard() {
             <tbody>
               {audits.map((a) => (
                 <tr key={a.id || a._id}
-                  onClick={() => (window.location.href = `/audit/${a.id || a._id}`)}
+                  onClick={() => router.push(`/audit/${a.id || a._id}`)}
                   className="border-b border-zinc-800/30 hover:bg-zinc-800/20 cursor-pointer transition-colors">
                   <td className="px-5 py-3">
                     <p className="text-[13px] text-zinc-200 font-medium">{a.businessName}</p>
