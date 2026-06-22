@@ -59,7 +59,7 @@ export default function AiVisibility({ locationId, initial }) {
                 {c.mentioned ? "Mentioned" : "Not mentioned"}
               </span>
               {c.snippet ? (
-                <span className="text-xs text-zinc-500 truncate">"{c.snippet}"</span>
+                <span className="text-xs text-zinc-500 truncate">&quot;{c.snippet}&quot;</span>
               ) : null}
             </li>
           ))}
